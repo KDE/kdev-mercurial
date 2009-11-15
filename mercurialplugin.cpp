@@ -45,7 +45,7 @@
 #include <vcs/vcsrevision.h>
 #include <vcs/vcsannotation.h>
 #include <vcs/dvcs/dvcsjob.h>
-#include <shell/core.h>
+#include <interfaces/icore.h>
 
 
 K_PLUGIN_FACTORY(KDevMercurialFactory, registerPlugin<MercurialPlugin>();)
@@ -60,8 +60,7 @@ MercurialPlugin::MercurialPlugin(QObject *parent, const QVariantList &)
     KDEV_USE_EXTENSION_INTERFACE(KDevelop::IDistributedVersionControl)
 
     core()->uiController()->addToolView(i18n("Mercurial"), dvcsViewFactory());
-    if (!(KDevelop::Core::self()->setupFlags() & KDevelop::Core::NoUi))
-        setXMLFile("kdevmercurial.rc");
+    setXMLFile("kdevmercurial.rc");
 }
 
 MercurialPlugin::~MercurialPlugin()

@@ -22,9 +22,9 @@ if (MERCURIAL)
 	target_link_libraries(kdevmercurial-test
 		${QT_QTTEST_LIBRARY}
 		${KDE4_KDECORE_LIBS}
-        kdevplatformutil
-        kdevplatformvcs
-        kdevplatformtests
+                ${KDEVPLATFORM_UTIL_LIBRARIES}
+                ${KDEVPLATFORM_VCS_LIBRARIES}
+                ${KDEVPLATFORM_TESTS_LIBRARIES}
 	)
 endif (MERCURIAL)
 
