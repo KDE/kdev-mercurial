@@ -346,7 +346,7 @@ bool MercurialPlugin::parseStatus(DVcsJob *job) const
     }
 
     const QString dir = job->getDirectory().absolutePath().append(QDir::separator());
-    const QStringList output = QString::fromUtf8(job->rawOutput()).split('\n', QString::SkipEmptyParts);
+    const QStringList output = job->output().split('\n', QString::SkipEmptyParts);
     QList<QVariant> filestatus;
     foreach(const QString &line, output) {
         QChar stCh = line.at(0);
