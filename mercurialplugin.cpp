@@ -346,7 +346,7 @@ bool MercurialPlugin::parseStatus(DVcsJob *job) const
     }
 
     const QString dir = job->getDirectory().absolutePath().append(QDir::separator());
-    const QStringList output = job->output().split('\n', QString::SkipEmptyParts);
+    const QStringList output = QString::fromUtf8(job->rawOutput()).split('\n', QString::SkipEmptyParts);
     QList<QVariant> filestatus;
     foreach(const QString &line, output) {
         QChar stCh = line.at(0);
@@ -630,16 +630,16 @@ void MercurialPlugin::parseLogOutputBasicVersionControl(DVcsJob* job) const
     qlonglong lastId;
 
     while (rbegin != rend) {
-        QString rev = *rbegin++;
-        QString node = *rbegin++;
-        QString parents = *rbegin++;
-        QString author = *rbegin++;
-        QString date = *rbegin++;
-        QString desc = *rbegin++;
-        QString mods = *rbegin++;
-        QString adds = *rbegin++;
-        QString dels = *rbegin++;
-        QString copies = *rbegin++;
+        QString rev = QString::fromLocal8Bit(*rbegin++);
+        QString node = QString::fromLocal8Bit(*rbegin++);
+        QString parents = QString::fromLocal8Bit(*rbegin++);
+        QString author = QString::fromLocal8Bit(*rbegin++);
+        QString date = QString::fromLocal8Bit(*rbegin++);
+        QString desc = QString::fromLocal8Bit(*rbegin++);
+        QString mods = QString::fromLocal8Bit(*rbegin++);
+        QString adds = QString::fromLocal8Bit(*rbegin++);
+        QString dels = QString::fromLocal8Bit(*rbegin++);
+        QString copies = QString::fromLocal8Bit(*rbegin++);
         lastId = id;
         id = rev.toLongLong(&success);
 
@@ -726,12 +726,12 @@ void MercurialPlugin::parseLogOutput(const DVcsJob * job, QList<DVcsEvent>& comm
     unsigned int lastId;
 
     while (rbegin != rend) {
-        QString rev = *rbegin++;
-        QString node = *rbegin++;
-        QString parents = *rbegin++;
-        QString author = *rbegin++;
-        QString date = *rbegin++;
-        QString desc = *rbegin++;
+        QString rev = QString::fromLocal8Bit(*rbegin++);
+        QString node = QString::fromLocal8Bit(*rbegin++);
+        QString parents = QString::fromLocal8Bit(*rbegin++);
+        QString author = QString::fromLocal8Bit(*rbegin++);
+        QString date = QString::fromLocal8Bit(*rbegin++);
+        QString desc = QString::fromLocal8Bit(*rbegin++);
         lastId = id;
         id = rev.toUInt(&success);
 
