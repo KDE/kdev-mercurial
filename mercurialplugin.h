@@ -119,13 +119,13 @@ protected slots:
     void parseLogOutputBasicVersionControl(DVcsJob *job) const;
     bool parseStatus(DVcsJob *job) const;
     bool parseAnnotations(DVcsJob *job) const;
-    void parseDiff(DVcsJob *job) const;
+    void parseDiff(DVcsJob *job);
 
 protected:
     //used in log
     void parseLogOutput(const DVcsJob *job, QList<DVcsEvent>& commits) const;
 
-    QString toMercurialRevision(const KDevelop::VcsRevision & vcsrev);
+    static QString toMercurialRevision(const KDevelop::VcsRevision & vcsrev);
     static bool addDirsConditionally(DVcsJob* job, const KUrl::List & locations, KDevelop::IBasicVersionControl::RecursionMode recursion);
     static KDevelop::VcsStatusInfo::State charToState(const char ch);
 

@@ -264,9 +264,8 @@ VcsJob* MercurialPlugin::diff(const KUrl& fileOrDirectory,
                 VcsDiff::Type diffType,
                 IBasicVersionControl::RecursionMode recursionMode)
 {
-    Q_UNUSED(diffType)
     Q_UNUSED(recursionMode)
-    //TODO: Honour recursionmode and diffType, handle working-dir revision as a src element
+    //TODO: Honour recursionmode and diffType
     if (!fileOrDirectory.isLocalFile()) {
         return NULL;
     }
@@ -274,20 +273,27 @@ VcsJob* MercurialPlugin::diff(const KUrl& fileOrDirectory,
     QString srcRev = toMercurialRevision(srcRevision);
     QString dstRev = toMercurialRevision(dstRevision);
 
-    if (QString::null == srcRev
-        || QString::null == dstRev
-        || srcRev.isEmpty())    // We cannot handle the working-directory revision as src argument
+    if (srcRev.isNull() || dstRev.isNull() || (srcRev.isEmpty() && dstRev.isEmpty())) {
+        kDebug() << "Diff between" << srcRevision.prettyValue() << '(' << srcRev << ')'<< "and" << dstRevision.prettyValue() << '(' << dstRev << ')'<< " not possible";
         return NULL;
+    }
 
     std::auto_ptr<DVcsJob> job(new DVcsJob(this));
 
     const QString srcPath = fileOrDirectory.toLocalFile();
 
     if (!prepareJob(job.get(), srcPath)) {
+        kDebug() << "Could not prepare diff-job in " << srcPath;
         return NULL;
     }
 
     *job << "hg" << "diff";
+
+    if (srcRev.isEmpty()) {
+        std::swap(srcRev, dstRev);
+		*job << "--reverse";
+    }
+
 
     if (diffType == VcsDiff::DiffUnified)
         *job << "-U" << "3";    // Default from GNU diff
@@ -341,19 +347,18 @@ VcsJob* MercurialPlugin::status(const KUrl::List& localLocations, IBasicVersionC
 bool MercurialPlugin::parseStatus(DVcsJob *job) const
 {
     if (job->status() != VcsJob::JobSucceeded) {
-        kDebug() << job->output();
+        kDebug() << "Job failed: " << job->output();
         return false;
     }
 
     const QString dir = job->getDirectory().absolutePath().append(QDir::separator());
+    kDebug() << "Job succeeded for " << dir;
     const QStringList output = job->output().split('\n', QString::SkipEmptyParts);
     QList<QVariant> filestatus;
     foreach(const QString &line, output) {
         QChar stCh = line.at(0);
 
         KUrl file(line.mid(2).prepend(dir));
-
-        kDebug() << dir;
 
         VcsStatusInfo status;
         status.setUrl(file);
@@ -553,11 +558,28 @@ QList<DVcsEvent> MercurialPlugin::getAllCommits(const QString &repo)
     return commits;
 }
 
-void MercurialPlugin::parseDiff(DVcsJob* job) const
+void MercurialPlugin::parseDiff(DVcsJob* job)
 {
+    if (job->status() != VcsJob::JobSucceeded) {
+        kDebug() << "Parse-job failed: " << job->output();
+        return;
+    }
+
+    // Diffs are generated relativly to the repository root,
+    // so we have recover it from the job.
+	// Not quite clean m_lastRepoRoot holds the root, after querying isValidDirectory()
+    QString workingDir(job->getDirectory().absolutePath());
+    isValidDirectory(KUrl(workingDir));
+    QString repoRoot = m_lastRepoRoot.path(KUrl::RemoveTrailingSlash);
     VcsDiff diff;
+    // We have to recover the type of the diff somehow.
     diff.setType(VcsDiff::DiffUnified);
-    diff.setDiff(job->output());
+    QString output = job->output();
+    // hg diff adds a prefix to the paths, which we will now strip
+    QRegExp reg("(diff [^\n]+\n--- )a(/[^\n]+\n\\+\\+\\+ )b(/[^\n]+\n)");
+    QString replacement("\\1" + repoRoot + "\\2" + repoRoot + "\\3");
+    output.replace(reg, replacement);
+    diff.setDiff(output);
     job->setResults(qVariantFromValue(diff));
 }
 
@@ -853,14 +875,15 @@ QString MercurialPlugin::toMercurialRevision(const VcsRevision & vcsrev)
 {
     switch (vcsrev.revisionType()) {
     case VcsRevision::Special:
-        switch (VcsRevision::RevisionSpecialType(vcsrev.revisionValue().toInt())) {
+        switch (vcsrev.revisionValue().value<KDevelop::VcsRevision::RevisionSpecialType>()) {
         case VcsRevision::Head:
-        case VcsRevision::Base:
             return QString("tip");
+        case VcsRevision::Base:
+            return QString(".");
         case VcsRevision::Working:
             return QString("");
-        case VcsRevision::Previous:
-            return QString();   // TODO: needs to be implemented
+        case VcsRevision::Previous: // We can't determine this from one revision alone
+            return QString::null;
         case VcsRevision::Start:
             return QString("0");
         default:
@@ -868,10 +891,10 @@ QString MercurialPlugin::toMercurialRevision(const VcsRevision & vcsrev)
         }
     case VcsRevision::GlobalNumber:
         return QString::number(vcsrev.revisionValue().toLongLong());
-    case VcsRevision::Date:
+    case VcsRevision::Date:			// TODO
     case VcsRevision::FileNumber:   // No file number for mercurial
     default:
-        return QString();
+        return QString::null;
     }
 }
 
