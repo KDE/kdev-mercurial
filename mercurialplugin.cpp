@@ -395,27 +395,38 @@ VcsJob* MercurialPlugin::log(const KUrl& localLocation,
                 const VcsRevision& rev,
                 unsigned long limit)
 {
-    Q_UNUSED(rev)
-    Q_UNUSED(limit)
-    std::auto_ptr<DVcsJob> job(new DVcsJob(this));
-
-    if (!prepareJob(job.get(), localLocation.toLocalFile())) {
-        return NULL;
-    }
-
-    *job << "hg" << "log" << "--template" << "{file_copies}\\0{file_dels}\\0{file_adds}\\0{file_mods}\\0{desc}\\0{date|isodate}\\0{author}\\0{parents}\\0{node}\\0{rev}\\0" << "--";
-
-    addFileList(job.get(), localLocation);
-    connect(job.get(), SIGNAL(readyForParsing(DVcsJob*)), SLOT(parseLogOutputBasicVersionControl(DVcsJob*)));
-    return job.release();
+    return log(localLocation, VcsRevision::createSpecialRevision(VcsRevision::Start), rev, limit);
 }
 
 VcsJob* MercurialPlugin::log(const KUrl& localLocation,
                 const VcsRevision& rev,
                 const VcsRevision& limit)
 {
-    Q_UNUSED(limit)
-    return log(localLocation, rev, 0);
+    return log(localLocation, rev, limit, 0);
+}
+
+
+VcsJob* MercurialPlugin::log(const KUrl& localLocation,
+                const VcsRevision& to,
+                const VcsRevision& from,
+                unsigned long limit)
+{
+    std::auto_ptr<DVcsJob> job(new DVcsJob(this));
+
+    if (!prepareJob(job.get(), localLocation.toLocalFile())) {
+        return NULL;
+    }
+
+    *job << "hg" << "log" << "-r" << toMercurialRevision(from) + ':' + toMercurialRevision(to);
+
+    if (limit > 0)
+        *job << "-l" << QString::number(limit);
+    
+    *job << "--template" << "{file_copies}\\0{file_dels}\\0{file_adds}\\0{file_mods}\\0{desc}\\0{date|isodate}\\0{author}\\0{parents}\\0{node}\\0{rev}\\0" << "--";
+
+    addFileList(job.get(), localLocation);
+    connect(job.get(), SIGNAL(readyForParsing(DVcsJob*)), SLOT(parseLogOutputBasicVersionControl(DVcsJob*)));
+    return job.release();
 }
 
 VcsJob* MercurialPlugin::annotate(const KUrl& localLocation,

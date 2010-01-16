@@ -93,6 +93,11 @@ public:
     KDevelop::VcsJob* log(const KUrl& localLocation,
                 const KDevelop::VcsRevision& rev,
                 const KDevelop::VcsRevision& limit);
+
+    KDevelop::VcsJob* log(const KUrl& localLocation,
+                const KDevelop::VcsRevision& to,
+                const KDevelop::VcsRevision& from,
+                unsigned long limit);
     KDevelop::VcsJob* annotate(const KUrl& localLocation,
                             const KDevelop::VcsRevision& rev);
 
