@@ -273,8 +273,12 @@ VcsJob* MercurialPlugin::diff(const KUrl& fileOrDirectory,
     QString srcRev = toMercurialRevision(srcRevision);
     QString dstRev = toMercurialRevision(dstRevision);
 
-    if (srcRev.isNull() || dstRev.isNull() || (srcRev.isEmpty() && dstRev.isEmpty())) {
-        kDebug() << "Diff between" << srcRevision.prettyValue() << '(' << srcRev << ')'<< "and" << dstRevision.prettyValue() << '(' << dstRev << ')'<< " not possible";
+    kDebug() << "Diff between" << srcRevision.prettyValue() << '(' << srcRev << ')'<< "and" << dstRevision.prettyValue() << '(' << dstRev << ')'<< " requested";
+
+    if ((srcRev.isNull() && dstRev.isNull())
+        || (srcRev.isEmpty() && dstRev.isEmpty())
+        ) {
+        kError() << "Diff between" << srcRevision.prettyValue() << '(' << srcRev << ')'<< "and" << dstRevision.prettyValue() << '(' << dstRev << ')'<< " not possible";
         return NULL;
     }
 
@@ -288,19 +292,30 @@ VcsJob* MercurialPlugin::diff(const KUrl& fileOrDirectory,
     }
 
     *job << "hg" << "diff";
-
-    if (srcRev.isEmpty()) {
+    
+    // Hg cannot do a diff from 
+    //   SomeRevision to Previous, or
+    //   Working to SomeRevsion directly, but the reverse
+    if (dstRev.isNull() // Destination is "Previous"
+        || (!srcRev.isNull() && srcRev.isEmpty()) // Source is "Working"
+        ) {
         std::swap(srcRev, dstRev);
 		*job << "--reverse";
     }
 
-
     if (diffType == VcsDiff::DiffUnified)
         *job << "-U" << "3";    // Default from GNU diff
 
-    *job << "-r" << srcRev;
-    if (!dstRev.isEmpty())
-        *job << "-r" << dstRev;
+    if (srcRev.isNull() /* from "Previous" */ && dstRev.isEmpty() /* to "Working" */) {
+        // Do nothing, that is the default
+    } else if (srcRev.isNull()) {  // Changes made in one arbitrary revision
+        *job << "-c" << dstRev;
+    } else {
+        *job << "-r" << srcRev;
+        if (!dstRev.isEmpty())
+            *job << "-r" << dstRev;
+    }
+    
     *job << "--";
     *job << srcPath;
 
