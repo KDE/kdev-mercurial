@@ -138,6 +138,11 @@ VcsJob* MercurialPlugin::init(const KUrl &directory)
     return job.release();
 }
 
+VcsJob* MercurialPlugin::repositoryLocation(const KUrl & directory)
+{
+    return NULL;
+}
+
 VcsJob* MercurialPlugin::createWorkingCopy(const VcsLocation & localOrRepoLocationSrc, const KUrl& directory, IBasicVersionControl::RecursionMode)
 {
     std::auto_ptr<DVcsJob> job(new DVcsJob(this));
@@ -252,6 +257,50 @@ VcsJob* MercurialPlugin::commit(const QString& message,
     *job << "hg" << "commit" << "-m" << message << "--";
 
     if (!addDirsConditionally(job.get(), localLocations, recursion)) {
+        return NULL;
+    }
+
+    return job.release();
+}
+
+VcsJob* MercurialPlugin::update(const KUrl::List& files,
+                                const KDevelop::VcsRevision& rev,
+                                KDevelop::IBasicVersionControl::RecursionMode recursion)
+{
+    if (files.empty())
+        return NULL;
+
+    std::auto_ptr<DVcsJob> job(new DVcsJob(this));
+
+    if (!prepareJob(job.get(), files.front().toLocalFile())) {
+        return NULL;
+    }
+
+    //Note: the message is quoted somewhere else, so if we quote here then we have quotes in the commit log
+    *job << "hg" << "revert" << "-r" << toMercurialRevision(rev) << "--";
+
+    if (!addDirsConditionally(job.get(), files, recursion)) {
+        return NULL;
+    }
+
+    return job.release();
+}
+
+VcsJob* MercurialPlugin::resolve(const KUrl::List& files, KDevelop::IBasicVersionControl::RecursionMode recursion)
+{
+    if (files.empty())
+        return NULL;
+
+    std::auto_ptr<DVcsJob> job(new DVcsJob(this));
+
+    if (!prepareJob(job.get(), files.front().toLocalFile())) {
+        return NULL;
+    }
+
+    //Note: the message is quoted somewhere else, so if we quote here then we have quotes in the commit log
+    *job << "hg" << "resolve" << "--";
+
+    if (!addDirsConditionally(job.get(), files, recursion)) {
         return NULL;
     }
 

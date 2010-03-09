@@ -64,6 +64,7 @@ public:
     QString name() const;
 
     KDevelop::VcsJob* init(const KUrl & directory);
+    KDevelop::VcsJob* repositoryLocation(const KUrl & directory);   // Not implemented.
     KDevelop::VcsJob* createWorkingCopy(const KDevelop::VcsLocation & localOrRepoLocationSrc, const KUrl & repository, IBasicVersionControl::RecursionMode = KDevelop::IBasicVersionControl::Recursive);
     KDevelop::VcsJob* add(const KUrl::List& localLocations,
                  KDevelop::IBasicVersionControl::RecursionMode recursion  = KDevelop::IBasicVersionControl::Recursive);
@@ -86,6 +87,9 @@ public:
                     KDevelop::IBasicVersionControl::RecursionMode recursion);
     KDevelop::VcsJob* revert(const KUrl::List& localLocations,
                     KDevelop::IBasicVersionControl::RecursionMode recursion);
+    KDevelop::VcsJob* update(const KUrl::List& files,
+                    const KDevelop::VcsRevision& rev, KDevelop::IBasicVersionControl::RecursionMode recursion);
+    KDevelop::VcsJob* resolve(const KUrl::List& files, KDevelop::IBasicVersionControl::RecursionMode recursion);
 
     KDevelop::VcsJob* log(const KUrl& localLocation,
                 const KDevelop::VcsRevision& rev,
