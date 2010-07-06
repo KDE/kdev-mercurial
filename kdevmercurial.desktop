@@ -21,6 +21,7 @@ Comment[x-test]=xxThis plugin integrates Mercurial to KDevelopxx
 Name=Mercurial Support
 Name[ca]=Implementació de Mercurial
 Name[ca@valencia]=Implementació de Mercurial
+Name[de]=Unterstützung für Mercurial
 Name[en_GB]=Mercurial Support
 Name[es]=Implementación de Mercurial
 Name[et]=Mercuriali toetus
