@@ -2,7 +2,7 @@
 Type=Service
 Icon=mercurial
 Exec=blubb
-Comment=This plugin integrates Mercurial to KDevelop
+Comment=This plugin integrates Mercurial
 Comment[ca]=Aquest connector integra Mercurial en KDevelop
 Comment[ca@valencia]=Este connector integra Mercurial en KDevelop
 Comment[en_GB]=This plugin integrates Mercurial to KDevelop
