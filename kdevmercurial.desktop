@@ -3,6 +3,7 @@ Type=Service
 Icon=mercurial
 Exec=blubb
 Comment=This plugin integrates Mercurial
+Comment[es]=Este complemento integra Mercurial
 Comment[pt]=Este 'plugin' integra o Mercurial
 Comment[pt_BR]=Este plugin integra o Mercurial
 Comment[sv]=Insticksprogrammet integrerar Mercurial
