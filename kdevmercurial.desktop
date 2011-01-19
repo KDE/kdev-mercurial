@@ -4,6 +4,7 @@ Icon=mercurial
 Exec=blubb
 Comment=This plugin integrates Mercurial
 Comment[es]=Este complemento integra Mercurial
+Comment[et]=See plugin lõimib Mercuriali
 Comment[fr]=Ce module externe intègre Mercurial
 Comment[pt]=Este 'plugin' integra o Mercurial
 Comment[pt_BR]=Este plugin integra o Mercurial
