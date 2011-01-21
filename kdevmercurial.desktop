@@ -3,6 +3,7 @@ Type=Service
 Icon=mercurial
 Exec=blubb
 Comment=This plugin integrates Mercurial
+Comment[en_GB]=This plugin integrates Mercurial
 Comment[es]=Este complemento integra Mercurial
 Comment[et]=See plugin lõimib Mercuriali
 Comment[fr]=Ce module externe intègre Mercurial
