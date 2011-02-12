@@ -107,8 +107,8 @@ public:
 
     KDevelop::VcsJob* reset(const KUrl& repository, const QStringList &args, const KUrl::List &files);
 
-    DVcsJob* switchBranch(const QString &repository, const QString &branch);
-    DVcsJob* branch(const QString &repository, const QString &basebranch = QString(), const QString &branch = QString(),
+    KDevelop::DVcsJob* switchBranch(const QString &repository, const QString &branch);
+    KDevelop::DVcsJob* branch(const QString &repository, const QString &basebranch = QString(), const QString &branch = QString(),
                     const QStringList &args = QStringList());
 
     KDevelop::VcsJob* push(const KUrl& localRepositoryLocation,
@@ -125,17 +125,17 @@ public:
     QList<DVcsEvent> getAllCommits(const QString &repo);
 
 protected slots:
-    void parseLogOutputBasicVersionControl(DVcsJob *job) const;
-    bool parseStatus(DVcsJob *job) const;
-    bool parseAnnotations(DVcsJob *job) const;
-    void parseDiff(DVcsJob *job);
+    void parseLogOutputBasicVersionControl(KDevelop::DVcsJob *job) const;
+    bool parseStatus(KDevelop::DVcsJob *job) const;
+    bool parseAnnotations(KDevelop::DVcsJob *job) const;
+    void parseDiff(KDevelop::DVcsJob *job);
 
 protected:
     //used in log
-    void parseLogOutput(const DVcsJob *job, QList<DVcsEvent>& commits) const;
+    void parseLogOutput(const KDevelop::DVcsJob *job, QList<DVcsEvent>& commits) const;
 
     static QString toMercurialRevision(const KDevelop::VcsRevision & vcsrev);
-    static bool addDirsConditionally(DVcsJob* job, const KUrl::List & locations, KDevelop::IBasicVersionControl::RecursionMode recursion);
+    static bool addDirsConditionally(KDevelop::DVcsJob* job, const KUrl::List & locations, KDevelop::IBasicVersionControl::RecursionMode recursion);
     static KDevelop::VcsStatusInfo::State charToState(const char ch);
 
     QStringList getLsFiles(const QString &directory, const QStringList &args = QStringList());
