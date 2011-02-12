@@ -4,6 +4,7 @@
  *                                                                         *
  *   Adapted for Mercurial                                                 *
  *   Copyright 2009 Fabian Wiesel <fabian.wiesel@fu-berlin.de>             *
+ *   Copyright 2011 Andrey Batyiev <batyiev@gmail.com>                     *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or         *
  *   modify it under the terms of the GNU General Public License as        *
@@ -127,15 +128,11 @@ bool MercurialPlugin::isVersionControlled(const KUrl & url)
 
 VcsJob* MercurialPlugin::init(const KUrl &directory)
 {
-    std::auto_ptr<DVcsJob> job(new DVcsJob(this));
-
-    if (!prepareJob(job.get(), directory.toLocalFile(), MercurialPlugin::Init)) {
-        return NULL;
-    }
+    DVcsJob *job = new DVcsJob(directory.path(), this);
 
     *job << "hg" << "init";
 
-    return job.release();
+    return job;
 }
 
 VcsJob* MercurialPlugin::repositoryLocation(const KUrl & directory)
@@ -143,44 +140,32 @@ VcsJob* MercurialPlugin::repositoryLocation(const KUrl & directory)
     return NULL;
 }
 
-VcsJob* MercurialPlugin::createWorkingCopy(const VcsLocation & localOrRepoLocationSrc, const KUrl& directory, IBasicVersionControl::RecursionMode)
+VcsJob* MercurialPlugin::createWorkingCopy(const VcsLocation & localOrRepoLocationSrc, const KUrl& destinationDirectory, IBasicVersionControl::RecursionMode)
 {
-    std::auto_ptr<DVcsJob> job(new DVcsJob(this));
+    DVcsJob *job = new DVcsJob(destinationDirectory.path(), this);
 
-    if (!prepareJob(job.get(), directory.toLocalFile(), MercurialPlugin::Init)) {
-        return NULL;
-    }
+    *job << "hg" << "clone" << "--" << localOrRepoLocationSrc.localUrl().pathOrUrl() << destinationDirectory.pathOrUrl();
 
-    *job << "hg" << "clone" << "--" <<  localOrRepoLocationSrc.localUrl().pathOrUrl();
-
-    return job.release();
+    return job;
 }
 
 VcsJob* MercurialPlugin::pull(const VcsLocation & otherRepository, const KUrl& workingRepository)
 {
-    std::auto_ptr<DVcsJob> job(new DVcsJob(this));
+    DVcsJob *job = new DVcsJob(workingRepository.toLocalFile(), this);
 
-    if (!prepareJob(job.get(), workingRepository.toLocalFile(), MercurialPlugin::Init)) {
-        return NULL;
-    }
-
-    *job << "hg" << "fetch" << "--";
+    *job << "hg" << "pull" << "--";
 
     QString pathOrUrl = otherRepository.localUrl().pathOrUrl();
 
     if (!pathOrUrl.isEmpty())
         *job << pathOrUrl;
 
-    return job.release();
+    return job;
 }
 
 VcsJob* MercurialPlugin::push(const KUrl &workingRepository, const VcsLocation & otherRepository)
 {
-    std::auto_ptr<DVcsJob> job(new DVcsJob(this));
-
-    if (!prepareJob(job.get(), workingRepository.toLocalFile(), MercurialPlugin::Init)) {
-        return NULL;
-    }
+    DVcsJob *job = new DVcsJob(workingRepository.toLocalFile(), this);
 
     *job << "hg" << "push" << "--";
 
@@ -189,7 +174,7 @@ VcsJob* MercurialPlugin::push(const KUrl &workingRepository, const VcsLocation &
     if (!pathOrUrl.isEmpty())
         *job << pathOrUrl;
 
-    return job.release();
+    return job;
 }
 
 VcsJob* MercurialPlugin::add(const KUrl::List& localLocations, IBasicVersionControl::RecursionMode recursion)
@@ -197,6 +182,9 @@ VcsJob* MercurialPlugin::add(const KUrl::List& localLocations, IBasicVersionCont
     if (localLocations.empty())
         return NULL;
 
+    return NULL;
+
+#if 0
     std::auto_ptr<DVcsJob> job(new DVcsJob(this));
 
     if (!prepareJob(job.get(), localLocations.front().toLocalFile())) {
@@ -210,10 +198,13 @@ VcsJob* MercurialPlugin::add(const KUrl::List& localLocations, IBasicVersionCont
     }
 
     return job.release();
+#endif
 }
 
 VcsJob* MercurialPlugin::copy(const KUrl& localLocationSrc, const KUrl& localLocationDst)
 {
+    return NULL;
+#if 0
     std::auto_ptr<DVcsJob> job(new DVcsJob(this));
 
     if (!prepareJob(job.get(), localLocationSrc.toLocalFile())) {
@@ -223,11 +214,15 @@ VcsJob* MercurialPlugin::copy(const KUrl& localLocationSrc, const KUrl& localLoc
     *job << "hg" << "cp" << "--" << localLocationSrc.toLocalFile() << localLocationDst.path();
 
     return job.release();
+#endif
 }
 
 VcsJob* MercurialPlugin::move(const KUrl& localLocationSrc,
                 const KUrl& localLocationDst)
 {
+    return NULL;
+
+#if 0
     std::auto_ptr<DVcsJob> job(new DVcsJob(this));
 
     if (!prepareJob(job.get(), localLocationSrc.toLocalFile())) {
@@ -237,6 +232,7 @@ VcsJob* MercurialPlugin::move(const KUrl& localLocationSrc,
     *job << "hg" << "mv" << "--" << localLocationSrc.toLocalFile() << localLocationDst.path();
 
     return job.release();
+#endif
 }
 
 //If no files specified then commit already added files
@@ -244,6 +240,9 @@ VcsJob* MercurialPlugin::commit(const QString& message,
                                   const KUrl::List& localLocations,
                                   IBasicVersionControl::RecursionMode recursion)
 {
+    return NULL;
+
+#if 0
     if (localLocations.empty() || message.isEmpty())
         return NULL;
 
@@ -261,12 +260,16 @@ VcsJob* MercurialPlugin::commit(const QString& message,
     }
 
     return job.release();
+#endif
 }
 
 VcsJob* MercurialPlugin::update(const KUrl::List& files,
                                 const KDevelop::VcsRevision& rev,
                                 KDevelop::IBasicVersionControl::RecursionMode recursion)
 {
+    return NULL;
+
+#if 0
     if (files.empty())
         return NULL;
 
@@ -284,10 +287,14 @@ VcsJob* MercurialPlugin::update(const KUrl::List& files,
     }
 
     return job.release();
+#endif
 }
 
 VcsJob* MercurialPlugin::resolve(const KUrl::List& files, KDevelop::IBasicVersionControl::RecursionMode recursion)
 {
+    return NULL;
+
+#if 0
     if (files.empty())
         return NULL;
 
@@ -305,6 +312,7 @@ VcsJob* MercurialPlugin::resolve(const KUrl::List& files, KDevelop::IBasicVersio
     }
 
     return job.release();
+#endif
 }
 
 VcsJob* MercurialPlugin::diff(const KUrl& fileOrDirectory,
@@ -313,6 +321,9 @@ VcsJob* MercurialPlugin::diff(const KUrl& fileOrDirectory,
                 VcsDiff::Type diffType,
                 IBasicVersionControl::RecursionMode recursionMode)
 {
+    return NULL;
+
+#if 0
     Q_UNUSED(recursionMode)
     //TODO: Honour recursionmode and diffType
     if (!fileOrDirectory.isLocalFile()) {
@@ -341,8 +352,8 @@ VcsJob* MercurialPlugin::diff(const KUrl& fileOrDirectory,
     }
 
     *job << "hg" << "diff";
-    
-    // Hg cannot do a diff from 
+
+    // Hg cannot do a diff from
     //   SomeRevision to Previous, or
     //   Working to SomeRevsion directly, but the reverse
     if (dstRev.isNull() // Destination is "Previous"
@@ -364,17 +375,21 @@ VcsJob* MercurialPlugin::diff(const KUrl& fileOrDirectory,
         if (!dstRev.isEmpty())
             *job << "-r" << dstRev;
     }
-    
+
     *job << "--";
     *job << srcPath;
 
     connect(job.get(), SIGNAL(readyForParsing(DVcsJob*)), SLOT(parseDiff(DVcsJob*)));
 
     return job.release();
+#endif
 }
 
 VcsJob* MercurialPlugin::remove(const KUrl::List& files)
 {
+    return NULL;
+
+#if 0
     if (files.empty())
         return NULL;
 
@@ -388,10 +403,13 @@ VcsJob* MercurialPlugin::remove(const KUrl::List& files)
 
     addFileList(job.get(), files);
     return job.release();
+#endif
 }
 
 VcsJob* MercurialPlugin::status(const KUrl::List& localLocations, IBasicVersionControl::RecursionMode recursion)
 {
+    return NULL;
+    #if 0
     std::auto_ptr<DVcsJob> job(new DVcsJob(this));
 
     if (!prepareJob(job.get(), localLocations.front().toLocalFile())) {
@@ -406,10 +424,14 @@ VcsJob* MercurialPlugin::status(const KUrl::List& localLocations, IBasicVersionC
     connect(job.get(), SIGNAL(readyForParsing(DVcsJob*)), SLOT(parseStatus(DVcsJob*)));
 
     return job.release();
+#endif
 }
 
 bool MercurialPlugin::parseStatus(DVcsJob *job) const
 {
+    return NULL;
+
+#if 0
     if (job->status() != VcsJob::JobSucceeded) {
         kDebug() << "Job failed: " << job->output();
         return false;
@@ -433,11 +455,15 @@ bool MercurialPlugin::parseStatus(DVcsJob *job) const
 
     job->setResults(qVariantFromValue(filestatus));
     return true;
+#endif
 }
 
 VcsJob* MercurialPlugin::revert(const KUrl::List& localLocations,
                                    IBasicVersionControl::RecursionMode recursion)
 {
+    return NULL;
+
+#if 0
     if (localLocations.empty())
         return NULL;
 
@@ -453,6 +479,7 @@ VcsJob* MercurialPlugin::revert(const KUrl::List& localLocations,
     }
 
     return job.release();
+#endif
 }
 
 VcsJob* MercurialPlugin::log(const KUrl& localLocation,
@@ -475,6 +502,9 @@ VcsJob* MercurialPlugin::log(const KUrl& localLocation,
                 const VcsRevision& from,
                 unsigned long limit)
 {
+    return NULL;
+
+#if 0
     std::auto_ptr<DVcsJob> job(new DVcsJob(this));
 
     if (!prepareJob(job.get(), localLocation.toLocalFile())) {
@@ -485,17 +515,21 @@ VcsJob* MercurialPlugin::log(const KUrl& localLocation,
 
     if (limit > 0)
         *job << "-l" << QString::number(limit);
-    
+
     *job << "--template" << "{file_copies}\\0{file_dels}\\0{file_adds}\\0{file_mods}\\0{desc}\\0{date|isodate}\\0{author}\\0{parents}\\0{node}\\0{rev}\\0" << "--";
 
     addFileList(job.get(), localLocation);
     connect(job.get(), SIGNAL(readyForParsing(DVcsJob*)), SLOT(parseLogOutputBasicVersionControl(DVcsJob*)));
     return job.release();
+#endif
 }
 
 VcsJob* MercurialPlugin::annotate(const KUrl& localLocation,
                             const VcsRevision& rev)
 {
+    return NULL;
+
+#if 0
     if (!localLocation.isLocalFile())
         return NULL;
 
@@ -517,11 +551,15 @@ VcsJob* MercurialPlugin::annotate(const KUrl& localLocation,
     connect(job.get(), SIGNAL(readyForParsing(DVcsJob*)), SLOT(parseAnnotations(DVcsJob*)));
 
     return job.release();
+#endif
 }
 
 
 DVcsJob* MercurialPlugin::switchBranch(const QString &repository, const QString &branch)
 {
+    return NULL;
+
+#if 0
     std::auto_ptr<DVcsJob> job(new DVcsJob(this));
 
     if (!prepareJob(job.get(), repository)) {
@@ -531,11 +569,15 @@ DVcsJob* MercurialPlugin::switchBranch(const QString &repository, const QString 
     *job << "hg" << "update" << "--" << branch;
 
     return job.release();
+#endif
 }
 
 DVcsJob* MercurialPlugin::branch(const QString &repository, const QString &basebranch, const QString &branch,
                                    const QStringList &args)
 {
+    return NULL;
+
+#if 0
     Q_UNUSED(repository)
     Q_UNUSED(basebranch)
     Q_UNUSED(branch)
@@ -556,10 +598,14 @@ DVcsJob* MercurialPlugin::branch(const QString &repository, const QString &baseb
     *job << "hg" << "branch" << "--" << branch;
 
     return job.release();
+#endif
 }
 
 VcsJob* MercurialPlugin::reset(const KUrl &repository, const QStringList &args, const KUrl::List& files)
 {
+    return NULL;
+
+#if 0
     std::auto_ptr<DVcsJob> job(new DVcsJob(this));
 
     if (!prepareJob(job.get(), repository.toLocalFile())) {
@@ -578,10 +624,14 @@ VcsJob* MercurialPlugin::reset(const KUrl &repository, const QStringList &args, 
         *job << "-a";
 
     return job.release();
+#endif
 }
 
 QString MercurialPlugin::curBranch(const QString &repository)
 {
+    return NULL;
+
+#if 0
     std::auto_ptr<DVcsJob> job(new DVcsJob(this));
 
     if (!prepareJob(job.get(), repository)) {
@@ -594,10 +644,14 @@ QString MercurialPlugin::curBranch(const QString &repository)
         return QString();
 
     return job->output().simplified();  // Strip the final newline. Mercurial does not allow whitespaces at beginning or end
+#endif
 }
 
 QStringList MercurialPlugin::branches(const QString &repository)
 {
+    return QStringList();
+
+#if 0
     std::auto_ptr<DVcsJob> job(new DVcsJob(this));
 
     if (!prepareJob(job.get(), repository)) {
@@ -610,10 +664,14 @@ QStringList MercurialPlugin::branches(const QString &repository)
         return QStringList();
 
     return job->output().split('\n', QString::SkipEmptyParts);
+#endif
 }
 
 QList<DVcsEvent> MercurialPlugin::getAllCommits(const QString &repo)
 {
+    return QList<DVcsEvent>();
+
+#if 0
     std::auto_ptr<DVcsJob> job(new DVcsJob(this));
     job->setAutoDelete(false);
 
@@ -631,10 +689,12 @@ QList<DVcsEvent> MercurialPlugin::getAllCommits(const QString &repo)
     parseLogOutput(job.get(), commits);
 
     return commits;
+#endif
 }
 
 void MercurialPlugin::parseDiff(DVcsJob* job)
 {
+#if 0
     if (job->status() != VcsJob::JobSucceeded) {
         kDebug() << "Parse-job failed: " << job->output();
         return;
@@ -656,11 +716,15 @@ void MercurialPlugin::parseDiff(DVcsJob* job)
     output.replace(reg, replacement);
     diff.setDiff(output);
     job->setResults(qVariantFromValue(diff));
+#endif
 }
 
 
 bool MercurialPlugin::parseAnnotations(DVcsJob *job) const
 {
+    return false;
+
+#if 0
     if (job->status() != VcsJob::JobSucceeded)
         return false;
 
@@ -699,10 +763,12 @@ bool MercurialPlugin::parseAnnotations(DVcsJob *job) const
     job->setResults(result);
 
     return true;
+#endif
 }
 
 void MercurialPlugin::parseLogOutputBasicVersionControl(DVcsJob* job) const
 {
+#if 0
     QList<QVariant> events;
     static unsigned int entriesPerCommit = 10;
     QList<QByteArray> items = job->rawOutput().split('\0');
@@ -794,10 +860,12 @@ void MercurialPlugin::parseLogOutputBasicVersionControl(DVcsJob* job) const
         events.push_front(qVariantFromValue(event));
     }
     job->setResults(QVariant(events));
+#endif
 }
 
 void MercurialPlugin::parseLogOutput(const DVcsJob * job, QList<DVcsEvent>& commits) const
 {
+#if 0
     static unsigned int entriesPerCommit = 6;
     QList<QByteArray> items = job->rawOutput().split('\0');
 
@@ -877,10 +945,19 @@ void MercurialPlugin::parseLogOutput(const DVcsJob * job, QList<DVcsEvent>& comm
 
         commits.push_front(commit);
     }
+#endif
+}
+
+VcsLocationWidget* MercurialPlugin::vcsLocation(QWidget* parent) const
+{
+    return NULL;
 }
 
 QStringList MercurialPlugin::getLsFiles(const QString &directory, const QStringList &args)
 {
+    return QStringList();
+
+#if 0
     std::auto_ptr<DVcsJob> job(new DVcsJob(this));
 
     if (!prepareJob(job.get(), directory)) {
@@ -901,6 +978,7 @@ QStringList MercurialPlugin::getLsFiles(const QString &directory, const QStringL
         it->prepend(prefix);
     }
     return fileList;
+#endif
 }
 
 struct isDirectory
@@ -912,6 +990,9 @@ struct isDirectory
 
 bool MercurialPlugin::addDirsConditionally(DVcsJob* job, const KUrl::List & locations, IBasicVersionControl::RecursionMode recursion)
 {
+    return false;
+
+#if 0
     if (locations.empty())
         return IBasicVersionControl::Recursive == recursion;
 
@@ -925,6 +1006,7 @@ bool MercurialPlugin::addDirsConditionally(DVcsJob* job, const KUrl::List & loca
         return false;
 
     return addFileList(job, localFileLocations);
+#endif
 }
 
 VcsStatusInfo::State MercurialPlugin::charToState(const char ch)

@@ -4,6 +4,7 @@
  *                                                                         *
  *   Adapted for Mercurial                                                 *
  *   Copyright 2009 Fabian Wiesel <fabian.wiesel@fu-berlin.de>             *
+ *   Copyright 2011 Andrey Batyiev <batyiev@gmail.com>                     *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or         *
  *   modify it under the terms of the GNU General Public License as        *
@@ -58,7 +59,7 @@ public:
     ~MercurialPlugin();
 
     virtual void unload();
-    
+
     bool isValidDirectory(const KUrl &dirPath);
     bool isVersionControlled(const KUrl &path);
     QString name() const;
@@ -116,6 +117,7 @@ public:
     KDevelop::VcsJob* pull(const KDevelop::VcsLocation& localOrRepoLocationSrc,
                           const KUrl& localRepositoryLocation);
 
+    KDevelop::VcsLocationWidget* vcsLocation(QWidget* parent) const;
 public:
     //parsers for branch:
     QString curBranch(const QString &repository);
