@@ -381,23 +381,13 @@ VcsJob* MercurialPlugin::diff(const KUrl& fileOrDirectory,
 
 VcsJob* MercurialPlugin::remove(const KUrl::List& files)
 {
-    return NULL;
-
-#if 0
-    if (files.empty())
-        return NULL;
-
-    std::auto_ptr<DVcsJob> job(new DVcsJob(this));
-
-    if (!prepareJob(job.get(), files.front().toLocalFile())) {
+    if (files.empty()) {
         return NULL;
     }
 
-    *job << "hg" << "rm" << "--";
-
-    addFileList(job.get(), files);
-    return job.release();
-#endif
+    DVcsJob *job = new DVcsJob(findWorkingDir(files.first()), this);
+    *job << "hg" << "rm" << "--" << files;
+    return job;
 }
 
 VcsJob* MercurialPlugin::status(const KUrl::List& localLocations, IBasicVersionControl::RecursionMode recursion)
