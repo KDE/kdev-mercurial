@@ -345,7 +345,7 @@ VcsJob* MercurialPlugin::diff(const KUrl& fileOrDirectory,
 
     DVcsJob *job = new DVcsJob(workingDir, this);
 
-    *job << "hg" << "diff";
+    *job << "hg" << "diff" << "-g";
 
     // Hg cannot do a diff from
     //   SomeRevision to Previous, or
