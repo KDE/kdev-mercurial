@@ -398,37 +398,31 @@ VcsJob* MercurialPlugin::remove(const KUrl::List& files)
 
 VcsJob* MercurialPlugin::status(const KUrl::List& localLocations, IBasicVersionControl::RecursionMode recursion)
 {
-    kDebug() << "status";
-    return NULL;
-#if 0
-    std::auto_ptr<DVcsJob> job(new DVcsJob(this));
-
-    if (!prepareJob(job.get(), localLocations.front().toLocalFile())) {
+    if (recursion == NonRecursive) {
+        // FIXME: filter out directories
         return NULL;
     }
 
-    *job << "hg" << "status" << "-A" << "--";
-    if (!addDirsConditionally(job.get(), localLocations, recursion)) {
+    if (localLocations.empty()) {
         return NULL;
     }
 
-    connect(job.get(), SIGNAL(readyForParsing(DVcsJob*)), SLOT(parseStatus(DVcsJob*)));
+    DVcsJob* job = new DVcsJob(localLocations.first().pathOrUrl(), this);
+    *job << "hg" << "status" << "-A" << "--" << localLocations;
 
-    return job.release();
-#endif
+    connect(job, SIGNAL(readyForParsing(KDevelop::DVcsJob*)), SLOT(parseStatus(KDevelop::DVcsJob*)));
+
+    return job;
 }
 
 bool MercurialPlugin::parseStatus(DVcsJob *job) const
 {
-    return NULL;
-
-#if 0
     if (job->status() != VcsJob::JobSucceeded) {
         kDebug() << "Job failed: " << job->output();
         return false;
     }
 
-    const QString dir = job->getDirectory().absolutePath().append(QDir::separator());
+    const QString dir = job->directory().absolutePath().append(QDir::separator());
     kDebug() << "Job succeeded for " << dir;
     const QStringList output = job->output().split('\n', QString::SkipEmptyParts);
     QList<QVariant> filestatus;
@@ -446,7 +440,6 @@ bool MercurialPlugin::parseStatus(DVcsJob *job) const
 
     job->setResults(qVariantFromValue(filestatus));
     return true;
-#endif
 }
 
 VcsJob* MercurialPlugin::revert(const KUrl::List& localLocations,
