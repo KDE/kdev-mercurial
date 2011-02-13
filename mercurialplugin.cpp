@@ -306,13 +306,23 @@ VcsJob* MercurialPlugin::diff(const KUrl& fileOrDirectory,
                 VcsDiff::Type diffType,
                 IBasicVersionControl::RecursionMode recursionMode)
 {
-    return NULL;
-
-#if 0
-    Q_UNUSED(recursionMode)
-    //TODO: Honour recursionmode and diffType
     if (!fileOrDirectory.isLocalFile()) {
         return NULL;
+    }
+
+    QString workingDir;
+    QFileInfo fileInfo(fileOrDirectory.toLocalFile());
+
+    // It's impossible to non-recursively diff directories
+    if (recursionMode == NonRecursive && fileInfo.isDir()) {
+        return NULL;
+    }
+
+    // find out correct working directory
+    if (fileInfo.isFile()) {
+        workingDir = fileInfo.absolutePath();
+    } else {
+        workingDir = fileInfo.absoluteFilePath();
     }
 
     QString srcRev = toMercurialRevision(srcRevision);
@@ -327,14 +337,9 @@ VcsJob* MercurialPlugin::diff(const KUrl& fileOrDirectory,
         return NULL;
     }
 
-    std::auto_ptr<DVcsJob> job(new DVcsJob(this));
-
     const QString srcPath = fileOrDirectory.toLocalFile();
 
-    if (!prepareJob(job.get(), srcPath)) {
-        kDebug() << "Could not prepare diff-job in " << srcPath;
-        return NULL;
-    }
+    DVcsJob *job = new DVcsJob(workingDir, this);
 
     *job << "hg" << "diff";
 
@@ -348,8 +353,9 @@ VcsJob* MercurialPlugin::diff(const KUrl& fileOrDirectory,
 		*job << "--reverse";
     }
 
-    if (diffType == VcsDiff::DiffUnified)
+    if (diffType == VcsDiff::DiffUnified) {
         *job << "-U" << "3";    // Default from GNU diff
+    }
 
     if (srcRev.isNull() /* from "Previous" */ && dstRev.isEmpty() /* to "Working" */) {
         // Do nothing, that is the default
@@ -357,17 +363,16 @@ VcsJob* MercurialPlugin::diff(const KUrl& fileOrDirectory,
         *job << "-c" << dstRev;
     } else {
         *job << "-r" << srcRev;
-        if (!dstRev.isEmpty())
+        if (!dstRev.isEmpty()) {
             *job << "-r" << dstRev;
+        }
     }
 
-    *job << "--";
-    *job << srcPath;
+    *job << "--" << srcPath;
 
-    connect(job.get(), SIGNAL(readyForParsing(DVcsJob*)), SLOT(parseDiff(DVcsJob*)));
+    connect(job, SIGNAL(readyForParsing(KDevelop::DVcsJob*)), SLOT(parseDiff(KDevelop::DVcsJob*)));
 
-    return job.release();
-#endif
+    return job;
 }
 
 VcsJob* MercurialPlugin::remove(const KUrl::List& files)
@@ -674,7 +679,6 @@ QList<DVcsEvent> MercurialPlugin::getAllCommits(const QString &repo)
 
 void MercurialPlugin::parseDiff(DVcsJob* job)
 {
-#if 0
     if (job->status() != VcsJob::JobSucceeded) {
         kDebug() << "Parse-job failed: " << job->output();
         return;
@@ -683,20 +687,24 @@ void MercurialPlugin::parseDiff(DVcsJob* job)
     // Diffs are generated relativly to the repository root,
     // so we have recover it from the job.
 	// Not quite clean m_lastRepoRoot holds the root, after querying isValidDirectory()
-    QString workingDir(job->getDirectory().absolutePath());
+    QString workingDir(job->directory().absolutePath());
     isValidDirectory(KUrl(workingDir));
     QString repoRoot = m_lastRepoRoot.path(KUrl::RemoveTrailingSlash);
+
     VcsDiff diff;
+
     // We have to recover the type of the diff somehow.
     diff.setType(VcsDiff::DiffUnified);
     QString output = job->output();
+
     // hg diff adds a prefix to the paths, which we will now strip
     QRegExp reg("(diff [^\n]+\n--- )a(/[^\n]+\n\\+\\+\\+ )b(/[^\n]+\n)");
     QString replacement("\\1" + repoRoot + "\\2" + repoRoot + "\\3");
     output.replace(reg, replacement);
+
     diff.setDiff(output);
+
     job->setResults(qVariantFromValue(diff));
-#endif
 }
 
 
