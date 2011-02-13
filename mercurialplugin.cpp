@@ -449,25 +449,18 @@ bool MercurialPlugin::parseStatus(DVcsJob *job) const
 VcsJob* MercurialPlugin::revert(const KUrl::List& localLocations,
                                    IBasicVersionControl::RecursionMode recursion)
 {
-    return NULL;
+    KUrl::List locations = localLocations;
+    if (recursion == NonRecursive) {
+        filterOutDirectories(locations);
+    }
 
-#if 0
-    if (localLocations.empty())
-        return NULL;
-
-    std::auto_ptr<DVcsJob> job(new DVcsJob(this));
-
-    if (!prepareJob(job.get(), localLocations.front().toLocalFile())) {
+    if (locations.empty()) {
         return NULL;
     }
 
-    *job << "hg" << "revert" << "--";
-    if (!addDirsConditionally(job.get(), localLocations, recursion)) {
-        return NULL;
-    }
-
-    return job.release();
-#endif
+    DVcsJob *job = new DVcsJob(findWorkingDir(locations.first()), this);
+    *job << "hg" << "revert" << "--" << locations;
+    return job;
 }
 
 VcsJob* MercurialPlugin::log(const KUrl& localLocation,
