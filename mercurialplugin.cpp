@@ -918,30 +918,26 @@ VcsLocationWidget* MercurialPlugin::vcsLocation(QWidget* parent) const
 
 QStringList MercurialPlugin::getLsFiles(const QString &directory, const QStringList &args)
 {
-    return QStringList();
-
-#if 0
-    std::auto_ptr<DVcsJob> job(new DVcsJob(this));
-
-    if (!prepareJob(job.get(), directory)) {
-        return QStringList();
-    }
-
+    DVcsJob *job = new DVcsJob(directory, this);
     *job << "hg" << "status" << "-n";
 
-    if (!args.isEmpty())
+    if (!args.isEmpty()) {
         *job << args;
+    }
 
-    if (!job->exec() || job->status() != VcsJob::JobSucceeded)
+    if (!job->exec() || job->status() != VcsJob::JobSucceeded) {
+        delete job;
         return QStringList();
+    }
 
     const QString prefix = directory.endsWith(QDir::separator()) ? directory : directory + QDir::separator();
     QStringList fileList = job->output().split('\n', QString::SkipEmptyParts);
     for (QStringList::iterator it = fileList.begin(); it != fileList.end(); ++it) {
         it->prepend(prefix);
     }
+
+    delete job;
     return fileList;
-#endif
 }
 
 struct isDirectory
