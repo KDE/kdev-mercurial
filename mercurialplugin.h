@@ -138,7 +138,12 @@ protected:
     void parseLogOutput(const KDevelop::DVcsJob *job, QList<DVcsEvent>& commits) const;
 
     static QString toMercurialRevision(const KDevelop::VcsRevision & vcsrev);
-    static bool addDirsConditionally(KDevelop::DVcsJob* job, const KUrl::List & locations, KDevelop::IBasicVersionControl::RecursionMode recursion);
+
+    /**
+     * Remove directories from @p locations.
+     */
+    static void filterOutDirectories(KUrl::List &locations);
+
     static KDevelop::VcsStatusInfo::State charToState(const char ch);
     static QDir findWorkingDir(const KUrl &location);
 

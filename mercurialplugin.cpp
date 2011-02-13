@@ -179,9 +179,10 @@ VcsJob* MercurialPlugin::push(const KUrl &workingRepository, const VcsLocation &
 
 VcsJob* MercurialPlugin::add(const KUrl::List& localLocations, IBasicVersionControl::RecursionMode recursion)
 {
+    KUrl::List locations = localLocations;
+
     if (recursion == NonRecursive) {
-        // FIXME: filter out directories
-        return NULL;
+        filterOutDirectories(locations);
     }
 
     if (localLocations.empty()) {
@@ -189,8 +190,8 @@ VcsJob* MercurialPlugin::add(const KUrl::List& localLocations, IBasicVersionCont
         return NULL;
     }
 
-    DVcsJob* job = new DVcsJob(findWorkingDir(localLocations.first()), this);
-    *job << "hg" << "add" << "--" << localLocations;
+    DVcsJob *job = new DVcsJob(findWorkingDir(locations.first()), this);
+    *job << "hg" << "add" << "--" << locations;
     return job;
 }
 
@@ -234,17 +235,18 @@ VcsJob* MercurialPlugin::commit(const QString& message,
                                   const KUrl::List& localLocations,
                                   IBasicVersionControl::RecursionMode recursion)
 {
+    KUrl::List locations = localLocations;
+
     if (recursion == NonRecursive) {
-        // FIXME: filter out directories
+        filterOutDirectories(locations);
+    }
+
+    if (locations.empty() || message.isEmpty()) {
         return NULL;
     }
 
-    if (localLocations.empty() || message.isEmpty()) {
-        return NULL;
-    }
-
-    DVcsJob* job = new DVcsJob(findWorkingDir(localLocations.first()), this);
-    *job << "hg" << "commit" << "-m" << message << "--" << localLocations;
+    DVcsJob *job = new DVcsJob(findWorkingDir(locations.first()), this);
+    *job << "hg" << "commit" << "-m" << message << "--" << locations;
     return job;
 }
 
@@ -400,17 +402,17 @@ VcsJob* MercurialPlugin::remove(const KUrl::List& files)
 
 VcsJob* MercurialPlugin::status(const KUrl::List& localLocations, IBasicVersionControl::RecursionMode recursion)
 {
+    KUrl::List locations = localLocations;
     if (recursion == NonRecursive) {
-        // FIXME: filter out directories
+        filterOutDirectories(locations);
+    }
+
+    if (locations.empty()) {
         return NULL;
     }
 
-    if (localLocations.empty()) {
-        return NULL;
-    }
-
-    DVcsJob* job = new DVcsJob(findWorkingDir(localLocations.first()), this);
-    *job << "hg" << "status" << "-A" << "--" << localLocations;
+    DVcsJob *job = new DVcsJob(findWorkingDir(locations.first()), this);
+    *job << "hg" << "status" << "-A" << "--" << locations;
 
     connect(job, SIGNAL(readyForParsing(KDevelop::DVcsJob*)), SLOT(parseStatus(KDevelop::DVcsJob*)));
 
@@ -943,32 +945,15 @@ QStringList MercurialPlugin::getLsFiles(const QString &directory, const QStringL
     return fileList;
 }
 
-struct isDirectory
+void MercurialPlugin::filterOutDirectories(KUrl::List &locations)
 {
-    bool operator()(KUrl const & url) const {
-        return QFileInfo(url.toLocalFile()).isDir();
+    KUrl::List fileLocations;
+    foreach(const KUrl &location, locations) {
+        if(!QFileInfo(location.toLocalFile()).isDir()) {
+            fileLocations << location;
+        }
     }
-};
-
-bool MercurialPlugin::addDirsConditionally(DVcsJob* job, const KUrl::List & locations, IBasicVersionControl::RecursionMode recursion)
-{
-    return false;
-
-#if 0
-    if (locations.empty())
-        return IBasicVersionControl::Recursive == recursion;
-
-    if (IBasicVersionControl::Recursive == recursion) {   // hg operates recursively on directories by default
-        return addFileList(job, locations);
-    }
-
-    KUrl::List localFileLocations;
-    std::remove_copy_if(locations.begin(), locations.end(), std::back_inserter(localFileLocations), isDirectory());
-    if (localFileLocations.empty())
-        return false;
-
-    return addFileList(job, localFileLocations);
-#endif
+    locations = fileLocations;
 }
 
 VcsStatusInfo::State MercurialPlugin::charToState(const char ch)
