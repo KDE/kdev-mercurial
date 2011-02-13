@@ -29,6 +29,7 @@
 #include <vcs/interfaces/idistributedversioncontrol.h>
 #include <vcs/dvcs/dvcsplugin.h>
 #include <QtCore/QObject>
+#include <QtCore/QDir>
 #include <vcs/vcsstatusinfo.h>
 
 namespace KDevelop
@@ -139,6 +140,7 @@ protected:
     static QString toMercurialRevision(const KDevelop::VcsRevision & vcsrev);
     static bool addDirsConditionally(KDevelop::DVcsJob* job, const KUrl::List & locations, KDevelop::IBasicVersionControl::RecursionMode recursion);
     static KDevelop::VcsStatusInfo::State charToState(const char ch);
+    static QDir findWorkingDir(const KUrl &location);
 
     QStringList getLsFiles(const QString &directory, const QStringList &args = QStringList());
     KUrl m_lastRepoRoot;

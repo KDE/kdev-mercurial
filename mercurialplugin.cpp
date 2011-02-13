@@ -189,7 +189,7 @@ VcsJob* MercurialPlugin::add(const KUrl::List& localLocations, IBasicVersionCont
         return NULL;
     }
 
-    DVcsJob* job = new DVcsJob(localLocations.first().pathOrUrl(), this);
+    DVcsJob* job = new DVcsJob(findWorkingDir(localLocations.first()), this);
     *job << "hg" << "add" << "--" << localLocations;
     return job;
 }
@@ -243,7 +243,7 @@ VcsJob* MercurialPlugin::commit(const QString& message,
         return NULL;
     }
 
-    DVcsJob* job = new DVcsJob(localLocations.first().pathOrUrl(), this);
+    DVcsJob* job = new DVcsJob(findWorkingDir(localLocations.first()), this);
     *job << "hg" << "commit" << "-m" << message << "--" << localLocations;
     return job;
 }
@@ -310,6 +310,8 @@ VcsJob* MercurialPlugin::diff(const KUrl& fileOrDirectory,
         return NULL;
     }
 
+
+    // non-standard searching for working directory
     QString workingDir;
     QFileInfo fileInfo(fileOrDirectory.toLocalFile());
 
@@ -407,7 +409,7 @@ VcsJob* MercurialPlugin::status(const KUrl::List& localLocations, IBasicVersionC
         return NULL;
     }
 
-    DVcsJob* job = new DVcsJob(localLocations.first().pathOrUrl(), this);
+    DVcsJob* job = new DVcsJob(findWorkingDir(localLocations.first()), this);
     *job << "hg" << "status" << "-A" << "--" << localLocations;
 
     connect(job, SIGNAL(readyForParsing(KDevelop::DVcsJob*)), SLOT(parseStatus(KDevelop::DVcsJob*)));
@@ -486,7 +488,7 @@ VcsJob* MercurialPlugin::log(const KUrl& localLocation,
                 const VcsRevision& from,
                 unsigned long limit)
 {
-    DVcsJob *job = new DVcsJob(localLocation.toLocalFile(), this);
+    DVcsJob *job = new DVcsJob(findWorkingDir(localLocation), this);
 
     *job << "hg" << "log" << "-r" << toMercurialRevision(from) + ':' + toMercurialRevision(to);
 
@@ -1012,6 +1014,18 @@ QString MercurialPlugin::toMercurialRevision(const VcsRevision & vcsrev)
     case VcsRevision::FileNumber:   // No file number for mercurial
     default:
         return QString::null;
+    }
+}
+
+QDir MercurialPlugin::findWorkingDir(const KUrl& location)
+{
+    QFileInfo fileInfo(location.toLocalFile());
+
+    // find out correct working directory
+    if (fileInfo.isFile()) {
+        return fileInfo.absolutePath();
+    } else {
+        return fileInfo.absoluteFilePath();
     }
 }
 
