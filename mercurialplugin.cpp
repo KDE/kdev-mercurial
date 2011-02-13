@@ -215,19 +215,9 @@ VcsJob* MercurialPlugin::copy(const KUrl& localLocationSrc, const KUrl& localLoc
 VcsJob* MercurialPlugin::move(const KUrl& localLocationSrc,
                 const KUrl& localLocationDst)
 {
-    return NULL;
-
-#if 0
-    std::auto_ptr<DVcsJob> job(new DVcsJob(this));
-
-    if (!prepareJob(job.get(), localLocationSrc.toLocalFile())) {
-        return NULL;
-    }
-
+    DVcsJob *job = new DVcsJob(findWorkingDir(localLocationSrc), this);
     *job << "hg" << "mv" << "--" << localLocationSrc.toLocalFile() << localLocationDst.path();
-
-    return job.release();
-#endif
+    return job;
 }
 
 //If no files specified then commit already added files
