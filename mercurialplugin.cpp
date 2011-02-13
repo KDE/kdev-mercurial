@@ -488,26 +488,20 @@ VcsJob* MercurialPlugin::log(const KUrl& localLocation,
                 const VcsRevision& from,
                 unsigned long limit)
 {
-    return NULL;
-
-#if 0
-    std::auto_ptr<DVcsJob> job(new DVcsJob(this));
-
-    if (!prepareJob(job.get(), localLocation.toLocalFile())) {
-        return NULL;
-    }
+    DVcsJob *job = new DVcsJob(localLocation.toLocalFile(), this);
 
     *job << "hg" << "log" << "-r" << toMercurialRevision(from) + ':' + toMercurialRevision(to);
 
     if (limit > 0)
         *job << "-l" << QString::number(limit);
 
-    *job << "--template" << "{file_copies}\\0{file_dels}\\0{file_adds}\\0{file_mods}\\0{desc}\\0{date|isodate}\\0{author}\\0{parents}\\0{node}\\0{rev}\\0" << "--";
+    *job << "--template"
+         << "{file_copies}\\0{file_dels}\\0{file_adds}\\0{file_mods}\\0{desc}\\0{date|rfc3339date}\\0{author}\\0{parents}\\0{node}\\0{rev}\\0"
+         << "--" << localLocation;
 
-    addFileList(job.get(), localLocation);
-    connect(job.get(), SIGNAL(readyForParsing(DVcsJob*)), SLOT(parseLogOutputBasicVersionControl(DVcsJob*)));
-    return job.release();
-#endif
+    connect(job, SIGNAL(readyForParsing(KDevelop::DVcsJob*)),
+            SLOT(parseLogOutputBasicVersionControl(KDevelop::DVcsJob*)));
+    return job;
 }
 
 VcsJob* MercurialPlugin::annotate(const KUrl& localLocation,
@@ -754,56 +748,45 @@ bool MercurialPlugin::parseAnnotations(DVcsJob *job) const
 
 void MercurialPlugin::parseLogOutputBasicVersionControl(DVcsJob* job) const
 {
-#if 0
     QList<QVariant> events;
     static unsigned int entriesPerCommit = 10;
     QList<QByteArray> items = job->rawOutput().split('\0');
 
-    if (uint(items.size()) < entriesPerCommit || 1 != (items.size() % entriesPerCommit)) {
+    /* remove trailing \0 */
+    items.removeLast();
+
+    if ((items.count() % entriesPerCommit) != 0) {
         kDebug() << "Cannot parse commit log: unexpected number of entries";
         return;
     }
 
-    bool success = false;
-
-    QString const & lastRev = items.at(entriesPerCommit - 1);
-    qlonglong id = lastRev.toLongLong(&success);
-
-    if (!success) {
-        kDebug() << "Could not parse last revision \"" << lastRev << '"';
-        id = 1024;
-    }
-
-    typedef std::reverse_iterator<QList<QByteArray>::const_iterator> QStringListReverseIterator;
-    QStringListReverseIterator rbegin(items.constEnd() - 1), rend(items.constBegin());  // Skip the final 0
-    qlonglong lastId;
-
-    while (rbegin != rend) {
-        QString rev = QString::fromLocal8Bit(*rbegin++);
-        QString node = QString::fromLocal8Bit(*rbegin++);
-        QString parents = QString::fromLocal8Bit(*rbegin++);
-        QString author = QString::fromLocal8Bit(*rbegin++);
-        QString date = QString::fromLocal8Bit(*rbegin++);
-        QString desc = QString::fromLocal8Bit(*rbegin++);
-        QString mods = QString::fromLocal8Bit(*rbegin++);
-        QString adds = QString::fromLocal8Bit(*rbegin++);
-        QString dels = QString::fromLocal8Bit(*rbegin++);
-        QString copies = QString::fromLocal8Bit(*rbegin++);
-        lastId = id;
-        id = rev.toLongLong(&success);
-
-        if (!success) {
-            kDebug() << "Could not parse revision \"" << rev << '"';
-            return;
-        }
+    /* get revision data from items.
+     * because there is continuous stream of \0 separated strings,
+     * incrementation will occur inside loop body
+     *
+     * "{file_copies}\\0{file_dels}\\0{file_adds}\\0{file_mods}\\0"
+     * "{desc}\\0{date|rfc3339date}\\0{author}\\0{parents}\\0{node}\\0{rev}\\0"
+     */
+    for(QList<QByteArray>::const_iterator it = items.begin(); it != items.end(); ) {
+        QString copies = QString::fromLocal8Bit(*it++);
+        QString dels = QString::fromLocal8Bit(*it++);
+        QString adds = QString::fromLocal8Bit(*it++);
+        QString mods = QString::fromLocal8Bit(*it++);
+        QString desc = QString::fromLocal8Bit(*it++);
+        QString date = QString::fromLocal8Bit(*it++);
+        QString author = QString::fromLocal8Bit(*it++);
+        QString parents = QString::fromLocal8Bit(*it++);
+        QString node = QString::fromLocal8Bit(*it++);
+        QString rev = QString::fromLocal8Bit(*it++);
 
         VcsEvent event;
-        VcsRevision revision;
-        revision.setRevisionValue(id, VcsRevision::GlobalNumber);
-        event.setRevision(revision);
-        event.setAuthor(author);
-        event.setDate(QDateTime::fromString( date, Qt::ISODate ));
         event.setMessage(desc);
+        event.setDate(QDateTime::fromString(date, Qt::ISODate));
+        event.setAuthor(author);
+
+        VcsRevision revision;
+        revision.setRevisionValue(rev, KDevelop::VcsRevision::GlobalNumber);
+        event.setRevision(revision);
 
         QList<VcsItemEvent> items;
 
@@ -831,26 +814,20 @@ void MercurialPlugin::parseLogOutputBasicVersionControl(DVcsJob* job) const
             item.setRepositoryLocation(file);
             items.push_back(item);
         }
-#if 0   // Currently not implemented due to lack of a new version of mercurial
-        foreach (const QString & file, copies.split(QChar(' '), QString::SkipEmptyParts)) {
-            VcsItemEvent item;
-            item.setActions(VcsItemEvent::Copied);
-            item.setRevision(revision);
-            item.setRepositoryLocation(file);
-//             item.setRepositoryCopySourceLocation( const QString& );
-//             item.setRepositoryCopySourceRevision( const VcsRevision& );
-            items.push_back(item);
-        }
-#endif
+
+        //TODO: copied files
+
         event.setItems(items);
-        events.push_front(qVariantFromValue(event));
+        events.push_back(QVariant::fromValue(event));
     }
+
     job->setResults(QVariant(events));
-#endif
 }
 
 void MercurialPlugin::parseLogOutput(const DVcsJob * job, QList<DVcsEvent>& commits) const
 {
+    kDebug() << "parseLogOutput";
+
 #if 0
     static unsigned int entriesPerCommit = 6;
     QList<QByteArray> items = job->rawOutput().split('\0');
