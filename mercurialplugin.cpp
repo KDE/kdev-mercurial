@@ -179,30 +179,24 @@ VcsJob* MercurialPlugin::push(const KUrl &workingRepository, const VcsLocation &
 
 VcsJob* MercurialPlugin::add(const KUrl::List& localLocations, IBasicVersionControl::RecursionMode recursion)
 {
-    if (localLocations.empty())
-        return NULL;
-
-    return NULL;
-
-#if 0
-    std::auto_ptr<DVcsJob> job(new DVcsJob(this));
-
-    if (!prepareJob(job.get(), localLocations.front().toLocalFile())) {
+    if (recursion == NonRecursive) {
+        // FIXME: filter out directories
         return NULL;
     }
 
-    *job << "hg" << "add" << "--";
-
-    if (!addDirsConditionally(job.get(), localLocations, recursion)) {
+    if (localLocations.empty()) {
+        // nothing left after filtering
         return NULL;
     }
 
-    return job.release();
-#endif
+    DVcsJob* job = new DVcsJob(localLocations.first().pathOrUrl(), this);
+    *job << "hg" << "add" << "--" << localLocations;
+    return job;
 }
 
 VcsJob* MercurialPlugin::copy(const KUrl& localLocationSrc, const KUrl& localLocationDst)
 {
+    kDebug() << "copy";
     return NULL;
 #if 0
     std::auto_ptr<DVcsJob> job(new DVcsJob(this));
@@ -240,27 +234,18 @@ VcsJob* MercurialPlugin::commit(const QString& message,
                                   const KUrl::List& localLocations,
                                   IBasicVersionControl::RecursionMode recursion)
 {
-    return NULL;
-
-#if 0
-    if (localLocations.empty() || message.isEmpty())
-        return NULL;
-
-    std::auto_ptr<DVcsJob> job(new DVcsJob(this));
-
-    if (!prepareJob(job.get(), localLocations.front().toLocalFile())) {
+    if (recursion == NonRecursive) {
+        // FIXME: filter out directories
         return NULL;
     }
 
-    //Note: the message is quoted somewhere else, so if we quote here then we have quotes in the commit log
-    *job << "hg" << "commit" << "-m" << message << "--";
-
-    if (!addDirsConditionally(job.get(), localLocations, recursion)) {
+    if (localLocations.empty() || message.isEmpty()) {
         return NULL;
     }
 
-    return job.release();
-#endif
+    DVcsJob* job = new DVcsJob(localLocations.first().pathOrUrl(), this);
+    *job << "hg" << "commit" << "-m" << message << "--" << localLocations;
+    return job;
 }
 
 VcsJob* MercurialPlugin::update(const KUrl::List& files,
@@ -408,8 +393,9 @@ VcsJob* MercurialPlugin::remove(const KUrl::List& files)
 
 VcsJob* MercurialPlugin::status(const KUrl::List& localLocations, IBasicVersionControl::RecursionMode recursion)
 {
+    kDebug() << "status";
     return NULL;
-    #if 0
+#if 0
     std::auto_ptr<DVcsJob> job(new DVcsJob(this));
 
     if (!prepareJob(job.get(), localLocations.front().toLocalFile())) {
