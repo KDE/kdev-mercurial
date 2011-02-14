@@ -482,31 +482,25 @@ VcsJob* MercurialPlugin::log(const KUrl& localLocation,
 VcsJob* MercurialPlugin::annotate(const KUrl& localLocation,
                             const VcsRevision& rev)
 {
-    return NULL;
+    DVcsJob *job = new DVcsJob(findWorkingDir(localLocation), this);
 
-#if 0
-    if (!localLocation.isLocalFile())
-        return NULL;
-
-    std::auto_ptr<DVcsJob> job(new DVcsJob(this));
-
-    if (!prepareJob(job.get(), localLocation.toLocalFile())) {
-        return NULL;
-    }
-
+    /*
+     * TODO: it would be very nice if we can add "-v" key
+     * to get full author name
+     */
     *job << "hg" << "annotate" << "-n" << "-u" << "-d";
+
     QString srev = toMercurialRevision(rev);
 
-    if (srev != QString::null && !srev.isEmpty())
+    if (srev != QString::null && !srev.isEmpty()) {
         *job << "-r" << srev;
+    }
 
-    *job << "--";
+    *job << "--" << localLocation.toLocalFile();
 
-    *job << localLocation.toLocalFile();
-    connect(job.get(), SIGNAL(readyForParsing(DVcsJob*)), SLOT(parseAnnotations(DVcsJob*)));
+    connect(job, SIGNAL(readyForParsing(KDevelop::DVcsJob*)), SLOT(parseAnnotations(KDevelop::DVcsJob*)));
 
-    return job.release();
-#endif
+    return job;
 }
 
 
@@ -680,9 +674,6 @@ void MercurialPlugin::parseDiff(DVcsJob* job)
 
 bool MercurialPlugin::parseAnnotations(DVcsJob *job) const
 {
-    return false;
-
-#if 0
     if (job->status() != VcsJob::JobSucceeded)
         return false;
 
@@ -708,8 +699,8 @@ bool MercurialPlugin::parseAnnotations(DVcsJob *job) const
             return false;
         }
 
-        // TODO: Doesn't work, but it should be a RFCDate as described in KDateString
-        KDateTime dt = KDateTime::fromString(reAnnot.cap(3), KDateTime::RFCDate);
+        KDateTime dt = KDateTime::fromString(reAnnot.cap(3), "%:a %:b %d %H:%M:%S %Y %z");
+        kDebug() << reAnnot.cap(3) << dt;
         annotation.setDate(dt.dateTime());
 
         VcsRevision vcsrev;
@@ -721,7 +712,6 @@ bool MercurialPlugin::parseAnnotations(DVcsJob *job) const
     job->setResults(result);
 
     return true;
-#endif
 }
 
 void MercurialPlugin::parseLogOutputBasicVersionControl(DVcsJob* job) const
