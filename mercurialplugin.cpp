@@ -552,42 +552,29 @@ DVcsJob* MercurialPlugin::branch(const QString &repository, const QString &baseb
 
 QString MercurialPlugin::curBranch(const QString &repository)
 {
-    return NULL;
-
-#if 0
-    std::auto_ptr<DVcsJob> job(new DVcsJob(this));
-
-    if (!prepareJob(job.get(), repository)) {
-        return NULL;
-    }
-
+    DVcsJob *job = new DVcsJob(findWorkingDir(repository), this);
     *job << "hg" << "branch";
 
-    if (!job->exec() || job->status() != VcsJob::JobSucceeded)
-        return QString();
+    QString result;
+    if (job->exec() && job->status() == VcsJob::JobSucceeded) {
+        // Strip the final newline. Mercurial does not allow whitespaces at beginning or end
+        result = job->output().simplified();
+    }
 
-    return job->output().simplified();  // Strip the final newline. Mercurial does not allow whitespaces at beginning or end
-#endif
+    return result;
 }
 
 QStringList MercurialPlugin::branches(const QString &repository)
 {
-    return QStringList();
-
-#if 0
-    std::auto_ptr<DVcsJob> job(new DVcsJob(this));
-
-    if (!prepareJob(job.get(), repository)) {
-        return QStringList();
-    }
-
+    DVcsJob *job = new DVcsJob(findWorkingDir(repository), this);
     *job << "hg" << "branches" << "-q";
 
-    if (!job->exec() || job->status() != VcsJob::JobSucceeded)
-        return QStringList();
+    QStringList result;
+    if (job->exec() && job->status() == VcsJob::JobSucceeded) {
+        result = job->output().split('\n', QString::SkipEmptyParts);
+    }
 
-    return job->output().split('\n', QString::SkipEmptyParts);
-#endif
+    return result;
 }
 
 QList<DVcsEvent> MercurialPlugin::getAllCommits(const QString &repo)
