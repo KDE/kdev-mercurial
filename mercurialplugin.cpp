@@ -550,32 +550,6 @@ DVcsJob* MercurialPlugin::branch(const QString &repository, const QString &baseb
 #endif
 }
 
-VcsJob* MercurialPlugin::reset(const KUrl &repository, const QStringList &args, const KUrl::List& files)
-{
-    return NULL;
-
-#if 0
-    std::auto_ptr<DVcsJob> job(new DVcsJob(this));
-
-    if (!prepareJob(job.get(), repository.toLocalFile())) {
-        return NULL;
-    }
-
-    *job << "hg" << "revert";
-
-    if (!args.isEmpty())
-        *job << args;
-
-    if (!files.isEmpty()) {
-        *job << "--";
-        addFileList(job.get(), files);
-    } else
-        *job << "-a";
-
-    return job.release();
-#endif
-}
-
 QString MercurialPlugin::curBranch(const QString &repository)
 {
     return NULL;

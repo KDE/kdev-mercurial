@@ -107,8 +107,6 @@ public:
     KDevelop::VcsJob* annotate(const KUrl& localLocation,
                             const KDevelop::VcsRevision& rev);
 
-    KDevelop::VcsJob* reset(const KUrl& repository, const QStringList &args, const KUrl::List &files);
-
     KDevelop::DVcsJob* switchBranch(const QString &repository, const QString &branch);
     KDevelop::DVcsJob* branch(const QString &repository, const QString &basebranch = QString(), const QString &branch = QString(),
                     const QStringList &args = QStringList());
