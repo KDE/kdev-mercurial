@@ -1,0 +1,15 @@
+BASIC SET:
+copy
+update
+resolve
+
+branch[delete]
+
+getAllCommits
+
+vcsLocation
+repositoryLocation
+
+
+EXTRA FEATURES:
+mercurial queues
