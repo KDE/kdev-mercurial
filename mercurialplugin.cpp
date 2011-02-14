@@ -513,30 +513,41 @@ DVcsJob* MercurialPlugin::switchBranch(const QString &repository, const QString 
 DVcsJob* MercurialPlugin::branch(const QString &repository, const QString &basebranch, const QString &branch,
                                    const QStringList &args)
 {
-    return NULL;
-
+   /*
+     * Delete branch?
+     * TODO: QStringList interface is ugly
+     */
+    if (args.contains("-D")) {
+        /*
+         * TODO: ok, nice try, but --close-branch operates only on current branch,
+         * so we need to:
+         * 1. check there is no uncommited changes
+         * 1.1. somehow store them (diff in mem? mq?)
+         * 2. switch branch
+         * 3. hg commit --close-branch
+         * 4. switch back
+         */
+        return NULL;
 #if 0
-    Q_UNUSED(repository)
-    Q_UNUSED(basebranch)
-    Q_UNUSED(branch)
-
-    if (args.size() > 0) // Mercurial doesn't support rename or delete operations, which are hidden in the args of the function call
-        return NULL;
-
-    std::auto_ptr<DVcsJob> job(new DVcsJob(this));
-
-    if (!prepareJob(job.get(), repository)) {
-        return NULL;
-    }
-
-    if (basebranch != curBranch(repository)) { // I'm to lazy to support branching from different branch (which isn't used the GUI)
-        return NULL;
-    }
-
-    *job << "hg" << "branch" << "--" << branch;
-
-    return job.release();
+        DVcsJob *job = new DVcsJob(findWorkingDir(repository), this);
+        *job << "hg" << "commit" << "--close-branch" << "-m" << QString("Closing %1 branch").arg(curBranch(repository));
+        return job;
 #endif
+    } else {
+        // Only create and delete is supported
+        if (args.size() > 0) {
+            return NULL;
+        }
+
+        // TODO: add support branching from different branch
+        if (basebranch != curBranch(repository)) {
+            return NULL;
+        }
+
+        DVcsJob *job = new DVcsJob(findWorkingDir(repository), this);
+        *job << "hg" << "branch" << "--" << branch;
+        return job;
+    }
 }
 
 QString MercurialPlugin::curBranch(const QString &repository)
