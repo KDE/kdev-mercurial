@@ -197,19 +197,9 @@ VcsJob* MercurialPlugin::add(const KUrl::List& localLocations, IBasicVersionCont
 
 VcsJob* MercurialPlugin::copy(const KUrl& localLocationSrc, const KUrl& localLocationDst)
 {
-    kDebug() << "copy";
-    return NULL;
-#if 0
-    std::auto_ptr<DVcsJob> job(new DVcsJob(this));
-
-    if (!prepareJob(job.get(), localLocationSrc.toLocalFile())) {
-        return NULL;
-    }
-
+    DVcsJob *job = new DVcsJob(findWorkingDir(localLocationSrc), this);
     *job << "hg" << "cp" << "--" << localLocationSrc.toLocalFile() << localLocationDst.path();
-
-    return job.release();
-#endif
+    return job;
 }
 
 VcsJob* MercurialPlugin::move(const KUrl& localLocationSrc,
