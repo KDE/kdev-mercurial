@@ -503,22 +503,11 @@ VcsJob* MercurialPlugin::annotate(const KUrl& localLocation,
     return job;
 }
 
-
 DVcsJob* MercurialPlugin::switchBranch(const QString &repository, const QString &branch)
 {
-    return NULL;
-
-#if 0
-    std::auto_ptr<DVcsJob> job(new DVcsJob(this));
-
-    if (!prepareJob(job.get(), repository)) {
-        return NULL;
-    }
-
+    DVcsJob *job = new DVcsJob(findWorkingDir(repository), this);
     *job << "hg" << "update" << "--" << branch;
-
-    return job.release();
-#endif
+    return job;
 }
 
 DVcsJob* MercurialPlugin::branch(const QString &repository, const QString &basebranch, const QString &branch,
