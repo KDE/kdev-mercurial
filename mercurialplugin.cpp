@@ -747,7 +747,7 @@ void MercurialPlugin::parseLogOutputBasicVersionControl(DVcsJob* job) const
         //TODO: copied files
 
         event.setItems(items);
-        events.push_back(QVariant::fromValue(event));
+        events.push_front(QVariant::fromValue(event));
     }
 
     job->setResults(QVariant(events));
