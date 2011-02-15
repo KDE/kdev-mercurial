@@ -6,7 +6,6 @@ branch[delete]
 
 getAllCommits
 
-vcsLocation
 repositoryLocation
 
 

@@ -47,6 +47,7 @@
 #include <vcs/vcsannotation.h>
 #include <vcs/dvcs/dvcsjob.h>
 #include <interfaces/icore.h>
+#include "mercurialvcslocationwidget.h"
 
 
 K_PLUGIN_FACTORY(KDevMercurialFactory, registerPlugin<MercurialPlugin>();)
@@ -142,7 +143,7 @@ VcsJob* MercurialPlugin::repositoryLocation(const KUrl & directory)
 
 VcsJob* MercurialPlugin::createWorkingCopy(const VcsLocation & localOrRepoLocationSrc, const KUrl& destinationDirectory, IBasicVersionControl::RecursionMode)
 {
-    DVcsJob *job = new DVcsJob(destinationDirectory.path(), this);
+    DVcsJob *job = new DVcsJob(QDir::home(), this);
 
     *job << "hg" << "clone" << "--" << localOrRepoLocationSrc.localUrl().pathOrUrl() << destinationDirectory.pathOrUrl();
 
@@ -843,7 +844,7 @@ void MercurialPlugin::parseLogOutput(const DVcsJob * job, QList<DVcsEvent>& comm
 
 VcsLocationWidget* MercurialPlugin::vcsLocation(QWidget* parent) const
 {
-    return NULL;
+    return new MercurialVcsLocationWidget(parent);
 }
 
 QStringList MercurialPlugin::getLsFiles(const QString &directory, const QStringList &args)

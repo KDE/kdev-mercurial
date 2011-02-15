@@ -18,6 +18,7 @@ add_subdirectory(tests)
 ########### next target ###############
 
 set(kdevmercurial_PART_SRCS
+    mercurialvcslocationwidget.cpp
     mercurialplugin.cpp
 )
 
