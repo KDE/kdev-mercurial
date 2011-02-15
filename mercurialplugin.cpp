@@ -230,31 +230,42 @@ VcsJob* MercurialPlugin::commit(const QString& message,
     return job;
 }
 
-VcsJob* MercurialPlugin::update(const KUrl::List& files,
-                                const KDevelop::VcsRevision& rev,
-                                KDevelop::IBasicVersionControl::RecursionMode recursion)
+VcsJob* MercurialPlugin::update(const KUrl::List& localLocations,
+                                const VcsRevision& rev,
+                                IBasicVersionControl::RecursionMode recursion)
 {
-    return NULL;
+    /* TODO: update to Head != pull, but for consistency with git plugin...
+     * TODO: per file pulls?
+     * TODO: why rev == VcsRevision::createSpecialRevision(VcsRevision::Head) doesn't work?
+     */
+    if(rev.revisionType() == VcsRevision::Special &&
+       rev.revisionValue().value<VcsRevision::RevisionSpecialType>() == VcsRevision::Head) {
+        return pull(VcsLocation(), findWorkingDir(localLocations.first()).path());
+    }
 
-#if 0
-    if (files.empty())
-        return NULL;
+    /*
+     * actually reverting files
+     * TODO: hg revert does not change parents, hg update does
+     *       hg revert works on files, hg update doesn't
+     * maybe do hg update only when top dir update() is requested?
+     * TODO: nobody calls update with something other than VcsRevision::Head
+     */
+    KUrl::List locations = localLocations;
 
-    std::auto_ptr<DVcsJob> job(new DVcsJob(this));
+    if (recursion == NonRecursive) {
+        filterOutDirectories(locations);
+    }
 
-    if (!prepareJob(job.get(), files.front().toLocalFile())) {
+    if (locations.empty()) {
         return NULL;
     }
+
+    DVcsJob *job = new DVcsJob(findWorkingDir(locations.first()), this);
 
     //Note: the message is quoted somewhere else, so if we quote here then we have quotes in the commit log
-    *job << "hg" << "revert" << "-r" << toMercurialRevision(rev) << "--";
-
-    if (!addDirsConditionally(job.get(), files, recursion)) {
-        return NULL;
-    }
-
-    return job.release();
-#endif
+    // idk what does previous comment mean -- abatyiev
+    *job << "hg" << "revert" << "-r" << toMercurialRevision(rev) << "--" << locations;
+    return job;
 }
 
 VcsJob* MercurialPlugin::resolve(const KUrl::List& files, KDevelop::IBasicVersionControl::RecursionMode recursion)

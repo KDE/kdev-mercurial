@@ -89,7 +89,7 @@ public:
                     KDevelop::IBasicVersionControl::RecursionMode recursion);
     KDevelop::VcsJob* revert(const KUrl::List& localLocations,
                     KDevelop::IBasicVersionControl::RecursionMode recursion);
-    KDevelop::VcsJob* update(const KUrl::List& files,
+    KDevelop::VcsJob* update(const KUrl::List& localLocations,
                     const KDevelop::VcsRevision& rev, KDevelop::IBasicVersionControl::RecursionMode recursion);
     KDevelop::VcsJob* resolve(const KUrl::List& files, KDevelop::IBasicVersionControl::RecursionMode recursion);
 
