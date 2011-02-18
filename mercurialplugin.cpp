@@ -932,4 +932,28 @@ QDir MercurialPlugin::findWorkingDir(const KUrl& location)
     }
 }
 
+KUrl MercurialPlugin::remotePushRepositoryLocation(QDir &directory)
+{
+    // check default-push first
+    DVcsJob *job = new DVcsJob(directory, this);
+    *job << "hg" << "paths" << "default-push";
+    if (!job->exec() || job->status() != VcsJob::JobSucceeded) {
+        kDebug() << "no default-push, hold on";
+
+        // or try default
+        job = new DVcsJob(directory, this);
+        *job << "hg" << "paths" << "default";
+
+        if (!job->exec() || job->status() != VcsJob::JobSucceeded) {
+            kDebug() << "nowhere to push!";
+
+            // fail is everywhere
+            return KUrl();
+        }
+    }
+
+    // don't forget to strip last '\n'
+    return job->output().trimmed();
+}
+
 // #include "mercurialplugin.moc"

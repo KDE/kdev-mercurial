@@ -30,7 +30,7 @@ class MercurialPushJob : public KDevelop::VcsJob
     Q_OBJECT
 
 public:
-    MercurialPushJob(const QDir &workingDir, const KUrl &destination, MercurialPlugin *parent) : VcsJob(parent), m_workingDir(workingDir), m_repoLocation(destination), m_status(JobNotStarted) { };
+    MercurialPushJob(const QDir &workingDir, const KUrl &destination, MercurialPlugin *parent);
     void start();
     QVariant fetchResults();
     KDevelop::VcsJob::JobStatus status() const;

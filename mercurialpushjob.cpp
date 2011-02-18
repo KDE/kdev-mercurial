@@ -28,6 +28,16 @@
 
 using namespace KDevelop;
 
+MercurialPushJob::MercurialPushJob(const QDir &workingDir, const KUrl &destination, MercurialPlugin *parent)
+: VcsJob(parent), m_workingDir(workingDir), m_status(JobNotStarted)
+{
+    if (destination.isEmpty()) {
+        m_repoLocation = static_cast<MercurialPlugin*>(vcsPlugin())->remotePushRepositoryLocation(m_workingDir);
+    } else {
+        m_repoLocation = destination;
+    }
+};
+
 void MercurialPushJob::start()
 {
     m_status = JobRunning;
@@ -36,10 +46,8 @@ void MercurialPushJob::start()
 
     *job << "hg" << "push" << "--";
 
-    QString pathOrUrl = m_repoLocation.pathOrUrl();
-
-    if (!pathOrUrl.isEmpty())
-        *job << pathOrUrl;
+    if (!m_repoLocation.isEmpty())
+        *job << m_repoLocation.url();
 
     connect(job, SIGNAL(resultsReady(KDevelop::VcsJob*)), SLOT(serverContacted(KDevelop::VcsJob*)));
     job->start();
@@ -73,9 +81,13 @@ void MercurialPushJob::serverContacted(VcsJob *job)
             // server requests username:password auth -> ask pass
             KPasswordDialog dlg(0, KPasswordDialog::ShowUsernameLine);
             dlg.setPrompt(i18n("Enter your login and password for Mercurial push."));
+            dlg.setUsername(m_repoLocation.user());
+            dlg.setPassword(m_repoLocation.pass());
             if (!dlg.exec()) {
                 setFail();
             } else {
+                m_repoLocation.setUser(dlg.username());
+                m_repoLocation.setPass(dlg.password());
                 start();
             }
         } else if (response.contains("remote: Permission denied")) {

@@ -125,6 +125,12 @@ public:
     //graph helpers
     QList<DVcsEvent> getAllCommits(const QString &repo);
 
+    /**
+     * Find out where is default remote located.
+     * @param directory inside working directory
+     */
+    KUrl remotePushRepositoryLocation(QDir &directory);
+
 protected slots:
     void parseLogOutputBasicVersionControl(KDevelop::DVcsJob *job) const;
     bool parseStatus(KDevelop::DVcsJob *job) const;
