@@ -48,6 +48,7 @@
 #include <vcs/dvcs/dvcsjob.h>
 #include <interfaces/icore.h>
 #include "mercurialvcslocationwidget.h"
+#include "mercurialpushjob.h"
 
 
 K_PLUGIN_FACTORY(KDevMercurialFactory, registerPlugin<MercurialPlugin>();)
@@ -166,16 +167,7 @@ VcsJob* MercurialPlugin::pull(const VcsLocation & otherRepository, const KUrl& w
 
 VcsJob* MercurialPlugin::push(const KUrl &workingRepository, const VcsLocation & otherRepository)
 {
-    DVcsJob *job = new DVcsJob(workingRepository.toLocalFile(), this);
-
-    *job << "hg" << "push" << "--";
-
-    QString pathOrUrl = otherRepository.localUrl().pathOrUrl();
-
-    if (!pathOrUrl.isEmpty())
-        *job << pathOrUrl;
-
-    return job;
+    return new MercurialPushJob(findWorkingDir(workingRepository), otherRepository.localUrl(), this);
 }
 
 VcsJob* MercurialPlugin::add(const KUrl::List& localLocations, IBasicVersionControl::RecursionMode recursion)
