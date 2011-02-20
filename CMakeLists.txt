@@ -14,6 +14,7 @@ include_directories(
 
 add_definitions(-DKDE_DEFAULT_DEBUG_AREA=9526)
 add_subdirectory(tests)
+add_subdirectory(icons)
 
 ########### next target ###############
 
@@ -39,4 +40,6 @@ install(TARGETS kdevmercurial DESTINATION ${PLUGIN_INSTALL_DIR} )
 ########### install files ###############
 install( FILES kdevmercurial.desktop DESTINATION ${SERVICES_INSTALL_DIR} )
 install( FILES kdevmercurial.rc DESTINATION ${DATA_INSTALL_DIR}/kdevmercurial )
+install( FILES kdevmercurial-log.style DESTINATION ${DATA_INSTALL_DIR}/kdevmercurial )
+add_definitions(-DLOG_STYLE_FILE="\\"${DATA_INSTALL_DIR}/kdevmercurial/kdevmercurial-log.style\\"")
 
