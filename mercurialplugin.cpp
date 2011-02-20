@@ -472,9 +472,9 @@ VcsJob* MercurialPlugin::log(const KUrl& localLocation,
     if (limit > 0)
         *job << "-l" << QString::number(limit);
 
-    *job << "--template"
-         << "{file_copies}\\0{file_dels}\\0{file_adds}\\0{file_mods}\\0{desc}\\0{date|rfc3339date}\\0{author}\\0{parents}\\0{node}\\0{rev}\\0"
-         << "--" << localLocation;
+    /* *job << "--template"
+         << "{file_copies}\\0{file_dels}\\0{file_adds}\\0{file_mods}\\0{desc}\\0{date|rfc3339date}\\0{author}\\0{parents}\\0{node}\\0{rev}\\0" */
+    *job << "--style" << LOG_STYLE_FILE << "--" << localLocation;
 
     connect(job, SIGNAL(readyForParsing(KDevelop::DVcsJob*)),
             SLOT(parseLogOutputBasicVersionControl(KDevelop::DVcsJob*)));
@@ -695,14 +695,10 @@ void MercurialPlugin::parseLogOutputBasicVersionControl(DVcsJob* job) const
      * because there is continuous stream of \0 separated strings,
      * incrementation will occur inside loop body
      *
-     * "{file_copies}\\0{file_dels}\\0{file_adds}\\0{file_mods}\\0"
-     * "{desc}\\0{date|rfc3339date}\\0{author}\\0{parents}\\0{node}\\0{rev}\\0"
+     * "{desc}\0{date|rfc3339date}\0{author}\0{parents}\0{node}\0{rev}\0"
+     * "{file_dels}\0{file_adds}\0{file_mods}\0{file_copies}\0'
      */
     for(QList<QByteArray>::const_iterator it = items.begin(); it != items.end(); ) {
-        QString copies = QString::fromLocal8Bit(*it++);
-        QString dels = QString::fromLocal8Bit(*it++);
-        QString adds = QString::fromLocal8Bit(*it++);
-        QString mods = QString::fromLocal8Bit(*it++);
         QString desc = QString::fromLocal8Bit(*it++);
         QString date = QString::fromLocal8Bit(*it++);
         QString author = QString::fromLocal8Bit(*it++);
@@ -721,32 +717,36 @@ void MercurialPlugin::parseLogOutputBasicVersionControl(DVcsJob* job) const
 
         QList<VcsItemEvent> items;
 
-        // TODO: Convince Mercurial to separate the files with newlines, in order to allow whitespaces in filenames
-        foreach (const QString & file, mods.split(QChar(' '), QString::SkipEmptyParts)) {
-            VcsItemEvent item;
-            item.setActions(VcsItemEvent::ContentsModified);
-            item.setRevision(revision);
-            item.setRepositoryLocation(file);
-            items.push_back(item);
+        const VcsItemEvent::Action actions[3] = {VcsItemEvent::ContentsModified, VcsItemEvent::Added, VcsItemEvent::Deleted};
+        for (int i = 0; i < 3; i++) {
+            const QByteArray &files = *it++;
+            if (files.isEmpty()) {
+                continue;
+            }
+
+            foreach (const QByteArray &file, files.split(' ')) {
+                VcsItemEvent item;
+                item.setActions(actions[i]);
+                item.setRevision(revision);
+                item.setRepositoryLocation(QUrl::fromPercentEncoding(file));
+                items.push_back(item);
+            }
         }
 
-        foreach (const QString & file, adds.split(QChar(' '), QString::SkipEmptyParts)) {
-            VcsItemEvent item;
-            item.setActions(VcsItemEvent::Added);
-            item.setRevision(revision);
-            item.setRepositoryLocation(file);
-            items.push_back(item);
+        const QByteArray &copies = *it++;
+        if (!copies.isEmpty()) {
+            foreach (const QByteArray &copy, copies.split(' ')) {
+                QList<QByteArray> files = copy.split('~');
+
+                VcsItemEvent item;
+                item.setActions(VcsItemEvent::Copied);
+                item.setRevision(revision);
+                item.setRepositoryCopySourceLocation(QUrl::fromPercentEncoding(files[0]));
+                item.setRepositoryLocation(QUrl::fromPercentEncoding(files[1]));
+                items.push_back(item);
+            }
         }
 
-        foreach (const QString & file, dels.split(QChar(' '), QString::SkipEmptyParts)) {
-            VcsItemEvent item;
-            item.setActions(VcsItemEvent::Deleted);
-            item.setRevision(revision);
-            item.setRepositoryLocation(file);
-            items.push_back(item);
-        }
-
-        //TODO: copied files
 
         event.setItems(items);
         events.push_front(QVariant::fromValue(event));
