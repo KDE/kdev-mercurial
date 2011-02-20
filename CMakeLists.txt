@@ -14,6 +14,7 @@ include_directories(
 
 add_definitions(-DKDE_DEFAULT_DEBUG_AREA=9526)
 add_subdirectory(tests)
+add_subdirectory(icons)
 
 ########### next target ###############
 
