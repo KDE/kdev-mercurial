@@ -145,7 +145,6 @@ protected:
     static KDevelop::VcsStatusInfo::State charToState(const char ch);
     static QDir findWorkingDir(const KUrl &location);
 
-    QStringList getLsFiles(const QString &directory, const QStringList &args = QStringList());
     KUrl m_lastRepoRoot;
 };
 

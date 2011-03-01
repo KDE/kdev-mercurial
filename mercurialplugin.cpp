@@ -117,14 +117,20 @@ bool MercurialPlugin::isVersionControlled(const KUrl & url)
         return isValidDirectory(url);
     }
 
-    // Clean, Added, Modified. Escape possible files starting with "-"
-    static const QStringList versionControlledFlags(QString("-c -a -m --").split(' '));
-    const QString absolutePath = fsObject.absolutePath();
-    QStringList listFile(versionControlledFlags);
-    listFile.push_back(fsObject.fileName());
-    const QStringList filesInDir = getLsFiles(absolutePath, listFile);
+    DVcsJob *job = static_cast<DVcsJob*>(status(url, Recursive));
+    if (!job->exec()) {
+        return false;
+    }
 
-    return !filesInDir.empty();
+    QList<QVariant> statuses = qvariant_cast<QList<QVariant> >(job->fetchResults());
+    VcsStatusInfo info = qvariant_cast< VcsStatusInfo >(statuses.first());
+    if (info.state() == VcsStatusInfo::ItemAdded ||
+        info.state() == VcsStatusInfo::ItemModified ||
+        info.state() == VcsStatusInfo::ItemUpToDate) {
+        return true;
+    }
+
+    return false;
 }
 
 VcsJob* MercurialPlugin::init(const KUrl &directory)
@@ -845,30 +851,6 @@ void MercurialPlugin::parseLogOutput(const DVcsJob * job, QList<DVcsEvent>& comm
 VcsLocationWidget* MercurialPlugin::vcsLocation(QWidget* parent) const
 {
     return new MercurialVcsLocationWidget(parent);
-}
-
-QStringList MercurialPlugin::getLsFiles(const QString &directory, const QStringList &args)
-{
-    DVcsJob *job = new DVcsJob(directory, this);
-    *job << "hg" << "status" << "-n";
-
-    if (!args.isEmpty()) {
-        *job << args;
-    }
-
-    if (!job->exec() || job->status() != VcsJob::JobSucceeded) {
-        delete job;
-        return QStringList();
-    }
-
-    const QString prefix = directory.endsWith(QDir::separator()) ? directory : directory + QDir::separator();
-    QStringList fileList = job->output().split('\n', QString::SkipEmptyParts);
-    for (QStringList::iterator it = fileList.begin(); it != fileList.end(); ++it) {
-        it->prepend(prefix);
-    }
-
-    delete job;
-    return fileList;
 }
 
 void MercurialPlugin::filterOutDirectories(KUrl::List &locations)
