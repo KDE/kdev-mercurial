@@ -19,13 +19,41 @@
  ***************************************************************************/
 
 #include "mercurialheadswidget.h"
-#include <models/mercurialheadsmodel.h>
 
-MercurialHeadsWidget::MercurialHeadsWidget(QWidget *parent, Qt::WindowFlags f)
-    : QDialog(parent, f), m_ui(new Ui::MercurialHeadsWidget)
+#include <vcs/vcsjob.h>
+#include <vcs/vcsevent.h>
+
+#include <interfaces/icore.h>
+#include <interfaces/iruncontroller.h>
+
+#include <models/mercurialheadsmodel.h>
+#include <mercurialplugin.h>
+
+using namespace KDevelop;
+
+MercurialHeadsWidget::MercurialHeadsWidget(MercurialPlugin *plugin, const KUrl &url)
+    : QDialog(), m_ui(new Ui::MercurialHeadsWidget), m_url(url)
 {
     m_ui->setupUi(this);
     m_headsModel = new MercurialHeadsModel(this);
     m_ui->headsTableView->setModel(static_cast<QAbstractItemModel*>(m_headsModel));
+
+    VcsJob *headsJob = plugin->heads(m_url);
+    connect(headsJob, SIGNAL(resultsReady(KDevelop::VcsJob*)), this, SLOT(headsReceived(KDevelop::VcsJob*)));
+    ICore::self()->runController()->registerJob(headsJob);
 }
 
+void MercurialHeadsWidget::headsReceived(VcsJob *job)
+{
+    QList<QVariant> data = job->fetchResults().toList();
+    QList<VcsEvent> events;
+    foreach(const QVariant &value, data) {
+        events << value.value<VcsEvent>();
+    }
+    m_headsModel->addEvents(events);
+}
+
+void MercurialHeadsWidget::identifyReceived(VcsJob *job)
+{
+
+}

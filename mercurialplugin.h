@@ -108,6 +108,10 @@ public:
     KDevelop::VcsJob* annotate(const KUrl& localLocation,
                             const KDevelop::VcsRevision& rev);
 
+    // mercurial specific stuff
+    KDevelop::VcsJob* heads(const KUrl &localLocation);
+    KDevelop::VcsJob* identify(const KUrl &localLocation);
+
     KDevelop::DVcsJob* switchBranch(const QString &repository, const QString &branch);
     KDevelop::DVcsJob* branch(const QString &repository, const QString &basebranch = QString(), const QString &branch = QString(),
                     const QStringList &args = QStringList());

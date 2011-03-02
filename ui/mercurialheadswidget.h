@@ -24,6 +24,11 @@
 #include <QtGui/QWidget>
 #include "ui_mercurialheadswidget.h"
 
+class MercurialPlugin;
+namespace KDevelop {
+class VcsJob;
+}
+
 class MercurialHeadsModel;
 
 class MercurialHeadsWidget : public QDialog
@@ -31,11 +36,17 @@ class MercurialHeadsWidget : public QDialog
     Q_OBJECT
 
 public:
-    explicit MercurialHeadsWidget(QWidget *parent = 0, Qt::WindowFlags f = 0);
+    explicit MercurialHeadsWidget(MercurialPlugin *plugin, const KUrl &url);
+
+private slots:
+    void headsReceived(KDevelop::VcsJob *job);
+    void identifyReceived(KDevelop::VcsJob *job);
 
 private:
     Ui::MercurialHeadsWidget *m_ui;
     MercurialHeadsModel *m_headsModel;
+    MercurialPlugin *plugin;
+    const KUrl &m_url;
 };
 
 #endif // MERCURIALHEADSWIDGET_H

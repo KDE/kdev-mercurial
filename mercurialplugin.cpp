@@ -31,6 +31,7 @@
 #include <QtCore/QDir>
 #include <QtCore/QDateTime>
 #include <QtCore/QFileInfo>
+#include <QtGui/QMenu>
 
 #include <KDE/KPluginFactory>
 #include <KDE/KPluginLoader>
@@ -38,6 +39,7 @@
 #include <KDE/KAboutData>
 #include <KDE/KDateTime>
 #include <KDE/KDebug>
+#include <KDE/KAction>
 
 #include <interfaces/icore.h>
 
@@ -46,10 +48,8 @@
 #include <vcs/vcsrevision.h>
 #include <vcs/vcsannotation.h>
 #include <vcs/dvcs/dvcsjob.h>
-#include <interfaces/icore.h>
+
 #include "mercurialvcslocationwidget.h"
-#include <QMenu>
-#include <KAction>
 #include "ui/mercurialheadswidget.h"
 
 
@@ -517,6 +517,26 @@ VcsJob* MercurialPlugin::annotate(const KUrl& localLocation,
     return job;
 }
 
+VcsJob* MercurialPlugin::heads(const KUrl &localLocation)
+{
+    DVcsJob *job = new DVcsJob(findWorkingDir(localLocation), this);
+
+    *job << "hg" << "heads" << "--style" << LOG_STYLE_FILE;
+
+    connect(job, SIGNAL(readyForParsing(KDevelop::DVcsJob*)),
+            SLOT(parseLogOutputBasicVersionControl(KDevelop::DVcsJob*)));
+    return job;
+}
+
+VcsJob* MercurialPlugin::identify(const KUrl& localLocation)
+{
+    DVcsJob *job = new DVcsJob(findWorkingDir(localLocation), this);
+
+    *job << "hg" << "identify" << "-i" << "--" << localLocation;
+
+    return job;
+}
+
 DVcsJob* MercurialPlugin::switchBranch(const QString &repository, const QString &branch)
 {
     DVcsJob *job = new DVcsJob(findWorkingDir(repository), this);
@@ -939,8 +959,8 @@ void MercurialPlugin::additionalMenuEntries(QMenu *menu, const KUrl::List &urls)
 
 void MercurialPlugin::showHeads()
 {
-    MercurialHeadsWidget *headsWidget = new MercurialHeadsWidget();
-    headsWidget->setWindowTitle(i18n("Mercurial heads (%1)", m_urls.first().toLocalFile()));
+    const KUrl &current = m_urls.first();
+    MercurialHeadsWidget *headsWidget = new MercurialHeadsWidget(this, current);
     headsWidget->show();
 }
 
