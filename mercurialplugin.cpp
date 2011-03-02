@@ -48,6 +48,9 @@
 #include <vcs/dvcs/dvcsjob.h>
 #include <interfaces/icore.h>
 #include "mercurialvcslocationwidget.h"
+#include <QMenu>
+#include <KAction>
+#include "ui/mercurialheadswidget.h"
 
 
 K_PLUGIN_FACTORY(KDevMercurialFactory, registerPlugin<MercurialPlugin>();)
@@ -61,6 +64,9 @@ MercurialPlugin::MercurialPlugin(QObject *parent, const QVariantList &)
     KDEV_USE_EXTENSION_INTERFACE(KDevelop::IBasicVersionControl)
     KDEV_USE_EXTENSION_INTERFACE(KDevelop::IDistributedVersionControl)
 
+    m_headsAction = new KAction(i18n("Heads..."), this);
+
+    connect(m_headsAction, SIGNAL(triggered()), this, SLOT(showHeads()));
     core()->uiController()->addToolView(i18n("Mercurial"), dvcsViewFactory());
     setXMLFile("kdevmercurial.rc");
 }
@@ -921,5 +927,22 @@ QDir MercurialPlugin::findWorkingDir(const KUrl& location)
         return fileInfo.absoluteFilePath();
     }
 }
+
+void MercurialPlugin::additionalMenuEntries(QMenu *menu, const KUrl::List &urls)
+{
+    m_urls = urls;
+
+    menu->addAction(m_headsAction);
+
+    m_headsAction->setEnabled(m_urls.count() == 1);
+}
+
+void MercurialPlugin::showHeads()
+{
+    MercurialHeadsWidget *headsWidget = new MercurialHeadsWidget();
+    headsWidget->setWindowTitle(i18n("Mercurial heads (%1)", m_urls.first().toLocalFile()));
+    headsWidget->show();
+}
+
 
 // #include "mercurialplugin.moc"

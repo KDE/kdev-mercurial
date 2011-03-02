@@ -32,6 +32,7 @@
 #include <QtCore/QDir>
 #include <vcs/vcsstatusinfo.h>
 
+class KAction;
 namespace KDevelop
 {
 
@@ -131,6 +132,11 @@ protected slots:
     bool parseAnnotations(KDevelop::DVcsJob *job) const;
     void parseDiff(KDevelop::DVcsJob *job);
 
+    /*
+     * ui helpers
+     */
+    void showHeads();
+
 protected:
     //used in log
     void parseLogOutput(const KDevelop::DVcsJob *job, QList<DVcsEvent>& commits) const;
@@ -146,6 +152,11 @@ protected:
     static QDir findWorkingDir(const KUrl &location);
 
     KUrl m_lastRepoRoot;
+
+    // actions
+    KAction *m_headsAction;
+    KUrl::List m_urls;
+    void additionalMenuEntries(QMenu *menu, const KUrl::List &urls);
 };
 
 #endif

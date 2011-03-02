@@ -19,10 +19,17 @@ add_subdirectory(icons)
 ########### next target ###############
 
 set(kdevmercurial_PART_SRCS
+    ui/mercurialheadswidget.cpp
+    models/mercurialheadsmodel.cpp
     mercurialvcslocationwidget.cpp
     mercurialplugin.cpp
 )
 
+set(kdevmercurial_UIS
+    ui/mercurialheadswidget.ui
+)
+
+kde4_add_ui_files(kdevmercurial_PART_SRCS ${kdevmercurial_UIS})
 kde4_add_plugin(kdevmercurial ${kdevmercurial_PART_SRCS})
 
 target_link_libraries(kdevmercurial
