@@ -32,13 +32,21 @@
 using namespace KDevelop;
 
 MercurialHeadsWidget::MercurialHeadsWidget(MercurialPlugin *plugin, const KUrl &url)
-    : QDialog(), m_ui(new Ui::MercurialHeadsWidget), m_url(url)
+    : QDialog(), m_ui(new Ui::MercurialHeadsWidget), m_plugin(plugin), m_url(url)
 {
     m_ui->setupUi(this);
     m_headsModel = new MercurialHeadsModel(this);
     m_ui->headsTableView->setModel(static_cast<QAbstractItemModel*>(m_headsModel));
 
-    VcsJob *headsJob = plugin->heads(m_url);
+    VcsJob *identifyJob = m_plugin->identify(m_url);
+    connect(identifyJob, SIGNAL(resultsReady(KDevelop::VcsJob*)), this, SLOT(identifyReceived(KDevelop::VcsJob*)));
+    ICore::self()->runController()->registerJob(identifyJob);
+}
+
+void MercurialHeadsWidget::identifyReceived(VcsJob *job)
+{
+    m_currentHead = job->fetchResults().value<VcsRevision>();
+    VcsJob *headsJob = m_plugin->heads(m_url);
     connect(headsJob, SIGNAL(resultsReady(KDevelop::VcsJob*)), this, SLOT(headsReceived(KDevelop::VcsJob*)));
     ICore::self()->runController()->registerJob(headsJob);
 }
@@ -47,13 +55,17 @@ void MercurialHeadsWidget::headsReceived(VcsJob *job)
 {
     QList<QVariant> data = job->fetchResults().toList();
     QList<VcsEvent> events;
+
+    unsigned int i = 0;
     foreach(const QVariant &value, data) {
-        events << value.value<VcsEvent>();
+        const VcsEvent &event = value.value<VcsEvent>();
+        events << event;
+        if (event.revision().revisionValue().toLongLong() == m_currentHead.revisionValue().toLongLong()) {
+            m_headsModel->setCurrentHead(i);
+        }
+        ++i;
     }
     m_headsModel->addEvents(events);
 }
 
-void MercurialHeadsWidget::identifyReceived(VcsJob *job)
-{
 
-}

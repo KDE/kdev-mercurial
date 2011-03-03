@@ -532,8 +532,10 @@ VcsJob* MercurialPlugin::identify(const KUrl& localLocation)
 {
     DVcsJob *job = new DVcsJob(findWorkingDir(localLocation), this);
 
-    *job << "hg" << "identify" << "-i" << "--" << localLocation;
+    *job << "hg" << "identify" << "-n" << "--" << localLocation;
 
+    connect(job, SIGNAL(readyForParsing(KDevelop::DVcsJob*)),
+            SLOT(parseIdentify(KDevelop::DVcsJob*)));
     return job;
 }
 
@@ -744,7 +746,7 @@ void MercurialPlugin::parseLogOutputBasicVersionControl(DVcsJob* job) const
         event.setAuthor(author);
 
         VcsRevision revision;
-        revision.setRevisionValue(rev, KDevelop::VcsRevision::GlobalNumber);
+        revision.setRevisionValue(rev.toLongLong(), KDevelop::VcsRevision::GlobalNumber);
         event.setRevision(revision);
 
         QList<VcsItemEvent> items;
@@ -786,6 +788,14 @@ void MercurialPlugin::parseLogOutputBasicVersionControl(DVcsJob* job) const
 
     job->setResults(QVariant(events));
 }
+
+void MercurialPlugin::parseIdentify(DVcsJob* job) const
+{
+    VcsRevision revision;
+    revision.setRevisionValue(job->output().toLongLong(), VcsRevision::GlobalNumber);
+    job->setResults(qVariantFromValue<VcsRevision>(revision));
+}
+
 
 void MercurialPlugin::parseLogOutput(const DVcsJob * job, QList<DVcsEvent>& commits) const
 {

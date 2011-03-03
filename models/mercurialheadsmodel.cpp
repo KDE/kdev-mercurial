@@ -20,9 +20,21 @@
 
 #include "mercurialheadsmodel.h"
 
+#include <KIcon>
+
+using namespace KDevelop;
+
 MercurialHeadsModel::MercurialHeadsModel(QObject *parent)
     : VcsEventModel(parent)
 {
 
 }
 
+QVariant MercurialHeadsModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+    if (orientation == Qt::Vertical && role == Qt::DecorationRole && section == m_currentHead) {
+        return QVariant(KIcon("arrow-right"));
+    } else {
+        return VcsEventModel::headerData(section, orientation, role);
+    }
+}

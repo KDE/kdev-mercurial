@@ -137,6 +137,11 @@ protected slots:
     void parseDiff(KDevelop::DVcsJob *job);
 
     /*
+     * mercurial specific stuff
+     */
+    void parseIdentify(KDevelop::DVcsJob *job) const;
+
+    /*
      * ui helpers
      */
     void showHeads();

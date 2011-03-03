@@ -22,9 +22,13 @@
 #define MERCURIALHEADSWIDGET_H
 
 #include <QtGui/QWidget>
+
+#include <vcs/vcsrevision.h>
+
 #include "ui_mercurialheadswidget.h"
 
 class MercurialPlugin;
+
 namespace KDevelop {
 class VcsJob;
 }
@@ -45,8 +49,9 @@ private slots:
 private:
     Ui::MercurialHeadsWidget *m_ui;
     MercurialHeadsModel *m_headsModel;
-    MercurialPlugin *plugin;
+    MercurialPlugin *m_plugin;
     const KUrl &m_url;
+    KDevelop::VcsRevision m_currentHead;
 };
 
 #endif // MERCURIALHEADSWIDGET_H
