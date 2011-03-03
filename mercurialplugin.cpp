@@ -792,7 +792,11 @@ void MercurialPlugin::parseLogOutputBasicVersionControl(DVcsJob* job) const
 void MercurialPlugin::parseIdentify(DVcsJob* job) const
 {
     VcsRevision revision;
-    revision.setRevisionValue(job->output().toLongLong(), VcsRevision::GlobalNumber);
+    QString value = job->output();
+    // remove last '+' if necessary
+    if (value.endsWith('+'))
+        value.chop(1);
+    revision.setRevisionValue(value.toLongLong(), VcsRevision::GlobalNumber);
     job->setResults(qVariantFromValue<VcsRevision>(revision));
 }
 
