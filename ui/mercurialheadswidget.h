@@ -43,8 +43,12 @@ public:
     explicit MercurialHeadsWidget(MercurialPlugin *plugin, const KUrl &url);
 
 private slots:
+    void updateModel();
+
     void headsReceived(KDevelop::VcsJob *job);
     void identifyReceived(KDevelop::VcsJob *job);
+
+    void checkoutRequested();
 
 private:
     Ui::MercurialHeadsWidget *m_ui;

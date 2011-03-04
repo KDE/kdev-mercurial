@@ -539,6 +539,15 @@ VcsJob* MercurialPlugin::identify(const KUrl& localLocation)
     return job;
 }
 
+VcsJob* MercurialPlugin::checkoutHead(const KUrl &localLocation, const KDevelop::VcsRevision &rev)
+{
+    DVcsJob *job = new DVcsJob(findWorkingDir(localLocation), this);
+
+    *job << "hg" << "update" << "-C" << toMercurialRevision(rev);
+
+    return job;
+}
+
 DVcsJob* MercurialPlugin::switchBranch(const QString &repository, const QString &branch)
 {
     DVcsJob *job = new DVcsJob(findWorkingDir(repository), this);
