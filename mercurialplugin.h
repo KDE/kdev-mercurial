@@ -112,6 +112,7 @@ public:
     KDevelop::VcsJob* heads(const KUrl &localLocation);
     KDevelop::VcsJob* identify(const KUrl &localLocation);
     KDevelop::VcsJob* checkoutHead(const KUrl &localLocation, const KDevelop::VcsRevision &rev);
+    KDevelop::VcsJob* mergeWith(const KUrl &localLocation, const KDevelop::VcsRevision &rev);
 
     KDevelop::DVcsJob* switchBranch(const QString &repository, const QString &branch);
     KDevelop::DVcsJob* branch(const QString &repository, const QString &basebranch = QString(), const QString &branch = QString(),

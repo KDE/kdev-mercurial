@@ -39,7 +39,7 @@ MercurialHeadsWidget::MercurialHeadsWidget(MercurialPlugin *plugin, const KUrl &
     m_ui->headsTableView->setModel(static_cast<QAbstractItemModel*>(m_headsModel));
 
     connect(m_ui->checkoutPushButton, SIGNAL(clicked(bool)), this, SLOT(checkoutRequested()));
-
+    connect(m_ui->mergePushButton, SIGNAL(clicked(bool)), this, SLOT(mergeRequested()));
     updateModel();
 }
 
@@ -82,6 +82,18 @@ void MercurialHeadsWidget::checkoutRequested()
     }
 
     VcsJob *job = m_plugin->checkoutHead(m_url, m_headsModel->eventForIndex(selection).revision());
+    connect(job, SIGNAL(resultsReady(KDevelop::VcsJob*)), this, SLOT(updateModel()));
+    ICore::self()->runController()->registerJob(job);
+}
+
+void MercurialHeadsWidget::mergeRequested()
+{
+    const QModelIndex &selection = m_ui->headsTableView->currentIndex();
+    if (!selection.isValid()) {
+        return;
+    }
+
+    VcsJob *job = m_plugin->mergeWith(m_url, m_headsModel->eventForIndex(selection).revision());
     connect(job, SIGNAL(resultsReady(KDevelop::VcsJob*)), this, SLOT(updateModel()));
     ICore::self()->runController()->registerJob(job);
 }

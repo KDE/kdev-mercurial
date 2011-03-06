@@ -49,6 +49,7 @@ private slots:
     void identifyReceived(KDevelop::VcsJob *job);
 
     void checkoutRequested();
+    void mergeRequested();
 
 private:
     Ui::MercurialHeadsWidget *m_ui;
