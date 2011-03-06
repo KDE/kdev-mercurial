@@ -50,29 +50,26 @@ void MercurialHeadsWidget::updateModel()
     VcsJob *identifyJob = m_plugin->identify(m_url);
     connect(identifyJob, SIGNAL(resultsReady(KDevelop::VcsJob*)), this, SLOT(identifyReceived(KDevelop::VcsJob*)));
     ICore::self()->runController()->registerJob(identifyJob);
-}
 
-void MercurialHeadsWidget::identifyReceived(VcsJob *job)
-{
-    m_currentHead = job->fetchResults().value<VcsRevision>();
     VcsJob *headsJob = m_plugin->heads(m_url);
     connect(headsJob, SIGNAL(resultsReady(KDevelop::VcsJob*)), this, SLOT(headsReceived(KDevelop::VcsJob*)));
     ICore::self()->runController()->registerJob(headsJob);
 }
 
+void MercurialHeadsWidget::identifyReceived(VcsJob *job)
+{
+    QList<VcsRevision> currentHeads;
+    foreach(const QVariant &value, job->fetchResults().toList()) {
+        currentHeads << value.value<VcsRevision>();
+    }
+    m_headsModel->setCurrentHeads(currentHeads);
+}
+
 void MercurialHeadsWidget::headsReceived(VcsJob *job)
 {
-    QList<QVariant> data = job->fetchResults().toList();
     QList<VcsEvent> events;
-
-    unsigned int i = 0;
-    foreach(const QVariant &value, data) {
-        const VcsEvent &event = value.value<VcsEvent>();
-        events << event;
-        if (event.revision().revisionValue().toLongLong() == m_currentHead.revisionValue().toLongLong()) {
-            m_headsModel->setCurrentHead(i);
-        }
-        ++i;
+    foreach(const QVariant &value, job->fetchResults().toList()) {
+        events << value.value<VcsEvent>();
     }
     m_headsModel->addEvents(events);
 }

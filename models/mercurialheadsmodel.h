@@ -34,10 +34,13 @@ class MercurialHeadsModel : public KDevelop::VcsEventModel
 public:
     MercurialHeadsModel(QObject *parent);
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-    void setCurrentHead(unsigned int currentHead) { m_currentHead = currentHead; }
+    void setCurrentHeads(const QList<KDevelop::VcsRevision> &currentHeads) {
+        m_currentHeads = currentHeads;
+        emit headerDataChanged(Qt::Vertical, 0, m_currentHeads.count());
+    }
 
 private:
-    unsigned int m_currentHead;
+    QList<KDevelop::VcsRevision> m_currentHeads;
 };
 
 #endif // MERCURIALHEADSMODEL_H

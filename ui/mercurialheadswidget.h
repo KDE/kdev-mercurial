@@ -55,7 +55,6 @@ private:
     MercurialHeadsModel *m_headsModel;
     MercurialPlugin *m_plugin;
     const KUrl &m_url;
-    KDevelop::VcsRevision m_currentHead;
 };
 
 #endif // MERCURIALHEADSWIDGET_H

@@ -22,6 +22,9 @@
 
 #include <KIcon>
 
+#include <vcs/vcsevent.h>
+#include <vcs/vcsrevision.h>
+
 using namespace KDevelop;
 
 MercurialHeadsModel::MercurialHeadsModel(QObject *parent)
@@ -32,8 +35,13 @@ MercurialHeadsModel::MercurialHeadsModel(QObject *parent)
 
 QVariant MercurialHeadsModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
-    if (orientation == Qt::Vertical && role == Qt::DecorationRole && section == m_currentHead) {
-        return QVariant(KIcon("arrow-right"));
+    if (orientation == Qt::Vertical && role == Qt::DecorationRole) {
+        const VcsRevision &rev = eventForIndex(index(section, 0)).revision();
+        if (m_currentHeads.contains(rev)) {
+            return QVariant(KIcon("arrow-right"));
+        } else {
+            return QVariant();
+        }
     } else {
         return VcsEventModel::headerData(section, orientation, role);
     }

@@ -800,13 +800,22 @@ void MercurialPlugin::parseLogOutputBasicVersionControl(DVcsJob* job) const
 
 void MercurialPlugin::parseIdentify(DVcsJob* job) const
 {
-    VcsRevision revision;
     QString value = job->output();
+    QList<QVariant> result;
+
+    // remove last '\n'
+    value.chop(1);
+
     // remove last '+' if necessary
     if (value.endsWith('+'))
         value.chop(1);
-    revision.setRevisionValue(value.toLongLong(), VcsRevision::GlobalNumber);
-    job->setResults(qVariantFromValue<VcsRevision>(revision));
+
+    foreach(const QString &rev, value.split('+')) {
+        VcsRevision revision;
+        revision.setRevisionValue(rev.toLongLong(), VcsRevision::GlobalNumber);
+        result << qVariantFromValue<VcsRevision>(revision);
+    }
+    job->setResults(QVariant(result));
 }
 
 
