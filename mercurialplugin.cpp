@@ -31,6 +31,7 @@
 #include <QtCore/QDir>
 #include <QtCore/QDateTime>
 #include <QtCore/QFileInfo>
+#include <QtGui/QMenu>
 
 #include <KDE/KPluginFactory>
 #include <KDE/KPluginLoader>
@@ -38,6 +39,7 @@
 #include <KDE/KAboutData>
 #include <KDE/KDateTime>
 #include <KDE/KDebug>
+#include <KDE/KAction>
 
 #include <interfaces/icore.h>
 
@@ -46,9 +48,10 @@
 #include <vcs/vcsrevision.h>
 #include <vcs/vcsannotation.h>
 #include <vcs/dvcs/dvcsjob.h>
-#include <interfaces/icore.h>
+
 #include "mercurialvcslocationwidget.h"
 #include "mercurialpushjob.h"
+#include "ui/mercurialheadswidget.h"
 
 
 K_PLUGIN_FACTORY(KDevMercurialFactory, registerPlugin<MercurialPlugin>();)
@@ -62,6 +65,9 @@ MercurialPlugin::MercurialPlugin(QObject *parent, const QVariantList &)
     KDEV_USE_EXTENSION_INTERFACE(KDevelop::IBasicVersionControl)
     KDEV_USE_EXTENSION_INTERFACE(KDevelop::IDistributedVersionControl)
 
+    m_headsAction = new KAction(i18n("Heads..."), this);
+
+    connect(m_headsAction, SIGNAL(triggered()), this, SLOT(showHeads()));
     core()->uiController()->addToolView(i18n("Mercurial"), dvcsViewFactory());
     setXMLFile("kdevmercurial.rc");
 }
@@ -118,14 +124,20 @@ bool MercurialPlugin::isVersionControlled(const KUrl & url)
         return isValidDirectory(url);
     }
 
-    // Clean, Added, Modified. Escape possible files starting with "-"
-    static const QStringList versionControlledFlags(QString("-c -a -m --").split(' '));
-    const QString absolutePath = fsObject.absolutePath();
-    QStringList listFile(versionControlledFlags);
-    listFile.push_back(fsObject.fileName());
-    const QStringList filesInDir = getLsFiles(absolutePath, listFile);
+    DVcsJob *job = static_cast<DVcsJob*>(status(url, Recursive));
+    if (!job->exec()) {
+        return false;
+    }
 
-    return !filesInDir.empty();
+    QList<QVariant> statuses = qvariant_cast<QList<QVariant> >(job->fetchResults());
+    VcsStatusInfo info = qvariant_cast< VcsStatusInfo >(statuses.first());
+    if (info.state() == VcsStatusInfo::ItemAdded ||
+        info.state() == VcsStatusInfo::ItemModified ||
+        info.state() == VcsStatusInfo::ItemUpToDate) {
+        return true;
+    }
+
+    return false;
 }
 
 VcsJob* MercurialPlugin::init(const KUrl &directory)
@@ -497,6 +509,46 @@ VcsJob* MercurialPlugin::annotate(const KUrl& localLocation,
     return job;
 }
 
+VcsJob* MercurialPlugin::heads(const KUrl &localLocation)
+{
+    DVcsJob *job = new DVcsJob(findWorkingDir(localLocation), this);
+
+    *job << "hg" << "heads" << "--style" << LOG_STYLE_FILE;
+
+    connect(job, SIGNAL(readyForParsing(KDevelop::DVcsJob*)),
+            SLOT(parseLogOutputBasicVersionControl(KDevelop::DVcsJob*)));
+    return job;
+}
+
+VcsJob* MercurialPlugin::identify(const KUrl& localLocation)
+{
+    DVcsJob *job = new DVcsJob(findWorkingDir(localLocation), this);
+
+    *job << "hg" << "identify" << "-n" << "--" << localLocation;
+
+    connect(job, SIGNAL(readyForParsing(KDevelop::DVcsJob*)),
+            SLOT(parseIdentify(KDevelop::DVcsJob*)));
+    return job;
+}
+
+VcsJob* MercurialPlugin::checkoutHead(const KUrl &localLocation, const KDevelop::VcsRevision &rev)
+{
+    DVcsJob *job = new DVcsJob(findWorkingDir(localLocation), this);
+
+    *job << "hg" << "update" << "-C" << toMercurialRevision(rev);
+
+    return job;
+}
+
+VcsJob* MercurialPlugin::mergeWith(const KUrl &localLocation, const KDevelop::VcsRevision &rev)
+{
+    DVcsJob *job = new DVcsJob(findWorkingDir(localLocation), this);
+
+    *job << "hg" << "merge" << "-r" << toMercurialRevision(rev);
+
+    return job;
+}
+
 DVcsJob* MercurialPlugin::switchBranch(const QString &repository, const QString &branch)
 {
     DVcsJob *job = new DVcsJob(findWorkingDir(repository), this);
@@ -704,7 +756,7 @@ void MercurialPlugin::parseLogOutputBasicVersionControl(DVcsJob* job) const
         event.setAuthor(author);
 
         VcsRevision revision;
-        revision.setRevisionValue(rev, KDevelop::VcsRevision::GlobalNumber);
+        revision.setRevisionValue(rev.toLongLong(), KDevelop::VcsRevision::GlobalNumber);
         event.setRevision(revision);
 
         QList<VcsItemEvent> items;
@@ -746,6 +798,27 @@ void MercurialPlugin::parseLogOutputBasicVersionControl(DVcsJob* job) const
 
     job->setResults(QVariant(events));
 }
+
+void MercurialPlugin::parseIdentify(DVcsJob* job) const
+{
+    QString value = job->output();
+    QList<QVariant> result;
+
+    // remove last '\n'
+    value.chop(1);
+
+    // remove last '+' if necessary
+    if (value.endsWith('+'))
+        value.chop(1);
+
+    foreach(const QString &rev, value.split('+')) {
+        VcsRevision revision;
+        revision.setRevisionValue(rev.toLongLong(), VcsRevision::GlobalNumber);
+        result << qVariantFromValue<VcsRevision>(revision);
+    }
+    job->setResults(QVariant(result));
+}
+
 
 void MercurialPlugin::parseLogOutput(const DVcsJob * job, QList<DVcsEvent>& commits) const
 {
@@ -837,30 +910,6 @@ void MercurialPlugin::parseLogOutput(const DVcsJob * job, QList<DVcsEvent>& comm
 VcsLocationWidget* MercurialPlugin::vcsLocation(QWidget* parent) const
 {
     return new MercurialVcsLocationWidget(parent);
-}
-
-QStringList MercurialPlugin::getLsFiles(const QString &directory, const QStringList &args)
-{
-    DVcsJob *job = new DVcsJob(directory, this);
-    *job << "hg" << "status" << "-n";
-
-    if (!args.isEmpty()) {
-        *job << args;
-    }
-
-    if (!job->exec() || job->status() != VcsJob::JobSucceeded) {
-        delete job;
-        return QStringList();
-    }
-
-    const QString prefix = directory.endsWith(QDir::separator()) ? directory : directory + QDir::separator();
-    QStringList fileList = job->output().split('\n', QString::SkipEmptyParts);
-    for (QStringList::iterator it = fileList.begin(); it != fileList.end(); ++it) {
-        it->prepend(prefix);
-    }
-
-    delete job;
-    return fileList;
 }
 
 void MercurialPlugin::filterOutDirectories(KUrl::List &locations)
@@ -955,5 +1004,22 @@ KUrl MercurialPlugin::remotePushRepositoryLocation(QDir &directory)
     // don't forget to strip last '\n'
     return job->output().trimmed();
 }
+
+void MercurialPlugin::additionalMenuEntries(QMenu *menu, const KUrl::List &urls)
+{
+    m_urls = urls;
+
+    menu->addAction(m_headsAction);
+
+    m_headsAction->setEnabled(m_urls.count() == 1);
+}
+
+void MercurialPlugin::showHeads()
+{
+    const KUrl &current = m_urls.first();
+    MercurialHeadsWidget *headsWidget = new MercurialHeadsWidget(this, current);
+    headsWidget->show();
+}
+
 
 // #include "mercurialplugin.moc"
