@@ -40,6 +40,9 @@ MercurialHeadsWidget::MercurialHeadsWidget(MercurialPlugin *plugin, const KUrl &
 
     connect(m_ui->checkoutPushButton, SIGNAL(clicked(bool)), this, SLOT(checkoutRequested()));
     connect(m_ui->mergePushButton, SIGNAL(clicked(bool)), this, SLOT(mergeRequested()));
+
+    setWindowTitle(i18n("Mercurial Heads (%1)", m_url.toLocalFile()));
+
     updateModel();
 }
 
