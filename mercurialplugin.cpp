@@ -398,7 +398,7 @@ VcsJob* MercurialPlugin::status(const KUrl::List& localLocations, IBasicVersionC
     }
 
     DVcsJob *job = new DVcsJob(findWorkingDir(locations.first()), this);
-    *job << "hg" << "status" << "-A" << "--" << locations;
+    *job << "hg" << "--config" << "extensions.kdevmercurial=" EXTENSION_FILE  << "resolveandstatus" << "--" << locations;
 
     connect(job, SIGNAL(readyForParsing(KDevelop::DVcsJob*)), SLOT(parseStatus(KDevelop::DVcsJob*)));
 
@@ -416,16 +416,42 @@ bool MercurialPlugin::parseStatus(DVcsJob *job) const
     kDebug() << "Job succeeded for " << dir;
     const QStringList output = job->output().split('\n', QString::SkipEmptyParts);
     QList<QVariant> filestatus;
-    foreach(const QString &line, output) {
-        QChar stCh = line.at(0);
 
-        KUrl file(line.mid(2).prepend(dir));
+    QSet<KUrl> conflictedFiles;
+
+    QStringList::const_iterator it = output.constBegin();
+
+    // conflicts first
+    for (; it != output.constEnd(); it++) {
+        QChar stCh = it->at(0);
+        if (stCh == '%') {
+            it++;
+            break;
+        }
+
+        KUrl file(it->mid(2).prepend(dir));
 
         VcsStatusInfo status;
         status.setUrl(file);
-        status.setState(charToState(stCh.toAscii()));
+        // FIXME: conflicts resolved
+        status.setState(VcsStatusInfo::ItemHasConflicts);
 
+        conflictedFiles.insert(file);
         filestatus.append(qVariantFromValue(status));
+    }
+
+    // standard statuses next
+    for (; it != output.constEnd(); it++) {
+        QChar stCh = it->at(0);
+
+        KUrl file(it->mid(2).prepend(dir));
+
+        if (!conflictedFiles.contains(file)) {
+            VcsStatusInfo status;
+            status.setUrl(file);
+            status.setState(charToState(stCh.toAscii()));
+            filestatus.append(qVariantFromValue(status));
+        }
     }
 
     job->setResults(qVariantFromValue(filestatus));
@@ -936,7 +962,6 @@ VcsStatusInfo::State MercurialPlugin::charToState(const char ch)
         return VcsStatusInfo::ItemUpToDate;
     case '!':   // Missing
         return VcsStatusInfo::ItemUserState;
-        //ToDo: hasConflicts
     default:
         return VcsStatusInfo::ItemUnknown;
     }
