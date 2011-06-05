@@ -797,7 +797,6 @@ void MercurialPlugin::parseLogOutputBasicVersionControl(DVcsJob* job) const
             foreach (const QByteArray &file, files.split(' ')) {
                 VcsItemEvent item;
                 item.setActions(actions[i]);
-                item.setRevision(revision);
                 item.setRepositoryLocation(QUrl::fromPercentEncoding(file));
                 items.push_back(item);
             }
@@ -810,7 +809,6 @@ void MercurialPlugin::parseLogOutputBasicVersionControl(DVcsJob* job) const
 
                 VcsItemEvent item;
                 item.setActions(VcsItemEvent::Copied);
-                item.setRevision(revision);
                 item.setRepositoryCopySourceLocation(QUrl::fromPercentEncoding(files[0]));
                 item.setRepositoryLocation(QUrl::fromPercentEncoding(files[1]));
                 items.push_back(item);
