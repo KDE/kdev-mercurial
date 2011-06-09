@@ -575,6 +575,43 @@ VcsJob* MercurialPlugin::mergeWith(const KUrl &localLocation, const KDevelop::Vc
     return job;
 }
 
+VcsJob* MercurialPlugin::branch(const KUrl& repository, const VcsRevision& rev, const QString& branchName)
+{
+    return 0;
+}
+
+VcsJob* MercurialPlugin::branches(const KUrl& repository)
+{
+    return 0;
+}
+
+VcsJob* MercurialPlugin::currentBranch(const KUrl& repository)
+{
+    return 0;
+}
+
+VcsJob* MercurialPlugin::deleteBranch(const KUrl& repository, const QString& branchName)
+{
+    return 0;
+}
+
+VcsJob* MercurialPlugin::renameBranch(const KUrl& repository, const QString& oldBranchName, const QString& newBranchName)
+{
+    return 0;
+}
+
+VcsJob* MercurialPlugin::switchBranch(const KUrl& repository, const QString& branchName)
+{
+    return 0;
+}
+
+VcsJob* MercurialPlugin::tag(const KUrl& repository, const QString& commitMessage, const VcsRevision& rev, const QString& tagName)
+{
+    return 0;
+}
+
+
+#if 0
 DVcsJob* MercurialPlugin::switchBranch(const QString &repository, const QString &branch)
 {
     DVcsJob *job = new DVcsJob(findWorkingDir(repository), this);
@@ -648,6 +685,8 @@ QStringList MercurialPlugin::branches(const QString &repository)
 
     return result;
 }
+#endif 
+
 
 QList<DVcsEvent> MercurialPlugin::getAllCommits(const QString &repo)
 {

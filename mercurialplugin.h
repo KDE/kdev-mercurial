@@ -114,9 +114,9 @@ public:
     KDevelop::VcsJob* checkoutHead(const KUrl &localLocation, const KDevelop::VcsRevision &rev);
     KDevelop::VcsJob* mergeWith(const KUrl &localLocation, const KDevelop::VcsRevision &rev);
 
-    KDevelop::DVcsJob* switchBranch(const QString &repository, const QString &branch);
-    KDevelop::DVcsJob* branch(const QString &repository, const QString &basebranch = QString(), const QString &branch = QString(),
-                    const QStringList &args = QStringList());
+    //KDevelop::DVcsJob* switchBranch(const QString &repository, const QString &branch);
+    //KDevelop::DVcsJob* branch(const QString &repository, const QString &basebranch = QString(), const QString //&branch = QString(),
+                    //const QStringList &args = QStringList());
 
     KDevelop::VcsJob* push(const KUrl& localRepositoryLocation,
                           const KDevelop::VcsLocation& localOrRepoLocationDst);
@@ -124,10 +124,18 @@ public:
                           const KUrl& localRepositoryLocation);
 
     KDevelop::VcsLocationWidget* vcsLocation(QWidget* parent) const;
-public:
+
     //parsers for branch:
-    QString curBranch(const QString &repository);
-    QStringList branches(const QString &repository);
+    KDevelop::VcsJob *branch(const KUrl &repository, const KDevelop::VcsRevision &rev, const QString &branchName);
+    KDevelop::VcsJob *branches(const KUrl &repository);
+    KDevelop::VcsJob *currentBranch(const KUrl &repository);
+    KDevelop::VcsJob *deleteBranch(const KUrl &repository, const QString &branchName);
+    KDevelop::VcsJob *renameBranch(const KUrl &repository, const QString &oldBranchName, const QString &newBranchName);
+    KDevelop::VcsJob *switchBranch(const KUrl &repository, const QString &branchName);
+    KDevelop::VcsJob *tag(const KUrl &repository, const QString &commitMessage, const KDevelop::VcsRevision &rev, const QString &tagName);
+    
+    //QString curBranch(const QString &repository);
+    //QStringList branches(const QString &repository);
 
     //graph helpers
     QList<DVcsEvent> getAllCommits(const QString &repo);
