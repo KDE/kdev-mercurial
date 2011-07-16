@@ -182,6 +182,13 @@ protected:
 
     // actions
     KAction *m_headsAction;
+
+    KAction *m_mqNew,
+            *m_mqPush,
+            *m_mqPushAll,
+            *m_mqPop,
+            *m_mqPopAll,
+            *m_mqManager;
     KUrl::List m_urls;
     void additionalMenuEntries(QMenu *menu, const KUrl::List &urls);
 };

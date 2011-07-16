@@ -66,6 +66,12 @@ MercurialPlugin::MercurialPlugin(QObject *parent, const QVariantList &)
     KDEV_USE_EXTENSION_INTERFACE(KDevelop::IDistributedVersionControl)
 
     m_headsAction = new KAction(i18n("Heads..."), this);
+    m_mqNew = new KAction(i18nc("mercurial queues submenu", "New..."), this);
+    m_mqPush = new KAction(i18nc("mercurial queues submenu", "Push"), this);
+    m_mqPushAll = new KAction(i18nc("mercurial queues submenu", "Push All"), this);
+    m_mqPop = new KAction(i18nc("mercurial queues submenu", "Pop"), this);
+    m_mqPopAll = new KAction(i18nc("mercurial queues submenu", "Pop All"), this);
+    m_mqManager = new KAction(i18nc("mercurial queues submenu", "Manager..."), this);
 
     connect(m_headsAction, SIGNAL(triggered()), this, SLOT(showHeads()));
     core()->uiController()->addToolView(i18n("Mercurial"), dvcsViewFactory());
@@ -1082,8 +1088,23 @@ void MercurialPlugin::additionalMenuEntries(QMenu *menu, const KUrl::List &urls)
     m_urls = urls;
 
     menu->addAction(m_headsAction);
+    menu->addSeparator()->setText(i18n("Mercurial Queues"));
+    menu->addAction(m_mqNew);
+    menu->addAction(m_mqPush);
+    menu->addAction(m_mqPushAll);
+    menu->addAction(m_mqPop);
+    menu->addAction(m_mqPopAll);
+    menu->addAction(m_mqManager);
 
     m_headsAction->setEnabled(m_urls.count() == 1);
+
+    //FIXME:not supported yet, so disable
+    m_mqNew->setEnabled(false);
+    m_mqPush->setEnabled(false);
+    m_mqPushAll->setEnabled(false);
+    m_mqPop->setEnabled(false);
+    m_mqPopAll->setEnabled(false);
+    m_mqManager->setEnabled(false);
 }
 
 void MercurialPlugin::showHeads()
