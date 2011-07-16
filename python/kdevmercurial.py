@@ -28,6 +28,15 @@ def resolve_and_status(ui, repo, *pats, **opts):
     ui.write('%\n')  # separator
     commands.status(ui, repo, *pats, all=True)
 
+def allbranches(ui, repo, *pats, **opts):
+    branches = repo.branchtags().keys()
+    current_branch = repo.dirstate.branch()
+    if current_branch not in branches:
+        branches.append(current_branch)
+    for branch in branches:
+        ui.write("%s\n" % branch)
+
 cmdtable = {
                "resolveandstatus" : (resolve_and_status, [], 'Print all status info (including resolution state)'),
+               "allbranches" : (allbranches, [], 'Print all branches (including uncommited new one)'),
            }

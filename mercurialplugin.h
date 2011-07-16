@@ -151,7 +151,8 @@ protected slots:
     bool parseStatus(KDevelop::DVcsJob *job) const;
     bool parseAnnotations(KDevelop::DVcsJob *job) const;
     void parseDiff(KDevelop::DVcsJob *job);
-
+    void parseBranchesOutput(KDevelop::DVcsJob *job) const;
+    
     /*
      * mercurial specific stuff
      */
@@ -167,6 +168,7 @@ protected:
     void parseLogOutput(const KDevelop::DVcsJob *job, QList<DVcsEvent>& commits) const;
 
     static QString toMercurialRevision(const KDevelop::VcsRevision & vcsrev);
+    static KDevelop::DVcsJob& callExtension(KDevelop::DVcsJob &job);
 
     /**
      * Remove directories from @p locations.

@@ -398,7 +398,7 @@ VcsJob* MercurialPlugin::status(const KUrl::List& localLocations, IBasicVersionC
     }
 
     DVcsJob *job = new DVcsJob(findWorkingDir(locations.first()), this);
-    *job << "hg" << "--config" << "extensions.kdevmercurial=" EXTENSION_FILE  << "resolveandstatus" << "--" << locations;
+    callExtension(*job) << "resolveandstatus" << "--" << locations;
 
     connect(job, SIGNAL(readyForParsing(KDevelop::DVcsJob*)), SLOT(parseStatus(KDevelop::DVcsJob*)));
 
@@ -575,50 +575,60 @@ VcsJob* MercurialPlugin::mergeWith(const KUrl &localLocation, const KDevelop::Vc
     return job;
 }
 
-VcsJob* MercurialPlugin::branch(const KUrl& repository, const VcsRevision& rev, const QString& branchName)
+VcsJob* MercurialPlugin::branch(const KUrl &repository, const VcsRevision &rev, const QString &branchName)
 {
-    return 0;
+    DVcsJob *job = new DVcsJob(findWorkingDir(repository), this);
+    *job << "hg" << "branch" << "--" << branchName;
+    return job;
 }
 
-VcsJob* MercurialPlugin::branches(const KUrl& repository)
+VcsJob* MercurialPlugin::branches(const KUrl &repository)
 {
-    return 0;
+    DVcsJob *job = new DVcsJob(findWorkingDir(repository), this);
+    callExtension(*job) << "allbranches" << "--" << repository;
+    connect(job, SIGNAL(readyForParsing(KDevelop::DVcsJob*)), this, SLOT(parseBranchesOutput(KDevelop::DVcsJob*)));
+    return job;
 }
 
 VcsJob* MercurialPlugin::currentBranch(const KUrl& repository)
 {
-    return 0;
+    DVcsJob *job = new DVcsJob(findWorkingDir(repository), this);
+    *job << "hg" << "branch";
+    connect(job, SIGNAL(readyForParsing(KDevelop::DVcsJob*)), this, SLOT(parseBranchesOutput(KDevelop::DVcsJob*)));
+    return job;
 }
 
-VcsJob* MercurialPlugin::deleteBranch(const KUrl& repository, const QString& branchName)
+void MercurialPlugin::parseBranchesOutput(DVcsJob *job) const
+{
+    job->setResults(job->output().split('\n', QString::SkipEmptyParts));
+}
+
+VcsJob* MercurialPlugin::deleteBranch(const KUrl &repository, const QString &branchName)
 {
     return 0;
 }
 
-VcsJob* MercurialPlugin::renameBranch(const KUrl& repository, const QString& oldBranchName, const QString& newBranchName)
+VcsJob* MercurialPlugin::renameBranch(const KUrl &repository, const QString &oldBranchName, const QString &newBranchName)
 {
     return 0;
 }
 
-VcsJob* MercurialPlugin::switchBranch(const KUrl& repository, const QString& branchName)
+VcsJob* MercurialPlugin::switchBranch(const KUrl &repository, const QString &branchName)
 {
-    return 0;
+    DVcsJob *job = new DVcsJob(findWorkingDir(repository), this);
+    *job << "hg" << "update" << "--" << branchName;
+    return job;
 }
 
-VcsJob* MercurialPlugin::tag(const KUrl& repository, const QString& commitMessage, const VcsRevision& rev, const QString& tagName)
+VcsJob* MercurialPlugin::tag(const KUrl &repository, const QString &commitMessage, const VcsRevision &rev, const QString &tagName)
 {
-    return 0;
+    DVcsJob *job = new DVcsJob(findWorkingDir(repository), this);
+    *job << "hg" << "tag" << "-m" << commitMessage << "-r" << toMercurialRevision(rev) << "--" << tagName;
+    return job;
 }
 
 
 #if 0
-DVcsJob* MercurialPlugin::switchBranch(const QString &repository, const QString &branch)
-{
-    DVcsJob *job = new DVcsJob(findWorkingDir(repository), this);
-    *job << "hg" << "update" << "--" << branch;
-    return job;
-}
-
 DVcsJob* MercurialPlugin::branch(const QString &repository, const QString &basebranch, const QString &branch,
                                    const QStringList &args)
 {
@@ -1081,6 +1091,12 @@ void MercurialPlugin::showHeads()
     const KUrl &current = m_urls.first();
     MercurialHeadsWidget *headsWidget = new MercurialHeadsWidget(this, current);
     headsWidget->show();
+}
+
+DVcsJob& MercurialPlugin::callExtension(DVcsJob &job)
+{
+    job << "hg" << "--config" << "extensions.kdevmercurial=" EXTENSION_FILE;
+    return job;
 }
 
 
