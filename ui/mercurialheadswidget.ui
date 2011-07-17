@@ -48,7 +48,7 @@
      <item>
       <widget class="QPushButton" name="mergePushButton">
        <property name="text">
-        <string>Merge into current</string>
+        <string>Merge into Current</string>
        </property>
       </widget>
      </item>
