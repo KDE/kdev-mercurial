@@ -52,12 +52,13 @@
 #include "mercurialvcslocationwidget.h"
 #include "mercurialpushjob.h"
 #include "ui/mercurialheadswidget.h"
-
+#include "ui/mercurialqueuesmanager.h"
 
 K_PLUGIN_FACTORY(KDevMercurialFactory, registerPlugin<MercurialPlugin>();)
 K_EXPORT_PLUGIN(KDevMercurialFactory(KAboutData("kdevmercurial", "kdevmercurial", ki18n("Mercurial"), "0.1", ki18n("A plugin to support Mercurial version control systems"), KAboutData::License_GPL)))
 
 using namespace KDevelop;
+
 
 MercurialPlugin::MercurialPlugin(QObject *parent, const QVariantList &)
         : DistributedVersionControlPlugin(parent, KDevMercurialFactory::componentData())
@@ -67,13 +68,14 @@ MercurialPlugin::MercurialPlugin(QObject *parent, const QVariantList &)
 
     m_headsAction = new KAction(i18n("Heads..."), this);
     m_mqNew = new KAction(i18nc("mercurial queues submenu", "New..."), this);
-    m_mqPush = new KAction(i18nc("mercurial queues submenu", "Push"), this);
-    m_mqPushAll = new KAction(i18nc("mercurial queues submenu", "Push All"), this);
-    m_mqPop = new KAction(i18nc("mercurial queues submenu", "Pop"), this);
-    m_mqPopAll = new KAction(i18nc("mercurial queues submenu", "Pop All"), this);
-    m_mqManager = new KAction(i18nc("mercurial queues submenu", "Manager..."), this);
+    m_mqPushAction = new KAction(i18nc("mercurial queues submenu", "Push"), this);
+    m_mqPushAllAction = new KAction(i18nc("mercurial queues submenu", "Push All"), this);
+    m_mqPopAction = new KAction(i18nc("mercurial queues submenu", "Pop"), this);
+    m_mqPopAllAction = new KAction(i18nc("mercurial queues submenu", "Pop All"), this);
+    m_mqManagerAction = new KAction(i18nc("mercurial queues submenu", "Manager..."), this);
 
     connect(m_headsAction, SIGNAL(triggered()), this, SLOT(showHeads()));
+    connect(m_mqManagerAction, SIGNAL(triggered()), this, SLOT(showMercurialQueuesManager()));
     core()->uiController()->addToolView(i18n("Mercurial"), dvcsViewFactory());
     setXMLFile("kdevmercurial.rc");
 }
@@ -592,7 +594,7 @@ VcsJob* MercurialPlugin::branches(const KUrl &repository)
 {
     DVcsJob *job = new DVcsJob(findWorkingDir(repository), this);
     callExtension(*job) << "allbranches" << "--" << repository;
-    connect(job, SIGNAL(readyForParsing(KDevelop::DVcsJob*)), this, SLOT(parseBranchesOutput(KDevelop::DVcsJob*)));
+    connect(job, SIGNAL(readyForParsing(KDevelop::DVcsJob*)), this, SLOT(parseMultiLineOutput(KDevelop::DVcsJob*)));
     return job;
 }
 
@@ -600,13 +602,8 @@ VcsJob* MercurialPlugin::currentBranch(const KUrl& repository)
 {
     DVcsJob *job = new DVcsJob(findWorkingDir(repository), this);
     *job << "hg" << "branch";
-    connect(job, SIGNAL(readyForParsing(KDevelop::DVcsJob*)), this, SLOT(parseBranchesOutput(KDevelop::DVcsJob*)));
+    connect(job, SIGNAL(readyForParsing(KDevelop::DVcsJob*)), this, SLOT(parseMultiLineOutput(KDevelop::DVcsJob*)));
     return job;
-}
-
-void MercurialPlugin::parseBranchesOutput(DVcsJob *job) const
-{
-    job->setResults(job->output().split('\n', QString::SkipEmptyParts));
 }
 
 VcsJob* MercurialPlugin::deleteBranch(const KUrl &repository, const QString &branchName)
@@ -727,6 +724,11 @@ QList<DVcsEvent> MercurialPlugin::getAllCommits(const QString &repo)
 
     return commits;
 #endif
+}
+
+void MercurialPlugin::parseMultiLineOutput(DVcsJob *job) const
+{
+    job->setResults(job->output().split('\n', QString::SkipEmptyParts));
 }
 
 void MercurialPlugin::parseDiff(DVcsJob* job)
@@ -1090,21 +1092,20 @@ void MercurialPlugin::additionalMenuEntries(QMenu *menu, const KUrl::List &urls)
     menu->addAction(m_headsAction);
     menu->addSeparator()->setText(i18n("Mercurial Queues"));
     menu->addAction(m_mqNew);
-    menu->addAction(m_mqPush);
-    menu->addAction(m_mqPushAll);
-    menu->addAction(m_mqPop);
-    menu->addAction(m_mqPopAll);
-    menu->addAction(m_mqManager);
+    menu->addAction(m_mqPushAction);
+    menu->addAction(m_mqPushAllAction);
+    menu->addAction(m_mqPopAction);
+    menu->addAction(m_mqPopAllAction);
+    menu->addAction(m_mqManagerAction);
 
     m_headsAction->setEnabled(m_urls.count() == 1);
 
     //FIXME:not supported yet, so disable
     m_mqNew->setEnabled(false);
-    m_mqPush->setEnabled(false);
-    m_mqPushAll->setEnabled(false);
-    m_mqPop->setEnabled(false);
-    m_mqPopAll->setEnabled(false);
-    m_mqManager->setEnabled(false);
+    m_mqPushAction->setEnabled(false);
+    m_mqPushAllAction->setEnabled(false);
+    m_mqPopAction->setEnabled(false);
+    m_mqPopAllAction->setEnabled(false);
 }
 
 void MercurialPlugin::showHeads()
@@ -1114,11 +1115,72 @@ void MercurialPlugin::showHeads()
     headsWidget->show();
 }
 
+void MercurialPlugin::showMercurialQueuesManager()
+{
+    const KUrl &current = m_urls.first();
+    MercurialQueuesManager *managerWidget = new MercurialQueuesManager(this, current);
+    managerWidget->show();
+}
+
+
 DVcsJob& MercurialPlugin::callExtension(DVcsJob &job)
 {
     job << "hg" << "--config" << "extensions.kdevmercurial=" EXTENSION_FILE;
     return job;
 }
 
+
+/*
+ * Mercurial Queues
+ */
+
+VcsJob* MercurialPlugin::mqNew(const KUrl &localLocation, const QString &name, const QString &message)
+{
+    return 0;
+}
+
+VcsJob* MercurialPlugin::mqPush(const KUrl &localLocation)
+{
+    DVcsJob *job = new DVcsJob(findWorkingDir(localLocation), this);
+    *job << "hg" << "qpush";
+    return job;
+}
+
+VcsJob* MercurialPlugin::mqPushAll(const KUrl &localLocation)
+{
+    DVcsJob *job = new DVcsJob(findWorkingDir(localLocation), this);
+    *job << "hg" << "qpush" << "-a";
+    return job;
+}
+
+VcsJob* MercurialPlugin::mqPop(const KUrl &localLocation)
+{
+    DVcsJob *job = new DVcsJob(findWorkingDir(localLocation), this);
+    *job << "hg" << "qpop";
+    return job;
+}
+
+VcsJob* MercurialPlugin::mqPopAll(const KUrl &localLocation)
+{
+    DVcsJob *job = new DVcsJob(findWorkingDir(localLocation), this);
+    *job << "hg" << "qpop" << "-a";
+    return job;
+}
+
+VcsJob* MercurialPlugin::mqApplied(const KUrl &localLocation)
+{
+    DVcsJob *job = new DVcsJob(findWorkingDir(localLocation), this);
+    *job << "hg" << "qapplied";
+    connect(job, SIGNAL(readyForParsing(KDevelop::DVcsJob*)), this, SLOT(parseMultiLineOutput(KDevelop::DVcsJob*)));
+    return job;
+}
+
+VcsJob* MercurialPlugin::mqUnapplied(const KUrl &localLocation)
+{
+    DVcsJob *job = new DVcsJob(findWorkingDir(localLocation), this);
+    *job << "hg" << "qunapplied";
+    connect(job, SIGNAL(readyForParsing(KDevelop::DVcsJob*)), this, SLOT(parseMultiLineOutput(KDevelop::DVcsJob*)));
+    return job;
+}
 
 // #include "mercurialplugin.moc"

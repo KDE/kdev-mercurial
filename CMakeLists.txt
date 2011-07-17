@@ -20,7 +20,9 @@ add_subdirectory(python)
 ########### next target ###############
 
 set(kdevmercurial_PART_SRCS
+    ui/mercurialqueuesmanager.cpp
     ui/mercurialheadswidget.cpp
+    models/mercurialqueueseriesmodel.cpp
     models/mercurialheadsmodel.cpp
     mercurialpushjob.cpp
     mercurialvcslocationwidget.cpp
@@ -29,6 +31,7 @@ set(kdevmercurial_PART_SRCS
 
 set(kdevmercurial_UIS
     ui/mercurialheadswidget.ui
+    ui/mercurialqueuesmanager.ui
 )
 
 kde4_add_ui_files(kdevmercurial_PART_SRCS ${kdevmercurial_UIS})

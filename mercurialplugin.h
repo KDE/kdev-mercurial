@@ -114,6 +114,15 @@ public:
     KDevelop::VcsJob* checkoutHead(const KUrl &localLocation, const KDevelop::VcsRevision &rev);
     KDevelop::VcsJob* mergeWith(const KUrl &localLocation, const KDevelop::VcsRevision &rev);
 
+    // mercurial queues stuff
+    KDevelop::VcsJob* mqNew(const KUrl &localLocation, const QString &name, const QString &message);
+    KDevelop::VcsJob* mqPush(const KUrl &localLocation);
+    KDevelop::VcsJob* mqPushAll(const KUrl &localLocation);
+    KDevelop::VcsJob* mqPop(const KUrl &localLocation);
+    KDevelop::VcsJob* mqPopAll(const KUrl &localLocation);
+    KDevelop::VcsJob* mqApplied(const KUrl &localLocation);
+    KDevelop::VcsJob* mqUnapplied(const KUrl &localLocation);
+
     //KDevelop::DVcsJob* switchBranch(const QString &repository, const QString &branch);
     //KDevelop::DVcsJob* branch(const QString &repository, const QString &basebranch = QString(), const QString //&branch = QString(),
                     //const QStringList &args = QStringList());
@@ -151,7 +160,7 @@ protected slots:
     bool parseStatus(KDevelop::DVcsJob *job) const;
     bool parseAnnotations(KDevelop::DVcsJob *job) const;
     void parseDiff(KDevelop::DVcsJob *job);
-    void parseBranchesOutput(KDevelop::DVcsJob *job) const;
+    void parseMultiLineOutput(KDevelop::DVcsJob *job) const;
     
     /*
      * mercurial specific stuff
@@ -162,7 +171,8 @@ protected slots:
      * ui helpers
      */
     void showHeads();
-
+    void showMercurialQueuesManager();
+    
 protected:
     //used in log
     void parseLogOutput(const KDevelop::DVcsJob *job, QList<DVcsEvent>& commits) const;
@@ -184,13 +194,15 @@ protected:
     KAction *m_headsAction;
 
     KAction *m_mqNew,
-            *m_mqPush,
-            *m_mqPushAll,
-            *m_mqPop,
-            *m_mqPopAll,
-            *m_mqManager;
+            *m_mqPushAction,
+            *m_mqPushAllAction,
+            *m_mqPopAction,
+            *m_mqPopAllAction,
+            *m_mqManagerAction;
     KUrl::List m_urls;
     void additionalMenuEntries(QMenu *menu, const KUrl::List &urls);
 };
+
+//class MercurialQueues
 
 #endif
