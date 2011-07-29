@@ -22,6 +22,7 @@
 #define MERCURIALQUEUESERIESMODEL_H
 
 #include <QModelIndex>
+#include <QStringList>
 
 class KUrl;
 class MercurialPlugin;
