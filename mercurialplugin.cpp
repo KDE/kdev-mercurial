@@ -825,7 +825,7 @@ void MercurialPlugin::parseLogOutputBasicVersionControl(DVcsJob* job) const
      * "{desc}\0{date|rfc3339date}\0{author}\0{parents}\0{node}\0{rev}\0"
      * "{file_dels}\0{file_adds}\0{file_mods}\0{file_copies}\0'
      */
-    for(QList<QByteArray>::const_iterator it = items.begin(); it != items.end(); ) {
+    for(QList<QByteArray>::const_iterator it = items.constBegin(); it != items.constEnd(); ) {
         QString desc = QString::fromLocal8Bit(*it++);
         QString date = QString::fromLocal8Bit(*it++);
         QString author = QString::fromLocal8Bit(*it++);
