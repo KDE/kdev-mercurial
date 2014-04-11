@@ -76,20 +76,12 @@ MercurialPlugin::MercurialPlugin(QObject *parent, const QVariantList &)
 
     connect(m_headsAction, SIGNAL(triggered()), this, SLOT(showHeads()));
     connect(m_mqManagerAction, SIGNAL(triggered()), this, SLOT(showMercurialQueuesManager()));
-    core()->uiController()->addToolView(i18n("Mercurial"), dvcsViewFactory());
     setXMLFile("kdevmercurial.rc");
 }
 
 MercurialPlugin::~MercurialPlugin()
 {
 }
-
-
-void MercurialPlugin::unload()
-{
-    core()->uiController()->removeToolView(dvcsViewFactory());
-}
-
 
 QString MercurialPlugin::name() const
 {
@@ -284,27 +276,21 @@ VcsJob *MercurialPlugin::update(const KUrl::List &localLocations,
 
 VcsJob *MercurialPlugin::resolve(const KUrl::List   &files, KDevelop::IBasicVersionControl::RecursionMode recursion)
 {
-    return NULL;
+    KUrl::List fileList = files;
+    if (recursion == NonRecursive) {
+        filterOutDirectories(fileList);
+    }
 
-#if 0
-    if (files.empty())
-        return NULL;
-
-    std::auto_ptr<DVcsJob> job(new DVcsJob(this));
-
-    if (!prepareJob(job.get(), files.front().toLocalFile())) {
+    if (fileList.empty()) {
         return NULL;
     }
+
+    DVcsJob *job = new DVcsJob(findWorkingDir(fileList.first()), this);
 
     //Note: the message is quoted somewhere else, so if we quote here then we have quotes in the commit log
-    *job << "hg" << "resolve" << "--";
+    *job << "hg" << "resolve" << "--" << fileList;
 
-    if (!addDirsConditionally(job.get(), files, recursion)) {
-        return NULL;
-    }
-
-    return job.release();
-#endif
+    return job;
 }
 
 VcsJob *MercurialPlugin::diff(const KUrl &fileOrDirectory,
@@ -316,7 +302,6 @@ VcsJob *MercurialPlugin::diff(const KUrl &fileOrDirectory,
     if (!fileOrDirectory.isLocalFile()) {
         return NULL;
     }
-
 
     // non-standard searching for working directory
     QString workingDir;
@@ -632,8 +617,6 @@ VcsJob *MercurialPlugin::tag(const KUrl &repository, const QString &commitMessag
     return job;
 }
 
-
-#if 0
 DVcsJob *MercurialPlugin::branch(const QString &repository, const QString &basebranch, const QString &branch,
                                  const QStringList &args)
 {
@@ -700,20 +683,11 @@ QStringList MercurialPlugin::branches(const QString &repository)
 
     return result;
 }
-#endif
 
 
 QList<DVcsEvent> MercurialPlugin::getAllCommits(const QString &repo)
 {
-    return QList<DVcsEvent>();
-
-#if 0
-    std::auto_ptr<DVcsJob> job(new DVcsJob(this));
-    job->setAutoDelete(false);
-
-    if (!prepareJob(job.get(), repo)) {
-        return QList<DVcsEvent>();
-    }
+    DVcsJob *job = new DVcsJob(repo, this);
 
     *job << "hg" << "log" << "--template" << "{desc}\\0{date|isodate}\\0{author}\\0{parents}\\0{node}\\0{rev}\\0";
 
@@ -722,10 +696,8 @@ QList<DVcsEvent> MercurialPlugin::getAllCommits(const QString &repo)
 
     QList<DVcsEvent> commits;
 
-    parseLogOutput(job.get(), commits);
-
+    parseLogOutput(job, commits);
     return commits;
-#endif
 }
 
 void MercurialPlugin::parseMultiLineOutput(DVcsJob *job) const
@@ -907,7 +879,6 @@ void MercurialPlugin::parseLogOutput(const DVcsJob *job, QList<DVcsEvent> &commi
 {
     kDebug() << "parseLogOutput";
 
-#if 0
     static unsigned int entriesPerCommit = 6;
     QList<QByteArray> items = job->rawOutput().split('\0');
 
@@ -987,7 +958,6 @@ void MercurialPlugin::parseLogOutput(const DVcsJob *job, QList<DVcsEvent> &commi
 
         commits.push_front(commit);
     }
-#endif
 }
 
 VcsLocationWidget *MercurialPlugin::vcsLocation(QWidget *parent) const
@@ -1085,6 +1055,11 @@ KUrl MercurialPlugin::remotePushRepositoryLocation(QDir &directory)
 
     // don't forget to strip last '\n'
     return job->output().trimmed();
+}
+
+void MercurialPlugin::registerRepositoryForCurrentBranchChanges(const KUrl &repository)
+{
+    // TODO
 }
 
 void MercurialPlugin::additionalMenuEntries(QMenu *menu, const KUrl::List &urls)

@@ -60,8 +60,6 @@ public:
     explicit MercurialPlugin(QObject *parent, const QVariantList &args = QVariantList());
     ~MercurialPlugin();
 
-    virtual void unload();
-
     bool isValidDirectory(const KUrl &dirPath);
     bool isVersionControlled(const KUrl &path);
     QString name() const;
@@ -123,9 +121,8 @@ public:
     KDevelop::VcsJob *mqApplied(const KUrl &localLocation);
     KDevelop::VcsJob *mqUnapplied(const KUrl &localLocation);
 
-    //KDevelop::DVcsJob* switchBranch(const QString &repository, const QString &branch);
-    //KDevelop::DVcsJob* branch(const QString &repository, const QString &basebranch = QString(), const QString //&branch = QString(),
-    //const QStringList &args = QStringList());
+    KDevelop::DVcsJob *switchBranch(const QString &repository, const QString &branch);
+    KDevelop::DVcsJob *branch(const QString &repository, const QString &basebranch = QString(), const QString &branch = QString(), const QStringList &args = QStringList());
 
     KDevelop::VcsJob *push(const KUrl &localRepositoryLocation,
                            const KDevelop::VcsLocation &localOrRepoLocationDst);
@@ -143,8 +140,8 @@ public:
     KDevelop::VcsJob *switchBranch(const KUrl &repository, const QString &branchName);
     KDevelop::VcsJob *tag(const KUrl &repository, const QString &commitMessage, const KDevelop::VcsRevision &rev, const QString &tagName);
 
-    //QString curBranch(const QString &repository);
-    //QStringList branches(const QString &repository);
+    QString curBranch(const QString &repository);
+    QStringList branches(const QString &repository);
 
     //graph helpers
     QList<DVcsEvent> getAllCommits(const QString &repo);
@@ -154,6 +151,8 @@ public:
      * @param directory inside working directory
      */
     KUrl remotePushRepositoryLocation(QDir &directory);
+
+    void registerRepositoryForCurrentBranchChanges(const KUrl &repository);
 
 protected slots:
     void parseLogOutputBasicVersionControl(KDevelop::DVcsJob *job) const;

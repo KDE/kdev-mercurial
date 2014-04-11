@@ -27,7 +27,7 @@
 using namespace KDevelop;
 
 MercurialQueuesManager::MercurialQueuesManager(MercurialPlugin *plugin, const KUrl &localLocation)
-    : QWidget(), repoLocation(localLocation), m_plugin(plugin), m_ui(new Ui::MercurialManagerWidget)
+    : QWidget(), m_plugin(plugin), repoLocation(localLocation), m_ui(new Ui::MercurialManagerWidget)
 {
     m_ui->setupUi(this);
     m_model = new MercurialQueueSeriesModel(m_plugin, repoLocation, m_ui->patchesListView);

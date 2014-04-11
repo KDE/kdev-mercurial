@@ -23,16 +23,11 @@
 
 #include "vcs/models/vcseventmodel.h"
 
-namespace KDevelop
-{
-class VcsRevision;
-}
-
 class MercurialHeadsModel : public KDevelop::VcsEventModel
 {
     Q_OBJECT
 public:
-    MercurialHeadsModel(QObject *parent);
+    MercurialHeadsModel(KDevelop::IBasicVersionControl *iface, const KDevelop::VcsRevision &rev, const KUrl &url, QObject *parent);
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
     void setCurrentHeads(const QList<KDevelop::VcsRevision> &currentHeads) {
         m_currentHeads = currentHeads;

@@ -17,7 +17,15 @@ FIND_PROGRAM(MERCURIAL NAMES hg
 
 if (MERCURIAL)
     set( EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_BINARY_DIR} )
-    set(mercurialInitTest_SRCS initTest.cpp ../mercurialplugin.cpp)
+    set(mercurialInitTest_SRCS
+        initTest.cpp
+        ../ui/mercurialqueuesmanager.cpp
+        ../ui/mercurialheadswidget.cpp
+        ../models/mercurialqueueseriesmodel.cpp
+        ../models/mercurialheadsmodel.cpp
+        ../mercurialpushjob.cpp
+        ../mercurialvcslocationwidget.cpp
+        ../mercurialplugin.cpp)
     kde4_add_unit_test(kdevmercurial-test ${mercurialInitTest_SRCS})
     target_link_libraries(kdevmercurial-test
         ${QT_QTTEST_LIBRARY}

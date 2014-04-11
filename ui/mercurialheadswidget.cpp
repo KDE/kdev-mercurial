@@ -35,7 +35,7 @@ MercurialHeadsWidget::MercurialHeadsWidget(MercurialPlugin *plugin, const KUrl &
     : QDialog(), m_ui(new Ui::MercurialHeadsWidget), m_plugin(plugin), m_url(url)
 {
     m_ui->setupUi(this);
-    m_headsModel = new MercurialHeadsModel(this);
+    m_headsModel = new MercurialHeadsModel(plugin, VcsRevision(), url, this);
     m_ui->headsTableView->setModel(static_cast<QAbstractItemModel *>(m_headsModel));
 
     connect(m_ui->checkoutPushButton, SIGNAL(clicked(bool)), this, SLOT(checkoutRequested()));
@@ -48,15 +48,9 @@ MercurialHeadsWidget::MercurialHeadsWidget(MercurialPlugin *plugin, const KUrl &
 
 void MercurialHeadsWidget::updateModel()
 {
-    m_headsModel->clear();
-
     VcsJob *identifyJob = m_plugin->identify(m_url);
     connect(identifyJob, SIGNAL(resultsReady(KDevelop::VcsJob *)), this, SLOT(identifyReceived(KDevelop::VcsJob *)));
     ICore::self()->runController()->registerJob(identifyJob);
-
-    VcsJob *headsJob = m_plugin->heads(m_url);
-    connect(headsJob, SIGNAL(resultsReady(KDevelop::VcsJob *)), this, SLOT(headsReceived(KDevelop::VcsJob *)));
-    ICore::self()->runController()->registerJob(headsJob);
 }
 
 void MercurialHeadsWidget::identifyReceived(VcsJob *job)
@@ -66,15 +60,6 @@ void MercurialHeadsWidget::identifyReceived(VcsJob *job)
         currentHeads << value.value<VcsRevision>();
     }
     m_headsModel->setCurrentHeads(currentHeads);
-}
-
-void MercurialHeadsWidget::headsReceived(VcsJob *job)
-{
-    QList<VcsEvent> events;
-    foreach (const QVariant & value, job->fetchResults().toList()) {
-        events << value.value<VcsEvent>();
-    }
-    m_headsModel->addEvents(events);
 }
 
 void MercurialHeadsWidget::checkoutRequested()

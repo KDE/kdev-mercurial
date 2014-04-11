@@ -53,7 +53,8 @@ void MercurialInitTest::initTestCase()
     AutoTestShell::init();
     m_testCore = new KDevelop::TestCore();
     m_testCore->initialize(KDevelop::Core::NoUi);
-//     m_testCore->initialize(KDevelop::Core::Default);
+    // m_testCore->initialize(KDevelop::Core::Default);
+
     m_proxy = new MercurialPlugin(m_testCore);
     removeTempDirs();
 
@@ -82,7 +83,6 @@ void MercurialInitTest::repoInit()
     VcsJob *j = m_proxy->init(KUrl(mercurialTest_BaseDir));
     QVERIFY(j);
 
-
     // try to start the job
     QVERIFY(j->exec());
     QVERIFY(j->status() == KDevelop::VcsJob::JobSucceeded);
@@ -107,19 +107,16 @@ void MercurialInitTest::addFiles()
         QTextStream input(&f);
         input << "HELLO WORLD";
     }
-
     f.flush();
-
     f.close();
+
     f.setFileName(mercurialTest_BaseDir + mercurialTest_FileName2);
 
     if (f.open(QIODevice::WriteOnly)) {
         QTextStream input(&f);
         input << "No, bar()!";
     }
-
     f.flush();
-
     f.close();
 
     //test mercurial-status exitCode (see VcsJob::setExitCode).
@@ -130,7 +127,7 @@ void MercurialInitTest::addFiles()
 
     // /tmp/kdevMercurial_testdir/ and kdevMercurial_testdir
     //add always should use aboslute path to the any directory of the repository, let's check:
-    j = m_proxy->add(KUrl::List(QStringList(mercurialTest_BaseDir + MercurialTestDir1)), KDevelop::IBasicVersionControl::Recursive);
+    j = m_proxy->add(KUrl::List(QStringList(mercurialTest_BaseDir) << MercurialTestDir1), KDevelop::IBasicVersionControl::Recursive);
     QVERIFY(j);
     QVERIFY(j->exec());
     QVERIFY(j->status() == KDevelop::VcsJob::JobSucceeded);
@@ -147,9 +144,7 @@ void MercurialInitTest::addFiles()
         QTextStream input(&f);
         input << "No, foo()! It's bar()!";
     }
-
     f.flush();
-
     f.close();
 
     //test mercurial-status exitCode again
@@ -178,20 +173,18 @@ void MercurialInitTest::addFiles()
         QTextStream input(&f);
         input << "file1";
     }
-
     f.flush();
-
     f.close();
+
     f.setFileName(mercurialTest_BaseDir + "file2");
 
     if (f.open(QIODevice::WriteOnly)) {
         QTextStream input(&f);
         input << "file2";
     }
-
     f.flush();
-
     f.close();
+
     QStringList multipleFiles;
     multipleFiles << (mercurialTest_BaseDir + "file1");
     multipleFiles << (mercurialTest_BaseDir + "file2");
@@ -216,24 +209,20 @@ void MercurialInitTest::commitFiles()
     //test mercurial-status exitCode one more time.
     j = m_proxy->status(KUrl::List(mercurialTest_BaseDir), KDevelop::IBasicVersionControl::Recursive);
     QVERIFY(j);
+
     QVERIFY(j->exec());
     QVERIFY(j->status() == KDevelop::VcsJob::JobSucceeded);
 
     //Test the results of the "mercurial add"
-    DVcsJob *jobLs = new DVcsJob(0);
-    jobLs->clear();
-    jobLs->setDirectory(mercurialTest_BaseDir);
+    DVcsJob *jobLs = new DVcsJob(mercurialTest_BaseDir, 0);
     *jobLs << "hg" << "stat" << "-q" << "-c" << "-n";
+    QVERIFY(jobLs->exec());
+    QVERIFY(jobLs->status() == KDevelop::VcsJob::JobSucceeded);
 
-    if (jobLs) {
-        QVERIFY(jobLs->exec());
-        QVERIFY(jobLs->status() == KDevelop::VcsJob::JobSucceeded);
-
-        QStringList files = jobLs->output().split("\n");
-        QVERIFY(files.contains(mercurialTest_FileName));
-        QVERIFY(files.contains(mercurialTest_FileName2));
-        QVERIFY(files.contains("src/" + mercurialTest_FileName3));
-    }
+    QStringList files = jobLs->output().split("\n");
+    QVERIFY(files.contains(mercurialTest_FileName));
+    QVERIFY(files.contains(mercurialTest_FileName2));
+    QVERIFY(files.contains("src/" + mercurialTest_FileName3));
 
     kDebug() << "Committing one more time";
 
@@ -244,8 +233,8 @@ void MercurialInitTest::commitFiles()
         QTextStream input(&f);
         input << "Just another HELLO WORLD";
     }
-
     f.flush();
+    f.close();
 
     //add changes
     j = m_proxy->add(KUrl::List(QStringList(mercurialTest_BaseDir + mercurialTest_FileName)), KDevelop::IBasicVersionControl::Recursive);
@@ -261,7 +250,6 @@ void MercurialInitTest::commitFiles()
     // try to start the job
     QVERIFY(j->exec());
     QVERIFY(j->status() == KDevelop::VcsJob::JobSucceeded);
-
 }
 
 void MercurialInitTest::cloneRepository()

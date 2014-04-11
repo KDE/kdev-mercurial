@@ -27,8 +27,8 @@
 
 using namespace KDevelop;
 
-MercurialHeadsModel::MercurialHeadsModel(QObject *parent)
-    : VcsEventModel(parent)
+MercurialHeadsModel::MercurialHeadsModel(IBasicVersionControl *iface, const KDevelop::VcsRevision &rev, const KUrl &url, QObject *parent)
+    : VcsEventModel(iface, rev, url, parent)
 {
 
 }
