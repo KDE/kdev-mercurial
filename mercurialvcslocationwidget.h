@@ -29,7 +29,7 @@ class MercurialVcsLocationWidget : public KDevelop::StandardVcsLocationWidget
     Q_OBJECT
 
 public:
-    MercurialVcsLocationWidget(QWidget* parent = 0, Qt::WindowFlags f = 0)
+    MercurialVcsLocationWidget(QWidget *parent = 0, Qt::WindowFlags f = 0)
         : KDevelop::StandardVcsLocationWidget(parent, f) {}
     bool isCorrect() const;
 };

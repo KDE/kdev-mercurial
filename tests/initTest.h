@@ -29,7 +29,8 @@
 
 class MercurialPlugin;
 
-namespace KDevelop {
+namespace KDevelop
+{
 class TestCore;
 }
 
@@ -55,8 +56,8 @@ private slots:
     void cleanupTestCase();
 
 private:
-    MercurialPlugin* m_proxy;
-    KDevelop::TestCore* m_testCore;
+    MercurialPlugin *m_proxy;
+    KDevelop::TestCore *m_testCore;
     void removeTempDirs();
 };
 

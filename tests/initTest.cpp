@@ -79,7 +79,7 @@ void MercurialInitTest::repoInit()
 {
     kDebug() << "Trying to init repo";
     // make job that creates the local repository
-    VcsJob* j = m_proxy->init(KUrl(mercurialTest_BaseDir));
+    VcsJob *j = m_proxy->init(KUrl(mercurialTest_BaseDir));
     QVERIFY(j);
 
 
@@ -123,7 +123,7 @@ void MercurialInitTest::addFiles()
     f.close();
 
     //test mercurial-status exitCode (see VcsJob::setExitCode).
-    VcsJob* j = m_proxy->status(KUrl::List(mercurialTest_BaseDir), KDevelop::IBasicVersionControl::Recursive);
+    VcsJob *j = m_proxy->status(KUrl::List(mercurialTest_BaseDir), KDevelop::IBasicVersionControl::Recursive);
     QVERIFY(j);
     QVERIFY(j->exec());
     QVERIFY(j->status() == KDevelop::VcsJob::JobSucceeded);
@@ -206,7 +206,7 @@ void MercurialInitTest::commitFiles()
     kDebug() << "Committing...";
     //we start it after addFiles, so we just have to commit
     ///TODO: if "" is ok?
-    VcsJob* j = m_proxy->commit(QString("Test commit"), KUrl::List(mercurialTest_BaseDir), KDevelop::IBasicVersionControl::Recursive);
+    VcsJob *j = m_proxy->commit(QString("Test commit"), KUrl::List(mercurialTest_BaseDir), KDevelop::IBasicVersionControl::Recursive);
     QVERIFY(j);
 
     // try to start the job
@@ -220,7 +220,7 @@ void MercurialInitTest::commitFiles()
     QVERIFY(j->status() == KDevelop::VcsJob::JobSucceeded);
 
     //Test the results of the "mercurial add"
-    DVcsJob* jobLs = new DVcsJob(0);
+    DVcsJob *jobLs = new DVcsJob(0);
     jobLs->clear();
     jobLs->setDirectory(mercurialTest_BaseDir);
     *jobLs << "hg" << "stat" << "-q" << "-c" << "-n";
@@ -267,7 +267,7 @@ void MercurialInitTest::commitFiles()
 void MercurialInitTest::cloneRepository()
 {
     // make job that clones the local repository, created in the previous test
-    VcsJob* j = m_proxy->createWorkingCopy(KUrl(mercurialTest_BaseDir), KUrl(mercurialTest_BaseDir2));
+    VcsJob *j = m_proxy->createWorkingCopy(KUrl(mercurialTest_BaseDir), KUrl(mercurialTest_BaseDir2));
     QVERIFY(j);
 
     // try to start the job

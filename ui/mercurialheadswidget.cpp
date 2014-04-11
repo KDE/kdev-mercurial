@@ -36,7 +36,7 @@ MercurialHeadsWidget::MercurialHeadsWidget(MercurialPlugin *plugin, const KUrl &
 {
     m_ui->setupUi(this);
     m_headsModel = new MercurialHeadsModel(this);
-    m_ui->headsTableView->setModel(static_cast<QAbstractItemModel*>(m_headsModel));
+    m_ui->headsTableView->setModel(static_cast<QAbstractItemModel *>(m_headsModel));
 
     connect(m_ui->checkoutPushButton, SIGNAL(clicked(bool)), this, SLOT(checkoutRequested()));
     connect(m_ui->mergePushButton, SIGNAL(clicked(bool)), this, SLOT(mergeRequested()));
@@ -51,18 +51,18 @@ void MercurialHeadsWidget::updateModel()
     m_headsModel->clear();
 
     VcsJob *identifyJob = m_plugin->identify(m_url);
-    connect(identifyJob, SIGNAL(resultsReady(KDevelop::VcsJob*)), this, SLOT(identifyReceived(KDevelop::VcsJob*)));
+    connect(identifyJob, SIGNAL(resultsReady(KDevelop::VcsJob *)), this, SLOT(identifyReceived(KDevelop::VcsJob *)));
     ICore::self()->runController()->registerJob(identifyJob);
 
     VcsJob *headsJob = m_plugin->heads(m_url);
-    connect(headsJob, SIGNAL(resultsReady(KDevelop::VcsJob*)), this, SLOT(headsReceived(KDevelop::VcsJob*)));
+    connect(headsJob, SIGNAL(resultsReady(KDevelop::VcsJob *)), this, SLOT(headsReceived(KDevelop::VcsJob *)));
     ICore::self()->runController()->registerJob(headsJob);
 }
 
 void MercurialHeadsWidget::identifyReceived(VcsJob *job)
 {
     QList<VcsRevision> currentHeads;
-    foreach(const QVariant &value, job->fetchResults().toList()) {
+    foreach (const QVariant & value, job->fetchResults().toList()) {
         currentHeads << value.value<VcsRevision>();
     }
     m_headsModel->setCurrentHeads(currentHeads);
@@ -71,7 +71,7 @@ void MercurialHeadsWidget::identifyReceived(VcsJob *job)
 void MercurialHeadsWidget::headsReceived(VcsJob *job)
 {
     QList<VcsEvent> events;
-    foreach(const QVariant &value, job->fetchResults().toList()) {
+    foreach (const QVariant & value, job->fetchResults().toList()) {
         events << value.value<VcsEvent>();
     }
     m_headsModel->addEvents(events);
@@ -85,7 +85,7 @@ void MercurialHeadsWidget::checkoutRequested()
     }
 
     VcsJob *job = m_plugin->checkoutHead(m_url, m_headsModel->eventForIndex(selection).revision());
-    connect(job, SIGNAL(resultsReady(KDevelop::VcsJob*)), this, SLOT(updateModel()));
+    connect(job, SIGNAL(resultsReady(KDevelop::VcsJob *)), this, SLOT(updateModel()));
     ICore::self()->runController()->registerJob(job);
 }
 
@@ -97,6 +97,6 @@ void MercurialHeadsWidget::mergeRequested()
     }
 
     VcsJob *job = m_plugin->mergeWith(m_url, m_headsModel->eventForIndex(selection).revision());
-    connect(job, SIGNAL(resultsReady(KDevelop::VcsJob*)), this, SLOT(updateModel()));
+    connect(job, SIGNAL(resultsReady(KDevelop::VcsJob *)), this, SLOT(updateModel()));
     ICore::self()->runController()->registerJob(job);
 }

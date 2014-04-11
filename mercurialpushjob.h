@@ -34,7 +34,7 @@ public:
     void start();
     QVariant fetchResults();
     KDevelop::VcsJob::JobStatus status() const;
-    KDevelop::IPlugin* vcsPlugin() const;
+    KDevelop::IPlugin *vcsPlugin() const;
 
 private slots:
     void serverContacted(KDevelop::VcsJob *job);

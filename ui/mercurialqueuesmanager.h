@@ -42,7 +42,7 @@ protected slots:
     void executePushAll();
     void executePop();
     void executePopAll();
-    
+
 private:
     MercurialPlugin *m_plugin;
     const KUrl repoLocation;

@@ -29,10 +29,10 @@
 using namespace KDevelop;
 
 MercurialPushJob::MercurialPushJob(const QDir &workingDir, const KUrl &destination, MercurialPlugin *parent)
-: VcsJob(parent), m_workingDir(workingDir), m_status(JobNotStarted)
+    : VcsJob(parent), m_workingDir(workingDir), m_status(JobNotStarted)
 {
     if (destination.isEmpty()) {
-        m_repoLocation = static_cast<MercurialPlugin*>(vcsPlugin())->remotePushRepositoryLocation(m_workingDir);
+        m_repoLocation = static_cast<MercurialPlugin *>(vcsPlugin())->remotePushRepositoryLocation(m_workingDir);
     } else {
         m_repoLocation = destination;
     }
@@ -49,7 +49,7 @@ void MercurialPushJob::start()
     if (!m_repoLocation.isEmpty())
         *job << m_repoLocation.url();
 
-    connect(job, SIGNAL(resultsReady(KDevelop::VcsJob*)), SLOT(serverContacted(KDevelop::VcsJob*)));
+    connect(job, SIGNAL(resultsReady(KDevelop::VcsJob *)), SLOT(serverContacted(KDevelop::VcsJob *)));
     job->start();
 }
 
@@ -63,14 +63,14 @@ VcsJob::JobStatus MercurialPushJob::status() const
     return m_status;
 }
 
-IPlugin* MercurialPushJob::vcsPlugin() const
+IPlugin *MercurialPushJob::vcsPlugin() const
 {
-    return static_cast<IPlugin*>(parent());
+    return static_cast<IPlugin *>(parent());
 }
 
 void MercurialPushJob::serverContacted(VcsJob *job)
 {
-    DVcsJob *dvcsJob = static_cast<DVcsJob*>(job);
+    DVcsJob *dvcsJob = static_cast<DVcsJob *>(job);
     // check for errors
     if (dvcsJob->error()) {
         QString response = QString::fromLocal8Bit(dvcsJob->errorOutput());

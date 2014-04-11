@@ -27,12 +27,12 @@
 using namespace KDevelop;
 
 MercurialQueuesManager::MercurialQueuesManager(MercurialPlugin *plugin, const KUrl &localLocation)
-: QWidget(), repoLocation(localLocation), m_plugin(plugin), m_ui(new Ui::MercurialManagerWidget)
+    : QWidget(), repoLocation(localLocation), m_plugin(plugin), m_ui(new Ui::MercurialManagerWidget)
 {
     m_ui->setupUi(this);
     m_model = new MercurialQueueSeriesModel(m_plugin, repoLocation, m_ui->patchesListView);
     m_ui->patchesListView->setModel(m_model);
-    
+
     connect(m_ui->pushPushButton, SIGNAL(clicked(bool)), this, SLOT(executePush()));
     connect(m_ui->pushAllPushButton, SIGNAL(clicked(bool)), this, SLOT(executePushAll()));
     connect(m_ui->popPushButton, SIGNAL(clicked(bool)), this, SLOT(executePop()));

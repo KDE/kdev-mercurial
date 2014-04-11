@@ -31,13 +31,13 @@ void MercurialQueueSeriesModel::update()
 {
     beginResetModel();
     VcsJob *job = m_plugin->mqApplied(m_repoLocation);
-    if(job->exec() && job->status() == VcsJob::JobSucceeded) {
+    if (job->exec() && job->status() == VcsJob::JobSucceeded) {
         m_appliedPatches = job->fetchResults().toStringList();
     }
     delete job;
-    
+
     job = m_plugin->mqUnapplied(m_repoLocation);
-    if(job->exec() && job->status() == VcsJob::JobSucceeded) {
+    if (job->exec() && job->status() == VcsJob::JobSucceeded) {
         m_unappliedPatches = job->fetchResults().toStringList();
     }
     delete job;
@@ -59,7 +59,7 @@ QVariant MercurialQueueSeriesModel::data(const QModelIndex &index, int role) con
     } else {
         row -= m_appliedPatches.size();
     }
-    
+
     if (row >= 0 && row < m_unappliedPatches.size()) {
         if (role == Qt::DisplayRole) {
             return m_unappliedPatches[row];
@@ -74,4 +74,3 @@ int MercurialQueueSeriesModel::rowCount(const QModelIndex &parent) const
 {
     return m_unappliedPatches.size() + m_appliedPatches.size();
 }
-

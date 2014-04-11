@@ -29,7 +29,8 @@
 
 class MercurialPlugin;
 
-namespace KDevelop {
+namespace KDevelop
+{
 class VcsJob;
 }
 
