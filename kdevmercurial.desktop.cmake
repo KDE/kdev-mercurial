@@ -26,6 +26,7 @@ Comment[tr]=Bu eklenti Mercurial'i bütünleştirir
 Comment[uk]=За допомогою цього додатка можна інтегрувати Mercurial
 Comment[x-test]=xxThis plugin integrates Mercurialxx
 Name=Mercurial Support
+Name[ast]=Sofitu de Mercurial
 Name[bg]=Поддръжка на Mercurial
 Name[bs]=Mercurial podrška
 Name[ca]=Implementació per a Mercurial
