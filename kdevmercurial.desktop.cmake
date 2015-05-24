@@ -60,6 +60,7 @@ GenericName[es]=Implementación de Control de Versiones
 GenericName[et]=Versioonihalduse toetus
 GenericName[fr]=Prise en charge du contrôle de versions
 GenericName[ga]=Tacaíocht do rialú leaganacha
+GenericName[gl]=Soporte de sistemas de versións
 GenericName[hu]=Verziókezelő támogatás
 GenericName[it]=Supporto per il controllo di versione
 GenericName[nds]=Verschoonkuntrull-Ünnerstütten
