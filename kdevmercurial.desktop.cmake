@@ -37,6 +37,7 @@ Name[es]=Implementación de Mercurial
 Name[et]=Mercuriali toetus
 Name[fr]=Prise en charge de Mercurial
 Name[ga]=Tacaíocht Mercurial
+Name[gl]=Integración con Mercurial
 Name[hu]=Mercurial támogatás
 Name[it]=Supporto per Mercurial
 Name[nds]=Mercurial-Ünnerstütten
