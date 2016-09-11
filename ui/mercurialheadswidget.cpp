@@ -31,7 +31,7 @@
 
 using namespace KDevelop;
 
-MercurialHeadsWidget::MercurialHeadsWidget(MercurialPlugin *plugin, const KUrl &url)
+MercurialHeadsWidget::MercurialHeadsWidget(MercurialPlugin *plugin, const QUrl &url)
     : QDialog(), m_ui(new Ui::MercurialHeadsWidget), m_plugin(plugin), m_url(url)
 {
     m_ui->setupUi(this);

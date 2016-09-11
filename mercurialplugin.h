@@ -60,85 +60,87 @@ public:
     explicit MercurialPlugin(QObject *parent, const QVariantList &args = QVariantList());
     ~MercurialPlugin();
 
-    bool isValidDirectory(const KUrl &dirPath);
-    bool isVersionControlled(const KUrl &path);
+    bool isValidDirectory(const QUrl &dirPath);
+    bool isVersionControlled(const QUrl &path);
     QString name() const;
 
-    KDevelop::VcsJob *init(const KUrl &directory);
-    KDevelop::VcsJob *repositoryLocation(const KUrl &directory);    // Not implemented.
-    KDevelop::VcsJob *createWorkingCopy(const KDevelop::VcsLocation &localOrRepoLocationSrc, const KUrl &repository, IBasicVersionControl::RecursionMode = KDevelop::IBasicVersionControl::Recursive);
-    KDevelop::VcsJob *add(const KUrl::List &localLocations,
+    KDevelop::VcsJob *init(const QUrl &directory);
+    KDevelop::VcsJob *repositoryLocation(const QUrl &directory);    // Not implemented.
+    KDevelop::VcsJob *createWorkingCopy(const KDevelop::VcsLocation &localOrRepoLocationSrc, const QUrl &repository, IBasicVersionControl::RecursionMode = KDevelop::IBasicVersionControl::Recursive);
+    KDevelop::VcsJob *add(const QList<QUrl> &localLocations,
                           KDevelop::IBasicVersionControl::RecursionMode recursion  = KDevelop::IBasicVersionControl::Recursive);
-    KDevelop::VcsJob *copy(const KUrl &localLocationSrc,
-                           const KUrl &localLocationDst);
-    KDevelop::VcsJob *move(const KUrl &localLocationSrc,
-                           const KUrl &localLocationDst);
+    KDevelop::VcsJob *copy(const QUrl &localLocationSrc,
+                           const QUrl &localLocationDst);
+    KDevelop::VcsJob *move(const QUrl &localLocationSrc,
+                           const QUrl &localLocationDst);
 
     KDevelop::VcsJob *commit(const QString &message,
-                             const KUrl::List &localLocations,
+                             const QList<QUrl> &localLocations,
                              KDevelop::IBasicVersionControl::RecursionMode recursion);
-    KDevelop::VcsJob *diff(const KUrl &fileOrDirectory,
+    KDevelop::VcsJob *diff(const QUrl &fileOrDirectory,
                            const KDevelop::VcsRevision &srcRevision,
                            const KDevelop::VcsRevision &dstRevision,
                            KDevelop::VcsDiff::Type diffType,
                            KDevelop::IBasicVersionControl::RecursionMode recursionMode);
 
-    KDevelop::VcsJob *remove(const KUrl::List &files);
-    KDevelop::VcsJob *status(const KUrl::List &localLocations,
+    KDevelop::VcsJob *remove(const QList<QUrl> &files);
+    KDevelop::VcsJob *status(const QList<QUrl> &localLocations,
                              KDevelop::IBasicVersionControl::RecursionMode recursion);
-    KDevelop::VcsJob *revert(const KUrl::List &localLocations,
+    KDevelop::VcsJob *revert(const QList<QUrl> &localLocations,
                              KDevelop::IBasicVersionControl::RecursionMode recursion);
-    KDevelop::VcsJob *update(const KUrl::List &localLocations,
+    KDevelop::VcsJob *update(const QList<QUrl> &localLocations,
                              const KDevelop::VcsRevision &rev, KDevelop::IBasicVersionControl::RecursionMode recursion);
-    KDevelop::VcsJob *resolve(const KUrl::List &files, KDevelop::IBasicVersionControl::RecursionMode recursion);
+    KDevelop::VcsJob *resolve(const QList<QUrl> &files, KDevelop::IBasicVersionControl::RecursionMode recursion);
 
-    KDevelop::VcsJob *log(const KUrl &localLocation,
+    KDevelop::VcsJob *log(const QUrl &localLocation,
                           const KDevelop::VcsRevision &rev,
                           unsigned long limit);
-    KDevelop::VcsJob *log(const KUrl &localLocation,
+    KDevelop::VcsJob *log(const QUrl &localLocation,
                           const KDevelop::VcsRevision &rev,
                           const KDevelop::VcsRevision &limit);
 
-    KDevelop::VcsJob *log(const KUrl &localLocation,
+    KDevelop::VcsJob *log(const QUrl &localLocation,
                           const KDevelop::VcsRevision &to,
                           const KDevelop::VcsRevision &from,
                           unsigned long limit);
-    KDevelop::VcsJob *annotate(const KUrl &localLocation,
+    KDevelop::VcsJob *annotate(const QUrl &localLocation,
                                const KDevelop::VcsRevision &rev);
 
+    KDevelop::VcsJob* mergeBranch(const QUrl &repository, const QString &branchName);
+
     // mercurial specific stuff
-    KDevelop::VcsJob *heads(const KUrl &localLocation);
-    KDevelop::VcsJob *identify(const KUrl &localLocation);
-    KDevelop::VcsJob *checkoutHead(const KUrl &localLocation, const KDevelop::VcsRevision &rev);
-    KDevelop::VcsJob *mergeWith(const KUrl &localLocation, const KDevelop::VcsRevision &rev);
+    KDevelop::VcsJob *heads(const QUrl &localLocation);
+    KDevelop::VcsJob *identify(const QUrl &localLocation);
+    KDevelop::VcsJob *checkoutHead(const QUrl &localLocation, const KDevelop::VcsRevision &rev);
+    KDevelop::VcsJob *mergeWith(const QUrl &localLocation, const KDevelop::VcsRevision &rev);
 
     // mercurial queues stuff
-    KDevelop::VcsJob *mqNew(const KUrl &localLocation, const QString &name, const QString &message);
-    KDevelop::VcsJob *mqPush(const KUrl &localLocation);
-    KDevelop::VcsJob *mqPushAll(const KUrl &localLocation);
-    KDevelop::VcsJob *mqPop(const KUrl &localLocation);
-    KDevelop::VcsJob *mqPopAll(const KUrl &localLocation);
-    KDevelop::VcsJob *mqApplied(const KUrl &localLocation);
-    KDevelop::VcsJob *mqUnapplied(const KUrl &localLocation);
+    KDevelop::VcsJob *mqNew(const QUrl &localLocation, const QString &name, const QString &message);
+    KDevelop::VcsJob *mqPush(const QUrl &localLocation);
+    KDevelop::VcsJob *mqPushAll(const QUrl &localLocation);
+    KDevelop::VcsJob *mqPop(const QUrl &localLocation);
+    KDevelop::VcsJob *mqPopAll(const QUrl &localLocation);
+    KDevelop::VcsJob *mqApplied(const QUrl &localLocation);
+    KDevelop::VcsJob *mqUnapplied(const QUrl &localLocation);
 
     KDevelop::DVcsJob *switchBranch(const QString &repository, const QString &branch);
     KDevelop::DVcsJob *branch(const QString &repository, const QString &basebranch = QString(), const QString &branch = QString(), const QStringList &args = QStringList());
 
-    KDevelop::VcsJob *push(const KUrl &localRepositoryLocation,
+    KDevelop::VcsJob *push(const QUrl &localRepositoryLocation,
                            const KDevelop::VcsLocation &localOrRepoLocationDst);
     KDevelop::VcsJob *pull(const KDevelop::VcsLocation &localOrRepoLocationSrc,
-                           const KUrl &localRepositoryLocation);
+                           const QUrl &localRepositoryLocation);
 
     KDevelop::VcsLocationWidget *vcsLocation(QWidget *parent) const;
 
     //parsers for branch:
-    KDevelop::VcsJob *branch(const KUrl &repository, const KDevelop::VcsRevision &rev, const QString &branchName);
-    KDevelop::VcsJob *branches(const KUrl &repository);
-    KDevelop::VcsJob *currentBranch(const KUrl &repository);
-    KDevelop::VcsJob *deleteBranch(const KUrl &repository, const QString &branchName);
-    KDevelop::VcsJob *renameBranch(const KUrl &repository, const QString &oldBranchName, const QString &newBranchName);
-    KDevelop::VcsJob *switchBranch(const KUrl &repository, const QString &branchName);
-    KDevelop::VcsJob *tag(const KUrl &repository, const QString &commitMessage, const KDevelop::VcsRevision &rev, const QString &tagName);
+    KDevelop::VcsJob *branch(const QUrl &repository, const KDevelop::VcsRevision &rev, const QString &branchName);
+    KDevelop::VcsJob *branches(const QUrl &repository);
+    KDevelop::VcsJob *currentBranch(const QUrl &repository);
+    KDevelop::VcsJob *deleteBranch(const QUrl &repository, const QString &branchName);
+    KDevelop::VcsJob *renameBranch(const QUrl &repository, const QString &oldBranchName, const QString &newBranchName);
+    KDevelop::VcsJob *switchBranch(const QUrl &repository, const QString &branchName);
+    KDevelop::VcsJob *tag(const QUrl &repository, const QString &commitMessage, const KDevelop::VcsRevision &rev, const QString &tagName);
 
     QString curBranch(const QString &repository);
     QStringList branches(const QString &repository);
@@ -150,9 +152,9 @@ public:
      * Find out where is default remote located.
      * @param directory inside working directory
      */
-    KUrl remotePushRepositoryLocation(QDir &directory);
+    QUrl remotePushRepositoryLocation(QDir &directory);
 
-    void registerRepositoryForCurrentBranchChanges(const KUrl &repository);
+    void registerRepositoryForCurrentBranchChanges(const QUrl &repository);
 
 protected slots:
     void parseLogOutputBasicVersionControl(KDevelop::DVcsJob *job) const;
@@ -177,17 +179,15 @@ protected:
     void parseLogOutput(const KDevelop::DVcsJob *job, QList<DVcsEvent> &commits) const;
 
     static QString toMercurialRevision(const KDevelop::VcsRevision &vcsrev);
-    static KDevelop::DVcsJob &callExtension(KDevelop::DVcsJob &job);
-
     /**
      * Remove directories from @p locations.
      */
-    static void filterOutDirectories(KUrl::List &locations);
+    static void filterOutDirectories(QList<QUrl> &locations);
 
     static KDevelop::VcsStatusInfo::State charToState(const char ch);
-    static QDir findWorkingDir(const KUrl &location);
+    static QDir findWorkingDir(const QUrl &location);
 
-    KUrl m_lastRepoRoot;
+    QUrl m_lastRepoRoot;
 
     // actions
     KAction *m_headsAction;
@@ -198,8 +198,8 @@ protected:
             *m_mqPopAction,
             *m_mqPopAllAction,
             *m_mqManagerAction;
-    KUrl::List m_urls;
-    void additionalMenuEntries(QMenu *menu, const KUrl::List &urls);
+    QList<QUrl> m_urls;
+    void additionalMenuEntries(QMenu *menu, const QList<QUrl> &urls);
 };
 
 //class MercurialQueues

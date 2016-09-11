@@ -30,7 +30,7 @@ class MercurialPushJob : public KDevelop::VcsJob
     Q_OBJECT
 
 public:
-    MercurialPushJob(const QDir &workingDir, const KUrl &destination, MercurialPlugin *parent);
+    MercurialPushJob(const QDir &workingDir, const QUrl &destination, MercurialPlugin *parent);
     void start();
     QVariant fetchResults();
     KDevelop::VcsJob::JobStatus status() const;
@@ -41,7 +41,7 @@ private slots:
 
 private:
     QDir m_workingDir;
-    KUrl m_repoLocation;
+    QUrl m_repoLocation;
     KDevelop::VcsJob::JobStatus m_status;
 
     void setFail();

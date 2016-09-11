@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2011 Andrey Batyiev <batyiev@gmail.com>                     *
+ *   Copyright 2014 Alex Richardson <arichardosn.kde@gmail.com>            *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or         *
  *   modify it under the terms of the GNU General Public License as        *
@@ -18,24 +18,10 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
  ***************************************************************************/
 
-#ifndef MERCURIALHEADSMODEL_H
-#define MERCURIALHEADSMODEL_H
+#include "mercurialplugin.h"
 
-#include "vcs/models/vcseventmodel.h"
+#include <KPluginFactory>
 
-class MercurialHeadsModel : public KDevelop::VcsEventModel
-{
-    Q_OBJECT
-public:
-    MercurialHeadsModel(KDevelop::IBasicVersionControl *iface, const KDevelop::VcsRevision &rev, const QUrl &url, QObject *parent);
-    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-    void setCurrentHeads(const QList<KDevelop::VcsRevision> &currentHeads) {
-        m_currentHeads = currentHeads;
-        emit headerDataChanged(Qt::Vertical, 0, m_currentHeads.count());
-    }
+K_PLUGIN_FACTORY_WITH_JSON(KDevMercurialPluginFactory, "kdevmercurial.json", registerPlugin<MercurialPlugin>(); )
 
-private:
-    QList<KDevelop::VcsRevision> m_currentHeads;
-};
-
-#endif // MERCURIALHEADSMODEL_H
+#include "mercurialpluginmetadata.moc"

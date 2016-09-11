@@ -1,0 +1,26 @@
+{
+    "KPlugin": {
+        "Authors": [
+            {
+                "Email": "batyiev@gmail.com",
+                "Name": "Andrey Batyiev", 
+                "Name[x-test]": "xxAndrey Batyievxx"
+            }
+        ],
+        "Category": "Version Control",
+        "Description": "This plugin integrates Mercurial to KDevelop",
+        "Icon": "mercurial",
+        "Id": "kdevmercurial",
+        "License": "GPL",
+        "Name": "Mercurial Support",
+        "ServiceTypes": [
+            "KDevelop/Plugin"
+        ],
+        "Version": "0.9"
+    },
+    "X-KDevelop-Interfaces": [
+        "org.kdevelop.IBasicVersionControl",
+        "org.kdevelop.IDistributedVersionControl"
+    ],
+    "X-KDevelop-Mode": "GUI"
+}

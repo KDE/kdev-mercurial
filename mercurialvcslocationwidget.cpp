@@ -20,7 +20,6 @@
 
 #include "mercurialvcslocationwidget.h"
 #include <vcs/vcslocation.h>
-#include <KDebug>
 
 bool MercurialVcsLocationWidget::isCorrect() const
 {

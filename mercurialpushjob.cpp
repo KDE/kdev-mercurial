@@ -23,12 +23,13 @@
 #include <vcs/dvcs/dvcsjob.h>
 #include <KPasswordDialog>
 #include <KLocalizedString>
-#include <QtGui/QMessageBox>
-#include <KDebug>
+
+#include <QMessageBox>
+#include <QDebug>
 
 using namespace KDevelop;
 
-MercurialPushJob::MercurialPushJob(const QDir &workingDir, const KUrl &destination, MercurialPlugin *parent)
+MercurialPushJob::MercurialPushJob(const QDir &workingDir, const QUrl &destination, MercurialPlugin *parent)
     : VcsJob(parent), m_workingDir(workingDir), m_status(JobNotStarted)
 {
     if (destination.isEmpty()) {
@@ -75,19 +76,19 @@ void MercurialPushJob::serverContacted(VcsJob *job)
     if (dvcsJob->error()) {
         QString response = QString::fromLocal8Bit(dvcsJob->errorOutput());
 
-        kDebug() << response;
+        qDebug() << response;
 
         if (response.contains("abort: http authorization required")) {
             // server requests username:password auth -> ask pass
             KPasswordDialog dlg(0, KPasswordDialog::ShowUsernameLine);
             dlg.setPrompt(i18n("Enter your login and password for Mercurial push."));
-            dlg.setUsername(m_repoLocation.user());
-            dlg.setPassword(m_repoLocation.pass());
+            dlg.setUsername(m_repoLocation.userName());
+            dlg.setPassword(m_repoLocation.password());
             if (!dlg.exec()) {
                 setFail();
             } else {
-                m_repoLocation.setUser(dlg.username());
-                m_repoLocation.setPass(dlg.password());
+                m_repoLocation.setUserName(dlg.username());
+                m_repoLocation.setPassword(dlg.password());
                 start();
             }
         } else if (response.contains("remote: Permission denied")) {

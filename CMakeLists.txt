@@ -1,25 +1,55 @@
 project(mercurial)
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 2.8.12)
 
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${php_SOURCE_DIR}/cmake/)
+find_package (ECM 0.0.9 REQUIRED NO_MODULE)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${mercurial_SOURCE_DIR}/cmake/modules ${ECM_MODULE_PATH})
 
-find_package(KDE4 REQUIRED)
-find_package(KDevPlatform 0.9.96 REQUIRED)
+include(KDECompilerSettings NO_POLICY_SCOPE)
+include(ECMAddTests)
+include(ECMOptionalAddSubdirectory)
+include(ECMInstallIcons)
+include(ECMSetupVersion)
+include(ECMMarkAsTest)
+include(ECMMarkNonGuiExecutable)
+include(ECMGenerateHeaders)
+include(ECMPackageConfigHelpers)
+include(GenerateExportHeader)
+include(FeatureSummary)
+include(WriteBasicConfigVersionFile)
+include(CheckFunctionExists)
+include(KDEInstallDirs)
+include(KDECMakeSettings)
+
+find_package(KF5 REQUIRED COMPONENTS
+  Config
+  GuiAddons
+  WidgetsAddons
+  IconThemes
+  I18n
+  ItemModels
+  ItemViews
+  JobWidgets
+  KCMUtils
+  KIO
+  Parts
+  WindowSystem
+  XmlGui)
+
+find_package(KDevPlatform 5.0.0 REQUIRED)
 
 include_directories(
-    ${KDEVPLATFORM_INCLUDE_DIR}
-    ${KDE4_INCLUDES}
     ${mercurial_BINARY_DIR}
     ${mercurial_SOURCE_DIR}
 )
 
+# TODO: Remove it
 add_definitions(-DKDE_DEFAULT_DEBUG_AREA=9526)
-add_definitions(-DLOG_STYLE_FILE="\\"${DATA_INSTALL_DIR}/kdevmercurial/kdevmercurial-log.style\\"")
-add_definitions(-DEXTENSION_FILE="\\"${DATA_INSTALL_DIR}/kdevmercurial/kdevmercurial.py\\"")
+
+#add_definitions(-DQT_NO_URL_CAST_FROM_STRING)
+
 add_subdirectory(tests)
 add_subdirectory(icons)
-add_subdirectory(python)
 
 ########### next target ###############
 
@@ -31,6 +61,7 @@ set(kdevmercurial_PART_SRCS
     mercurialpushjob.cpp
     mercurialvcslocationwidget.cpp
     mercurialplugin.cpp
+    mercurialpluginmetadata.cpp
 )
 
 set(kdevmercurial_UIS
@@ -38,22 +69,14 @@ set(kdevmercurial_UIS
     ui/mercurialqueuesmanager.ui
 )
 
-kde4_add_ui_files(kdevmercurial_PART_SRCS ${kdevmercurial_UIS})
-kde4_add_plugin(kdevmercurial ${kdevmercurial_PART_SRCS})
+ki18n_wrap_ui(kdevmercurial_PART_SRCS ${kdevmercurial_UIS})
+kdevplatform_add_plugin(kdevmercurial JSON kdevmercurial.json SOURCES ${kdevmercurial_PART_SRCS})
 
 target_link_libraries(kdevmercurial
-    ${KDE4_KDEUI_LIBS}
-    ${KDEVPLATFORM_UTIL_LIBRARIES}
-    ${KDEVPLATFORM_INTERFACES_LIBRARIES}
-    ${KDEVPLATFORM_VCS_LIBRARIES}
-    ${KDEVPLATFORM_PROJECT_LIBRARIES}
+    KDev::Util
+    KDev::Interfaces
+    KDev::Vcs
+    KDev::Project
 )
 
-configure_file(kdevmercurial.desktop.cmake ${CMAKE_CURRENT_BINARY_DIR}/kdevmercurial.desktop)
-install(TARGETS kdevmercurial DESTINATION ${PLUGIN_INSTALL_DIR} )
-
-
-########### install files ###############
-install( FILES ${CMAKE_CURRENT_BINARY_DIR}/kdevmercurial.desktop DESTINATION ${SERVICES_INSTALL_DIR} )
-install( FILES kdevmercurial.rc DESTINATION ${DATA_INSTALL_DIR}/kdevmercurial )
-install( FILES kdevmercurial-log.style DESTINATION ${DATA_INSTALL_DIR}/kdevmercurial )
+feature_summary(WHAT ALL FATAL_ON_MISSING_REQUIRED_PACKAGES)

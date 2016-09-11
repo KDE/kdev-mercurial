@@ -24,7 +24,7 @@
 #include <QModelIndex>
 #include <QStringList>
 
-class KUrl;
+class QUrl;
 class MercurialPlugin;
 
 class MercurialQueueSeriesModel : public QAbstractListModel
@@ -32,7 +32,7 @@ class MercurialQueueSeriesModel : public QAbstractListModel
     Q_OBJECT
 
 public:
-    explicit MercurialQueueSeriesModel(MercurialPlugin *plugin, const KUrl &localLocation, QObject *parent = 0)
+    explicit MercurialQueueSeriesModel(MercurialPlugin *plugin, const QUrl &localLocation, QObject *parent = 0)
         : QAbstractListModel(parent), m_repoLocation(localLocation), m_plugin(plugin) {
         update();
     };
@@ -43,7 +43,7 @@ public:
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
 
 private:
-    const KUrl &m_repoLocation;
+    const QUrl &m_repoLocation;
     MercurialPlugin *m_plugin;
     QStringList m_appliedPatches, m_unappliedPatches;
 };

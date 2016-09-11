@@ -24,14 +24,14 @@
 
 #include "initTest.h"
 
-#include <qtest_kde.h>
 #include <QtTest/QtTest>
 #include <tests/testcore.h>
 #include <tests/autotestshell.h>
 
-#include <KUrl>
-#include <KDebug>
-#include <kio/netaccess.h>
+#include <QUrl>
+#include <QDebug>
+
+#include <KIO/DeleteJob>
 
 #include <vcs/dvcs/dvcsjob.h>
 #include "../mercurialplugin.h"
@@ -70,17 +70,17 @@ void MercurialInitTest::cleanupTestCase()
     delete m_proxy;
 
     if (QFileInfo(mercurialTest_BaseDir).exists())
-        KIO::NetAccess::del(KUrl(mercurialTest_BaseDir), 0);
+        KIO::del(QUrl::fromLocalFile(mercurialTest_BaseDir))->exec();
 
     if (QFileInfo(mercurialTest_BaseDir2).exists())
-        KIO::NetAccess::del(KUrl(mercurialTest_BaseDir2), 0);
+        KIO::del(QUrl::fromLocalFile(mercurialTest_BaseDir2))->exec();
 }
 
 void MercurialInitTest::repoInit()
 {
-    kDebug() << "Trying to init repo";
+    qDebug() << "Trying to init repo";
     // make job that creates the local repository
-    VcsJob *j = m_proxy->init(KUrl(mercurialTest_BaseDir));
+    VcsJob *j = m_proxy->init(QUrl::fromLocalFile(mercurialTest_BaseDir));
     QVERIFY(j);
 
     // try to start the job
@@ -91,53 +91,51 @@ void MercurialInitTest::repoInit()
     QVERIFY(QFileInfo(mercurialRepo).exists());
 
     //check if isValidDirectory works
-    QVERIFY(m_proxy->isValidDirectory(KUrl(mercurialTest_BaseDir)));
+    QVERIFY(m_proxy->isValidDirectory(QUrl::fromLocalFile(mercurialTest_BaseDir)));
     //and for non-mercurial dir, I hope nobody has /tmp under mercurial
-    QVERIFY(!m_proxy->isValidDirectory(KUrl("/tmp")));
+    QVERIFY(!m_proxy->isValidDirectory(QUrl::fromLocalFile("/tmp")));
 }
 
 void MercurialInitTest::addFiles()
 {
-    kDebug() << "Adding files to the repo";
+    qDebug() << "Adding files to the repo";
 
     //we start it after repoInit, so we still have empty mercurial repo
-    QFile f(mercurialTest_BaseDir + mercurialTest_FileName);
+    {
+        QFile f(mercurialTest_BaseDir + mercurialTest_FileName);
 
-    if (f.open(QIODevice::WriteOnly)) {
+        QVERIFY(f.open(QIODevice::WriteOnly));
         QTextStream input(&f);
         input << "HELLO WORLD";
     }
-    f.flush();
-    f.close();
-
-    f.setFileName(mercurialTest_BaseDir + mercurialTest_FileName2);
-
-    if (f.open(QIODevice::WriteOnly)) {
+    {
+        QFile f(mercurialTest_BaseDir + mercurialTest_FileName2);
+        QVERIFY(f.open(QIODevice::WriteOnly));
         QTextStream input(&f);
         input << "No, bar()!";
     }
-    f.flush();
-    f.close();
 
     //test mercurial-status exitCode (see VcsJob::setExitCode).
-    VcsJob *j = m_proxy->status(KUrl::List(mercurialTest_BaseDir), KDevelop::IBasicVersionControl::Recursive);
+    VcsJob *j = m_proxy->status({QUrl::fromLocalFile(mercurialTest_BaseDir)}, KDevelop::IBasicVersionControl::Recursive);
     QVERIFY(j);
     QVERIFY(j->exec());
     QVERIFY(j->status() == KDevelop::VcsJob::JobSucceeded);
 
     // /tmp/kdevMercurial_testdir/ and kdevMercurial_testdir
     //add always should use aboslute path to the any directory of the repository, let's check:
-    j = m_proxy->add(KUrl::List(QStringList(mercurialTest_BaseDir) << MercurialTestDir1), KDevelop::IBasicVersionControl::Recursive);
+    j = m_proxy->add({QUrl::fromLocalFile(mercurialTest_BaseDir), QUrl::fromLocalFile(MercurialTestDir1)}, KDevelop::IBasicVersionControl::Recursive);
     QVERIFY(j);
     QVERIFY(j->exec());
     QVERIFY(j->status() == KDevelop::VcsJob::JobSucceeded);
 
     // /tmp/kdevMercurial_testdir/ and testfile
-    j = m_proxy->add(KUrl::List(QStringList(mercurialTest_BaseDir + mercurialTest_FileName)), KDevelop::IBasicVersionControl::Recursive);
+    j = m_proxy->add({QUrl::fromLocalFile(mercurialTest_BaseDir + mercurialTest_FileName)}, KDevelop::IBasicVersionControl::Recursive);
     QVERIFY(j);
     QVERIFY(j->exec());
     QVERIFY(j->status() == KDevelop::VcsJob::JobSucceeded);
 
+    // TODO: Such ugly code..
+    QFile f;
     f.setFileName(mercurialSrcDir + mercurialTest_FileName3);
 
     if (f.open(QIODevice::WriteOnly)) {
@@ -148,20 +146,20 @@ void MercurialInitTest::addFiles()
     f.close();
 
     //test mercurial-status exitCode again
-    j = m_proxy->status(KUrl::List(mercurialTest_BaseDir), KDevelop::IBasicVersionControl::Recursive);
+    j = m_proxy->status({QUrl::fromLocalFile(mercurialTest_BaseDir)}, KDevelop::IBasicVersionControl::Recursive);
     QVERIFY(j);
     QVERIFY(j->exec());
     QVERIFY(j->status() == KDevelop::VcsJob::JobSucceeded);
 
     //repository path without trailing slash and a file in a parent directory
     // /tmp/repo  and /tmp/repo/src/bar
-    j = m_proxy->add(KUrl::List(QStringList(mercurialSrcDir + mercurialTest_FileName3)));
+    j = m_proxy->add({QUrl::fromLocalFile(mercurialSrcDir + mercurialTest_FileName3)});
     QVERIFY(j);
     QVERIFY(j->exec());
     QVERIFY(j->status() == KDevelop::VcsJob::JobSucceeded);
 
     //let's use absolute path, because it's used in ContextMenus
-    j = m_proxy->add(KUrl::List(QStringList(mercurialTest_BaseDir + mercurialTest_FileName2)), KDevelop::IBasicVersionControl::Recursive);
+    j = m_proxy->add({QUrl::fromLocalFile(mercurialTest_BaseDir + mercurialTest_FileName2)}, KDevelop::IBasicVersionControl::Recursive);
     QVERIFY(j);
     QVERIFY(j->exec());
     QVERIFY(j->status() == KDevelop::VcsJob::JobSucceeded);
@@ -185,10 +183,7 @@ void MercurialInitTest::addFiles()
     f.flush();
     f.close();
 
-    QStringList multipleFiles;
-    multipleFiles << (mercurialTest_BaseDir + "file1");
-    multipleFiles << (mercurialTest_BaseDir + "file2");
-    j = m_proxy->add(KUrl::List(multipleFiles), KDevelop::IBasicVersionControl::Recursive);
+    j = m_proxy->add({QUrl::fromLocalFile(mercurialTest_BaseDir + "file1"), QUrl::fromLocalFile(mercurialTest_BaseDir + "file2")}, KDevelop::IBasicVersionControl::Recursive);
     QVERIFY(j);
     QVERIFY(j->exec());
     QVERIFY(j->status() == KDevelop::VcsJob::JobSucceeded);
@@ -196,10 +191,10 @@ void MercurialInitTest::addFiles()
 
 void MercurialInitTest::commitFiles()
 {
-    kDebug() << "Committing...";
+    qDebug() << "Committing...";
     //we start it after addFiles, so we just have to commit
     ///TODO: if "" is ok?
-    VcsJob *j = m_proxy->commit(QString("Test commit"), KUrl::List(mercurialTest_BaseDir), KDevelop::IBasicVersionControl::Recursive);
+    VcsJob *j = m_proxy->commit(QString("Test commit"), {QUrl::fromLocalFile(mercurialTest_BaseDir)}, KDevelop::IBasicVersionControl::Recursive);
     QVERIFY(j);
 
     // try to start the job
@@ -207,7 +202,7 @@ void MercurialInitTest::commitFiles()
     QVERIFY(j->status() == KDevelop::VcsJob::JobSucceeded);
 
     //test mercurial-status exitCode one more time.
-    j = m_proxy->status(KUrl::List(mercurialTest_BaseDir), KDevelop::IBasicVersionControl::Recursive);
+    j = m_proxy->status({QUrl::fromLocalFile(mercurialTest_BaseDir)}, KDevelop::IBasicVersionControl::Recursive);
     QVERIFY(j);
 
     QVERIFY(j->exec());
@@ -224,7 +219,7 @@ void MercurialInitTest::commitFiles()
     QVERIFY(files.contains(mercurialTest_FileName2));
     QVERIFY(files.contains("src/" + mercurialTest_FileName3));
 
-    kDebug() << "Committing one more time";
+    qDebug() << "Committing one more time";
 
     //let's try to change the file and test "hg commit -a"
     QFile f(mercurialTest_BaseDir + mercurialTest_FileName);
@@ -237,14 +232,14 @@ void MercurialInitTest::commitFiles()
     f.close();
 
     //add changes
-    j = m_proxy->add(KUrl::List(QStringList(mercurialTest_BaseDir + mercurialTest_FileName)), KDevelop::IBasicVersionControl::Recursive);
+    j = m_proxy->add({QUrl::fromLocalFile(mercurialTest_BaseDir + mercurialTest_FileName)}, KDevelop::IBasicVersionControl::Recursive);
     QVERIFY(j);
 
     // try to start the job
     QVERIFY(j->exec());
     QVERIFY(j->status() == KDevelop::VcsJob::JobSucceeded);
 
-    j = m_proxy->commit(QString("KDevelop's Test commit2"), KUrl::List(mercurialTest_BaseDir), KDevelop::IBasicVersionControl::Recursive);
+    j = m_proxy->commit(QString("KDevelop's Test commit2"), {QUrl::fromLocalFile(mercurialTest_BaseDir)}, KDevelop::IBasicVersionControl::Recursive);
     QVERIFY(j);
 
     // try to start the job
@@ -255,7 +250,7 @@ void MercurialInitTest::commitFiles()
 void MercurialInitTest::cloneRepository()
 {
     // make job that clones the local repository, created in the previous test
-    VcsJob *j = m_proxy->createWorkingCopy(KUrl(mercurialTest_BaseDir), KUrl(mercurialTest_BaseDir2));
+    VcsJob *j = m_proxy->createWorkingCopy(VcsLocation(mercurialTest_BaseDir), QUrl::fromLocalFile(mercurialTest_BaseDir2));
     QVERIFY(j);
 
     // try to start the job
@@ -300,14 +295,14 @@ void MercurialInitTest::revHistory()
 void MercurialInitTest::removeTempDirs()
 {
     if (QFileInfo(mercurialTest_BaseDir).exists())
-        if (!KIO::NetAccess::del(KUrl(mercurialTest_BaseDir), 0))
-            qDebug() << "KIO::NetAccess::del(" << mercurialTest_BaseDir << ") returned false";
+        if (!(KIO::del(QUrl::fromLocalFile(mercurialTest_BaseDir))->exec()))
+            qDebug() << "KIO::del(" << mercurialTest_BaseDir << ") returned false";
 
     if (QFileInfo(mercurialTest_BaseDir2).exists())
-        if (!KIO::NetAccess::del(KUrl(mercurialTest_BaseDir2), 0))
-            qDebug() << "KIO::NetAccess::del(" << mercurialTest_BaseDir2 << ") returned false";
+        if (!(KIO::del(QUrl::fromLocalFile(mercurialTest_BaseDir2))->exec()))
+            qDebug() << "KIO::del(" << mercurialTest_BaseDir2 << ") returned false";
 }
 
-QTEST_KDEMAIN(MercurialInitTest, GUI)
+QTEST_MAIN(MercurialInitTest)
 
 // #include "mercurialtest.moc"

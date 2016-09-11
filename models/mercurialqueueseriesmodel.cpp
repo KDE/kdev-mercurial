@@ -19,7 +19,7 @@
  ***************************************************************************/
 
 #include <QStringList>
-#include <KIcon>
+#include <QIcon>
 
 #include <mercurialplugin.h>
 #include "mercurialqueueseriesmodel.h"
@@ -52,7 +52,7 @@ QVariant MercurialQueueSeriesModel::data(const QModelIndex &index, int role) con
             return m_appliedPatches[row];
         } else if (role == Qt::DecorationRole) {
             // FIXME
-            return QVariant(KIcon("dialog-ok-apply"));
+            return QVariant(QIcon("dialog-ok-apply"));
         } else {
             return QVariant();
         }

@@ -26,7 +26,7 @@
 
 using namespace KDevelop;
 
-MercurialQueuesManager::MercurialQueuesManager(MercurialPlugin *plugin, const KUrl &localLocation)
+MercurialQueuesManager::MercurialQueuesManager(MercurialPlugin *plugin, const QUrl &localLocation)
     : QWidget(), m_plugin(plugin), repoLocation(localLocation), m_ui(new Ui::MercurialManagerWidget)
 {
     m_ui->setupUi(this);

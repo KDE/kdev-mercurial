@@ -22,7 +22,7 @@
 #define MERCURIALQUEUESMANAGER_H
 
 #include <QWidget>
-#include <KUrl>
+#include <QUrl>
 
 class MercurialPlugin;
 namespace Ui
@@ -35,7 +35,7 @@ class MercurialQueuesManager : public QWidget
 {
     Q_OBJECT
 public:
-    MercurialQueuesManager(MercurialPlugin *plugin, const KUrl &localLocation);
+    MercurialQueuesManager(MercurialPlugin *plugin, const QUrl &localLocation);
 
 protected slots:
     void executePush();
@@ -45,7 +45,7 @@ protected slots:
 
 private:
     MercurialPlugin *m_plugin;
-    const KUrl repoLocation;
+    const QUrl repoLocation;
     Ui::MercurialManagerWidget *m_ui;
     MercurialQueueSeriesModel *m_model;
 };

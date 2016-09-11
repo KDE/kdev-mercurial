@@ -21,7 +21,7 @@
 #ifndef MERCURIALHEADSWIDGET_H
 #define MERCURIALHEADSWIDGET_H
 
-#include <QtGui/QWidget>
+#include <QWidget>
 
 #include <vcs/vcsrevision.h>
 
@@ -41,7 +41,7 @@ class MercurialHeadsWidget : public QDialog
     Q_OBJECT
 
 public:
-    explicit MercurialHeadsWidget(MercurialPlugin *plugin, const KUrl &url);
+    explicit MercurialHeadsWidget(MercurialPlugin *plugin, const QUrl &url);
 
 private slots:
     void updateModel();
@@ -53,7 +53,7 @@ private:
     Ui::MercurialHeadsWidget *m_ui;
     MercurialHeadsModel *m_headsModel;
     MercurialPlugin *m_plugin;
-    const KUrl &m_url;
+    const QUrl &m_url;
 };
 
 #endif // MERCURIALHEADSWIDGET_H
