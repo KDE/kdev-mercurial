@@ -43,7 +43,27 @@ include_directories(
     ${mercurial_SOURCE_DIR}
 )
 
-add_definitions(-DQT_NO_URL_CAST_FROM_STRING)
+add_definitions(
+    -DQT_DEPRECATED_WARNINGS
+    -DQT_DISABLE_DEPRECATED_BEFORE=0x050400
+    -DQT_NO_URL_CAST_FROM_STRING
+    -DQT_STRICT_ITERATORS
+    -DQT_USE_FAST_CONCATENATION
+    -DQT_USE_FAST_OPERATOR_PLUS
+)
+
+check_cxx_compiler_flag(-Wno-missing-field-initializers HAVE_MFI_FLAG)
+check_cxx_compiler_flag(-Werror=undefined-bool-conversion HAVE_UBC_FLAG)
+check_cxx_compiler_flag(-Werror=tautological-undefined-compare HAVE_TUC_FLAG)
+if (HAVE_MFI_FLAG)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-missing-field-initializers")
+endif()
+if (HAVE_UBC_FLAG)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror=undefined-bool-conversion")
+endif()
+if (HAVE_TUC_FLAG)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror=tautological-undefined-compare")
+endif()
 
 add_subdirectory(tests)
 add_subdirectory(icons)
