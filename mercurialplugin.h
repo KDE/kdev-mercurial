@@ -60,53 +60,53 @@ public:
     explicit MercurialPlugin(QObject *parent, const QVariantList &args = QVariantList());
     ~MercurialPlugin();
 
-    bool isValidDirectory(const QUrl &dirPath);
-    bool isVersionControlled(const QUrl &path);
-    QString name() const;
+    bool isValidDirectory(const QUrl &dirPath) override;
+    bool isVersionControlled(const QUrl &path) override;
+    QString name() const override;
 
-    KDevelop::VcsJob *init(const QUrl &directory);
-    KDevelop::VcsJob *repositoryLocation(const QUrl &directory);    // Not implemented.
-    KDevelop::VcsJob *createWorkingCopy(const KDevelop::VcsLocation &localOrRepoLocationSrc, const QUrl &repository, IBasicVersionControl::RecursionMode = KDevelop::IBasicVersionControl::Recursive);
+    KDevelop::VcsJob *init(const QUrl &directory) override;
+    KDevelop::VcsJob *repositoryLocation(const QUrl &directory) override;    // Not implemented.
+    KDevelop::VcsJob *createWorkingCopy(const KDevelop::VcsLocation &localOrRepoLocationSrc, const QUrl &repository, IBasicVersionControl::RecursionMode = KDevelop::IBasicVersionControl::Recursive) override;
     KDevelop::VcsJob *add(const QList<QUrl> &localLocations,
-                          KDevelop::IBasicVersionControl::RecursionMode recursion  = KDevelop::IBasicVersionControl::Recursive);
+                          KDevelop::IBasicVersionControl::RecursionMode recursion  = KDevelop::IBasicVersionControl::Recursive) override;
     KDevelop::VcsJob *copy(const QUrl &localLocationSrc,
-                           const QUrl &localLocationDst);
+                           const QUrl &localLocationDst) override;
     KDevelop::VcsJob *move(const QUrl &localLocationSrc,
-                           const QUrl &localLocationDst);
+                           const QUrl &localLocationDst) override;
 
     KDevelop::VcsJob *commit(const QString &message,
                              const QList<QUrl> &localLocations,
-                             KDevelop::IBasicVersionControl::RecursionMode recursion);
+                             KDevelop::IBasicVersionControl::RecursionMode recursion) override;
     KDevelop::VcsJob *diff(const QUrl &fileOrDirectory,
                            const KDevelop::VcsRevision &srcRevision,
                            const KDevelop::VcsRevision &dstRevision,
                            KDevelop::VcsDiff::Type diffType,
-                           KDevelop::IBasicVersionControl::RecursionMode recursionMode);
+                           KDevelop::IBasicVersionControl::RecursionMode recursionMode) override;
 
-    KDevelop::VcsJob *remove(const QList<QUrl> &files);
+    KDevelop::VcsJob *remove(const QList<QUrl> &files) override;
     KDevelop::VcsJob *status(const QList<QUrl> &localLocations,
-                             KDevelop::IBasicVersionControl::RecursionMode recursion);
+                             KDevelop::IBasicVersionControl::RecursionMode recursion) override;
     KDevelop::VcsJob *revert(const QList<QUrl> &localLocations,
-                             KDevelop::IBasicVersionControl::RecursionMode recursion);
+                             KDevelop::IBasicVersionControl::RecursionMode recursion) override;
     KDevelop::VcsJob *update(const QList<QUrl> &localLocations,
-                             const KDevelop::VcsRevision &rev, KDevelop::IBasicVersionControl::RecursionMode recursion);
-    KDevelop::VcsJob *resolve(const QList<QUrl> &files, KDevelop::IBasicVersionControl::RecursionMode recursion);
+                             const KDevelop::VcsRevision &rev, KDevelop::IBasicVersionControl::RecursionMode recursion) override;
+    KDevelop::VcsJob *resolve(const QList<QUrl> &files, KDevelop::IBasicVersionControl::RecursionMode recursion) override;
 
     KDevelop::VcsJob *log(const QUrl &localLocation,
                           const KDevelop::VcsRevision &rev,
-                          unsigned long limit);
+                          unsigned long limit) override;
     KDevelop::VcsJob *log(const QUrl &localLocation,
                           const KDevelop::VcsRevision &rev,
-                          const KDevelop::VcsRevision &limit);
+                          const KDevelop::VcsRevision &limit) override;
 
     KDevelop::VcsJob *log(const QUrl &localLocation,
                           const KDevelop::VcsRevision &to,
                           const KDevelop::VcsRevision &from,
                           unsigned long limit);
     KDevelop::VcsJob *annotate(const QUrl &localLocation,
-                               const KDevelop::VcsRevision &rev);
+                               const KDevelop::VcsRevision &rev) override;
 
-    KDevelop::VcsJob* mergeBranch(const QUrl &repository, const QString &branchName);
+    KDevelop::VcsJob* mergeBranch(const QUrl &repository, const QString &branchName) override;
 
     // mercurial specific stuff
     KDevelop::VcsJob *heads(const QUrl &localLocation);
@@ -123,30 +123,27 @@ public:
     KDevelop::VcsJob *mqApplied(const QUrl &localLocation);
     KDevelop::VcsJob *mqUnapplied(const QUrl &localLocation);
 
-    KDevelop::DVcsJob *switchBranch(const QString &repository, const QString &branch);
-    KDevelop::DVcsJob *branch(const QString &repository, const QString &basebranch = QString(), const QString &branch = QString(), const QStringList &args = QStringList());
-
     KDevelop::VcsJob *push(const QUrl &localRepositoryLocation,
-                           const KDevelop::VcsLocation &localOrRepoLocationDst);
+                           const KDevelop::VcsLocation &localOrRepoLocationDst) override;
     KDevelop::VcsJob *pull(const KDevelop::VcsLocation &localOrRepoLocationSrc,
-                           const QUrl &localRepositoryLocation);
+                           const QUrl &localRepositoryLocation) override;
 
-    KDevelop::VcsLocationWidget *vcsLocation(QWidget *parent) const;
+    KDevelop::VcsLocationWidget *vcsLocation(QWidget *parent) const override;
 
     //parsers for branch:
-    KDevelop::VcsJob *branch(const QUrl &repository, const KDevelop::VcsRevision &rev, const QString &branchName);
-    KDevelop::VcsJob *branches(const QUrl &repository);
-    KDevelop::VcsJob *currentBranch(const QUrl &repository);
-    KDevelop::VcsJob *deleteBranch(const QUrl &repository, const QString &branchName);
-    KDevelop::VcsJob *renameBranch(const QUrl &repository, const QString &oldBranchName, const QString &newBranchName);
-    KDevelop::VcsJob *switchBranch(const QUrl &repository, const QString &branchName);
-    KDevelop::VcsJob *tag(const QUrl &repository, const QString &commitMessage, const KDevelop::VcsRevision &rev, const QString &tagName);
+    KDevelop::VcsJob *branch(const QUrl &repository, const KDevelop::VcsRevision &rev, const QString &branchName) override;
+    KDevelop::VcsJob *branches(const QUrl &repository) override;
+    KDevelop::VcsJob *currentBranch(const QUrl &repository) override;
+    KDevelop::VcsJob *deleteBranch(const QUrl &repository, const QString &branchName) override;
+    KDevelop::VcsJob *renameBranch(const QUrl &repository, const QString &oldBranchName, const QString &newBranchName) override;
+    KDevelop::VcsJob *switchBranch(const QUrl &repository, const QString &branchName) override;
+    KDevelop::VcsJob *tag(const QUrl &repository, const QString &commitMessage, const KDevelop::VcsRevision &rev, const QString &tagName) override;
 
     QString curBranch(const QString &repository);
     QStringList branches(const QString &repository);
 
     //graph helpers
-    QList<DVcsEvent> getAllCommits(const QString &repo);
+    QList<DVcsEvent> getAllCommits(const QString &repo) override;
 
     /**
      * Find out where is default remote located.
@@ -154,7 +151,7 @@ public:
      */
     QUrl remotePushRepositoryLocation(QDir &directory);
 
-    void registerRepositoryForCurrentBranchChanges(const QUrl &repository);
+    void registerRepositoryForCurrentBranchChanges(const QUrl &repository) override;
 
 protected slots:
     void parseLogOutputBasicVersionControl(KDevelop::DVcsJob *job) const;
@@ -176,7 +173,7 @@ protected slots:
 
 protected:
     //used in log
-    void parseLogOutput(const KDevelop::DVcsJob *job, QList<DVcsEvent> &commits) const;
+    void parseLogOutput(const KDevelop::DVcsJob *job, QList<DVcsEvent> &commits) const override;
 
     static QString toMercurialRevision(const KDevelop::VcsRevision &vcsrev);
     /**
@@ -199,7 +196,7 @@ protected:
             *m_mqPopAllAction,
             *m_mqManagerAction;
     QList<QUrl> m_urls;
-    void additionalMenuEntries(QMenu *menu, const QList<QUrl> &urls);
+    void additionalMenuEntries(QMenu *menu, const QList<QUrl> &urls) override;
 };
 
 //class MercurialQueues

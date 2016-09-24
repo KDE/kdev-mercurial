@@ -43,7 +43,7 @@ include_directories(
     ${mercurial_SOURCE_DIR}
 )
 
-#add_definitions(-DQT_NO_URL_CAST_FROM_STRING)
+add_definitions(-DQT_NO_URL_CAST_FROM_STRING)
 
 add_subdirectory(tests)
 add_subdirectory(icons)

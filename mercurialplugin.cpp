@@ -249,7 +249,7 @@ VcsJob *MercurialPlugin::update(const QList<QUrl> &localLocations,
      */
     if (rev.revisionType() == VcsRevision::Special &&
             rev.revisionValue().value<VcsRevision::RevisionSpecialType>() == VcsRevision::Head) {
-        return pull(VcsLocation(), findWorkingDir(localLocations.first()).path());
+        return pull(VcsLocation(), QUrl::fromLocalFile(findWorkingDir(localLocations.first()).path()));
     }
 
     /*
@@ -627,49 +627,9 @@ VcsJob *MercurialPlugin::tag(const QUrl &repository, const QString &commitMessag
     return job;
 }
 
-DVcsJob *MercurialPlugin::branch(const QString &repository, const QString &basebranch, const QString &branch,
-                                 const QStringList &args)
-{
-    /*
-     * Delete branch?
-     * TODO: QStringList interface is ugly
-     */
-    if (args.contains("-D")) {
-        /*
-         * TODO: ok, nice try, but --close-branch operates only on current branch,
-         * so we need to:
-         * 1. check there is no uncommited changes
-         * 1.1. somehow store them (diff in mem? mq?)
-         * 2. switch branch
-         * 3. hg commit --close-branch
-         * 4. switch back
-         */
-        return NULL;
-#if 0
-        DVcsJob *job = new DVcsJob(findWorkingDir(repository), this);
-        *job << "hg" << "commit" << "--close-branch" << "-m" << QString("Closing %1 branch").arg(curBranch(repository));
-        return job;
-#endif
-    } else {
-        // Only create and delete is supported
-        if (args.size() > 0) {
-            return NULL;
-        }
-
-        // TODO: add support branching from different branch
-        if (basebranch != curBranch(repository)) {
-            return NULL;
-        }
-
-        DVcsJob *job = new DVcsJob(findWorkingDir(repository), this);
-        *job << "hg" << "branch" << "--" << branch;
-        return job;
-    }
-}
-
 QString MercurialPlugin::curBranch(const QString &repository)
 {
-    DVcsJob *job = new DVcsJob(findWorkingDir(repository), this);
+    DVcsJob *job = new DVcsJob(findWorkingDir(QUrl::fromLocalFile(repository)), this);
     *job << "hg" << "branch";
 
     QString result;
@@ -683,7 +643,7 @@ QString MercurialPlugin::curBranch(const QString &repository)
 
 QStringList MercurialPlugin::branches(const QString &repository)
 {
-    DVcsJob *job = new DVcsJob(findWorkingDir(repository), this);
+    DVcsJob *job = new DVcsJob(findWorkingDir(QUrl::fromLocalFile(repository)), this);
     *job << "hg" << "branches" << "-q";
 
     QStringList result;
@@ -1065,7 +1025,7 @@ QUrl MercurialPlugin::remotePushRepositoryLocation(QDir &directory)
     }
 
     // don't forget to strip last '\n'
-    return job->output().trimmed();
+    return QUrl::fromLocalFile(job->output().trimmed());
 }
 
 void MercurialPlugin::registerRepositoryForCurrentBranchChanges(const QUrl &repository)
