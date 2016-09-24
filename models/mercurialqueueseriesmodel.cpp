@@ -70,7 +70,7 @@ QVariant MercurialQueueSeriesModel::data(const QModelIndex &index, int role) con
     return QVariant();
 }
 
-int MercurialQueueSeriesModel::rowCount(const QModelIndex &parent) const
+int MercurialQueueSeriesModel::rowCount(const QModelIndex &/*parent*/) const
 {
     return m_unappliedPatches.size() + m_appliedPatches.size();
 }

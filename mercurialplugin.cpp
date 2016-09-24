@@ -153,7 +153,7 @@ VcsJob *MercurialPlugin::init(const QUrl &directory)
     return job;
 }
 
-VcsJob *MercurialPlugin::repositoryLocation(const QUrl &directory)
+VcsJob *MercurialPlugin::repositoryLocation(const QUrl &/*directory*/)
 {
     return NULL;
 }
@@ -580,7 +580,7 @@ VcsJob *MercurialPlugin::mergeWith(const QUrl &localLocation, const KDevelop::Vc
     return job;
 }
 
-VcsJob *MercurialPlugin::branch(const QUrl &repository, const VcsRevision &rev, const QString &branchName)
+VcsJob *MercurialPlugin::branch(const QUrl &repository, const VcsRevision &/*rev*/, const QString &branchName)
 {
     DVcsJob *job = new DVcsJob(findWorkingDir(repository), this);
     *job << "hg" << "branch" << "--" << branchName;
@@ -603,12 +603,12 @@ VcsJob *MercurialPlugin::currentBranch(const QUrl &repository)
     return job;
 }
 
-VcsJob *MercurialPlugin::deleteBranch(const QUrl &repository, const QString &branchName)
+VcsJob *MercurialPlugin::deleteBranch(const QUrl &/*repository*/, const QString &/*branchName*/)
 {
     return 0;
 }
 
-VcsJob *MercurialPlugin::renameBranch(const QUrl &repository, const QString &oldBranchName, const QString &newBranchName)
+VcsJob *MercurialPlugin::renameBranch(const QUrl &/*repository*/, const QString &/*oldBranchName*/, const QString &/*newBranchName*/)
 {
     return 0;
 }
@@ -1028,7 +1028,7 @@ QUrl MercurialPlugin::remotePushRepositoryLocation(QDir &directory)
     return QUrl::fromLocalFile(job->output().trimmed());
 }
 
-void MercurialPlugin::registerRepositoryForCurrentBranchChanges(const QUrl &repository)
+void MercurialPlugin::registerRepositoryForCurrentBranchChanges(const QUrl &/*repository*/)
 {
     // TODO
 }
@@ -1074,7 +1074,7 @@ void MercurialPlugin::showMercurialQueuesManager()
  * Mercurial Queues
  */
 
-VcsJob *MercurialPlugin::mqNew(const QUrl &localLocation, const QString &name, const QString &message)
+VcsJob *MercurialPlugin::mqNew(const QUrl &/*localLocation*/, const QString &/*name*/, const QString &/*message*/)
 {
     return 0;
 }
