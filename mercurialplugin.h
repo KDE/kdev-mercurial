@@ -32,7 +32,7 @@
 #include <QtCore/QDir>
 #include <vcs/vcsstatusinfo.h>
 
-class KAction;
+class QAction;
 namespace KDevelop
 {
 
@@ -190,9 +190,9 @@ protected:
     QUrl m_lastRepoRoot;
 
     // actions
-    KAction *m_headsAction;
+    QAction *m_headsAction;
 
-    KAction *m_mqNew,
+    QAction *m_mqNew,
             *m_mqPushAction,
             *m_mqPushAllAction,
             *m_mqPopAction,

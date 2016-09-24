@@ -55,26 +55,30 @@ Q_LOGGING_CATEGORY(PLUGIN_MERCURIAL, "kdevplatform.plugins.mercurial")
 
 using namespace KDevelop;
 
+namespace
+{
+    QString logTemplate()
+    {
+        return QStringLiteral("{file_copies}\\0{file_dels}\\0{file_adds}\\0{file_mods}\\0{desc}\\0{date|rfc3339date}\\0{author}\\0{parents}\\0{node}\\0{rev}\\0");
+    }
+}
+
 MercurialPlugin::MercurialPlugin(QObject *parent, const QVariantList &)
     : DistributedVersionControlPlugin(parent, QStringLiteral("kdevmercurial"))
 {
     KDEV_USE_EXTENSION_INTERFACE(KDevelop::IBasicVersionControl)
     KDEV_USE_EXTENSION_INTERFACE(KDevelop::IDistributedVersionControl)
 
-     // FIXME:
-    /*
-    m_headsAction = new KAction(i18n("Heads..."), this);
-    m_mqNew = new KAction(i18nc("mercurial queues submenu", "New..."), this);
-    m_mqPushAction = new KAction(i18nc("mercurial queues submenu", "Push"), this);
-    m_mqPushAllAction = new KAction(i18nc("mercurial queues submenu", "Push All"), this);
-    m_mqPopAction = new KAction(i18nc("mercurial queues submenu", "Pop"), this);
-    m_mqPopAllAction = new KAction(i18nc("mercurial queues submenu", "Pop All"), this);
-    m_mqManagerAction = new KAction(i18nc("mercurial queues submenu", "Manager..."), this);*/
+    m_headsAction = new QAction(i18n("Heads..."), this);
+    m_mqNew = new QAction(i18nc("mercurial queues submenu", "New..."), this);
+    m_mqPushAction = new QAction(i18nc("mercurial queues submenu", "Push"), this);
+    m_mqPushAllAction = new QAction(i18nc("mercurial queues submenu", "Push All"), this);
+    m_mqPopAction = new QAction(i18nc("mercurial queues submenu", "Pop"), this);
+    m_mqPopAllAction = new QAction(i18nc("mercurial queues submenu", "Pop All"), this);
+    m_mqManagerAction = new QAction(i18nc("mercurial queues submenu", "Manager..."), this);
 
-   
-    /*
     connect(m_headsAction, SIGNAL(triggered()), this, SLOT(showHeads()));
-    connect(m_mqManagerAction, SIGNAL(triggered()), this, SLOT(showMercurialQueuesManager()));*/
+    connect(m_mqManagerAction, SIGNAL(triggered()), this, SLOT(showMercurialQueuesManager()));
 }
 
 MercurialPlugin::~MercurialPlugin()
@@ -94,7 +98,7 @@ bool MercurialPlugin::isValidDirectory(const QUrl &directory)
     if (m_lastRepoRoot.isParentOf(directory))
         return true;
 
-    const QString initialPath(directory.toLocalFile());
+    const QString initialPath(directory.adjusted(QUrl::StripTrailingSlash).toLocalFile());
     const QFileInfo finfo(initialPath);
     QDir dir;
     if (finfo.isFile()) {
@@ -111,6 +115,7 @@ bool MercurialPlugin::isValidDirectory(const QUrl &directory)
         return false;
 
     dir.cdUp(); // Leave .hg
+    // TODO: Check whether this is the right port, original code was: m_lastRepoRoot.setDirectory(dir.absolutePath());
     m_lastRepoRoot.setPath(dir.absolutePath());
     return true;
 }
@@ -497,7 +502,7 @@ VcsJob *MercurialPlugin::log(const QUrl &localLocation,
         *job << "-l" << QString::number(limit);
 
     *job << "--template"
-         << "{file_copies}\\0{file_dels}\\0{file_adds}\\0{file_mods}\\0{desc}\\0{date|rfc3339date}\\0{author}\\0{parents}\\0{node}\\0{rev}\\0" "--" << localLocation;
+         << logTemplate() << "--" << localLocation;
 
     connect(job, SIGNAL(readyForParsing(KDevelop::DVcsJob *)),
             SLOT(parseLogOutputBasicVersionControl(KDevelop::DVcsJob *)));
@@ -530,7 +535,7 @@ VcsJob *MercurialPlugin::annotate(const QUrl &localLocation,
 
 KDevelop::VcsJob* MercurialPlugin::mergeBranch(const QUrl &/*repository*/, const QString &/*branchName*/)
 {
-    // FIXME:
+    // TODO:
     return nullptr;
 }
 
@@ -538,9 +543,8 @@ VcsJob *MercurialPlugin::heads(const QUrl &localLocation)
 {
     DVcsJob *job = new DVcsJob(findWorkingDir(localLocation), this);
 
-    // FIXME: Share code
     *job << "hg" << "heads" << "--template"
-         << "{file_copies}\\0{file_dels}\\0{file_adds}\\0{file_mods}\\0{desc}\\0{date|rfc3339date}\\0{author}\\0{parents}\\0{node}\\0{rev}\\0" "--" << localLocation;
+         << logTemplate() << "--" << localLocation;
 
     connect(job, SIGNAL(readyForParsing(KDevelop::DVcsJob *)),
             SLOT(parseLogOutputBasicVersionControl(KDevelop::DVcsJob *)));
@@ -722,8 +726,9 @@ void MercurialPlugin::parseDiff(DVcsJob *job)
     // so we have recover it from the job.
     // Not quite clean m_lastRepoRoot holds the root, after querying isValidDirectory()
     QString workingDir(job->directory().absolutePath());
-    isValidDirectory(QUrl(workingDir));
-    QString repoRoot = m_lastRepoRoot.path();
+    isValidDirectory(QUrl::fromLocalFile(workingDir));
+    // TODO: Is this the right port? Original code was: m_lastRepoRoot.path(KUrl::RemoveTrailingSlash);
+    QString repoRoot = m_lastRepoRoot.adjusted(QUrl::StripTrailingSlash).path();
 
     VcsDiff diff;
 
@@ -1072,24 +1077,23 @@ void MercurialPlugin::additionalMenuEntries(QMenu *menu, const QList<QUrl> &urls
 {
     m_urls = urls;
 
-    // FIXME:
-//     menu->addAction(m_headsAction);
-//     menu->addSeparator()->setText(i18n("Mercurial Queues"));
-//     menu->addAction(m_mqNew);
-//     menu->addAction(m_mqPushAction);
-//     menu->addAction(m_mqPushAllAction);
-//     menu->addAction(m_mqPopAction);
-//     menu->addAction(m_mqPopAllAction);
-//     menu->addAction(m_mqManagerAction);
-// 
-//     m_headsAction->setEnabled(m_urls.count() == 1);
-// 
-//     //FIXME:not supported yet, so disable
-//     m_mqNew->setEnabled(false);
-//     m_mqPushAction->setEnabled(false);
-//     m_mqPushAllAction->setEnabled(false);
-//     m_mqPopAction->setEnabled(false);
-//     m_mqPopAllAction->setEnabled(false);
+    menu->addAction(m_headsAction);
+    menu->addSeparator()->setText(i18n("Mercurial Queues"));
+    menu->addAction(m_mqNew);
+    menu->addAction(m_mqPushAction);
+    menu->addAction(m_mqPushAllAction);
+    menu->addAction(m_mqPopAction);
+    menu->addAction(m_mqPopAllAction);
+    menu->addAction(m_mqManagerAction);
+
+    m_headsAction->setEnabled(m_urls.count() == 1);
+
+    //FIXME:not supported yet, so disable
+    m_mqNew->setEnabled(false);
+    m_mqPushAction->setEnabled(false);
+    m_mqPushAllAction->setEnabled(false);
+    m_mqPopAction->setEnabled(false);
+    m_mqPopAllAction->setEnabled(false);
 }
 
 void MercurialPlugin::showHeads()
