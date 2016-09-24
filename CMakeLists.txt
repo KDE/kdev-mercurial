@@ -43,9 +43,6 @@ include_directories(
     ${mercurial_SOURCE_DIR}
 )
 
-# TODO: Remove it
-add_definitions(-DKDE_DEFAULT_DEBUG_AREA=9526)
-
 #add_definitions(-DQT_NO_URL_CAST_FROM_STRING)
 
 add_subdirectory(tests)

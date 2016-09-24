@@ -31,8 +31,8 @@
 #include <QtCore/QDir>
 #include <QtCore/QDateTime>
 #include <QtCore/QFileInfo>
+#include <QtCore/QLoggingCategory>
 #include <QAction>
-#include <QDebug>
 #include <QMenu>
 #include <QDateTime>
 
@@ -49,8 +49,9 @@
 #include "ui/mercurialheadswidget.h"
 #include "ui/mercurialqueuesmanager.h"
 
-// FIXME:
-//Q_LOGGING_CATEGORY(PLUGIN_MERCURIAL, "kdevplatform.plugins.mercurial")
+#include "debug.h"
+
+Q_LOGGING_CATEGORY(PLUGIN_MERCURIAL, "kdevplatform.plugins.mercurial")
 
 using namespace KDevelop;
 
@@ -319,7 +320,7 @@ VcsJob *MercurialPlugin::diff(const QUrl &fileOrDirectory,
     QString srcRev = toMercurialRevision(srcRevision);
     QString dstRev = toMercurialRevision(dstRevision);
 
-    qDebug() << "Diff between" << srcRevision.prettyValue() << '(' << srcRev << ')' << "and" << dstRevision.prettyValue() << '(' << dstRev << ')' << " requested";
+    mercurialDebug() << "Diff between" << srcRevision.prettyValue() << '(' << srcRev << ')' << "and" << dstRevision.prettyValue() << '(' << dstRev << ')' << " requested";
 
     if (
         (srcRev.isNull() && dstRev.isNull()) ||
@@ -400,12 +401,12 @@ VcsJob *MercurialPlugin::status(const QList<QUrl> &localLocations, IBasicVersion
 bool MercurialPlugin::parseStatus(DVcsJob *job) const
 {
     if (job->status() != VcsJob::JobSucceeded) {
-        qDebug() << "Job failed: " << job->output();
+        mercurialDebug() << "Job failed: " << job->output();
         return false;
     }
 
     const QString dir = job->directory().absolutePath().append(QDir::separator());
-    qDebug() << "Job succeeded for " << dir;
+    mercurialDebug() << "Job succeeded for " << dir;
     const QStringList output = job->output().split('\n', QString::SkipEmptyParts);
     QList<QVariant> filestatus;
 
@@ -713,7 +714,7 @@ void MercurialPlugin::parseMultiLineOutput(DVcsJob *job) const
 void MercurialPlugin::parseDiff(DVcsJob *job)
 {
     if (job->status() != VcsJob::JobSucceeded) {
-        qDebug() << "Parse-job failed: " << job->output();
+        mercurialDebug() << "Parse-job failed: " << job->output();
         return;
     }
 
@@ -753,7 +754,7 @@ bool MercurialPlugin::parseAnnotations(DVcsJob *job) const
     unsigned int lineNumber = 0;
     foreach (const QString & line, lines) {
         if (!reAnnot.exactMatch(line)) {
-            qDebug() << "Could not parse annotation line: \"" << line << '\"';
+            mercurialDebug() << "Could not parse annotation line: \"" << line << '\"';
             return false;
         }
         VcsAnnotationLine annotation;
@@ -764,12 +765,12 @@ bool MercurialPlugin::parseAnnotations(DVcsJob *job) const
         bool success = false;
         qlonglong rev = reAnnot.cap(2).toLongLong(&success);
         if (!success) {
-            qDebug() << "Could not parse revision in annotation line: \"" << line << '\"';
+            mercurialDebug() << "Could not parse revision in annotation line: \"" << line << '\"';
             return false;
         }
 
         QDateTime dt = QDateTime::fromString(reAnnot.cap(3), "%:a %:b %d %H:%M:%S %Y %z");
-        qDebug() << reAnnot.cap(3) << dt;
+        mercurialDebug() << reAnnot.cap(3) << dt;
         annotation.setDate(dt);
 
         VcsRevision vcsrev;
@@ -793,7 +794,7 @@ void MercurialPlugin::parseLogOutputBasicVersionControl(DVcsJob *job) const
     items.removeLast();
 
     if ((items.count() % entriesPerCommit) != 0) {
-        qDebug() << "Cannot parse commit log: unexpected number of entries";
+        mercurialDebug() << "Cannot parse commit log: unexpected number of entries";
         return;
     }
 
@@ -882,13 +883,13 @@ void MercurialPlugin::parseIdentify(DVcsJob *job) const
 
 void MercurialPlugin::parseLogOutput(const DVcsJob *job, QList<DVcsEvent> &commits) const
 {
-    qDebug() << "parseLogOutput";
+    mercurialDebug() << "parseLogOutput";
 
     static unsigned int entriesPerCommit = 6;
     QList<QByteArray> items = job->rawOutput().split('\0');
 
     if (uint(items.size()) < entriesPerCommit || 1 != (items.size() % entriesPerCommit)) {
-        qDebug() << "Cannot parse commit log: unexpected number of entries";
+        mercurialDebug() << "Cannot parse commit log: unexpected number of entries";
         return;
     }
 
@@ -898,7 +899,7 @@ void MercurialPlugin::parseLogOutput(const DVcsJob *job, QList<DVcsEvent> &commi
     unsigned int id = lastRev.toUInt(&success);
 
     if (!success) {
-        qDebug() << "Could not parse last revision \"" << lastRev << '"';
+        mercurialDebug() << "Could not parse last revision \"" << lastRev << '"';
         id = 1024;
     }
 
@@ -919,7 +920,7 @@ void MercurialPlugin::parseLogOutput(const DVcsJob *job, QList<DVcsEvent> &commi
         id = rev.toUInt(&success);
 
         if (!success) {
-            qDebug() << "Could not parse revision \"" << rev << '"';
+            mercurialDebug() << "Could not parse revision \"" << rev << '"';
             return;
         }
 
@@ -950,7 +951,7 @@ void MercurialPlugin::parseLogOutput(const DVcsJob *job, QList<DVcsEvent> &commi
                     id = ids.toUInt(&success);
 
                     if (!success) {
-                        qDebug() << "Could not parse parent-revision \"" << ids << "\" of revision " << rev;
+                        mercurialDebug() << "Could not parse parent-revision \"" << ids << "\" of revision " << rev;
                         return;
                     }
 
@@ -1044,14 +1045,14 @@ QUrl MercurialPlugin::remotePushRepositoryLocation(QDir &directory)
     DVcsJob *job = new DVcsJob(directory, this);
     *job << "hg" << "paths" << "default-push";
     if (!job->exec() || job->status() != VcsJob::JobSucceeded) {
-        qDebug() << "no default-push, hold on";
+        mercurialDebug() << "no default-push, hold on";
 
         // or try default
         job = new DVcsJob(directory, this);
         *job << "hg" << "paths" << "default";
 
         if (!job->exec() || job->status() != VcsJob::JobSucceeded) {
-            qDebug() << "nowhere to push!";
+            mercurialDebug() << "nowhere to push!";
 
             // fail is everywhere
             return QUrl();

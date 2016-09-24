@@ -25,7 +25,8 @@
 #include <KLocalizedString>
 
 #include <QMessageBox>
-#include <QDebug>
+
+#include "debug.h"
 
 using namespace KDevelop;
 
@@ -76,7 +77,7 @@ void MercurialPushJob::serverContacted(VcsJob *job)
     if (dvcsJob->error()) {
         QString response = QString::fromLocal8Bit(dvcsJob->errorOutput());
 
-        qDebug() << response;
+        mercurialDebug() << response;
 
         if (response.contains("abort: http authorization required")) {
             // server requests username:password auth -> ask pass

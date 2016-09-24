@@ -29,12 +29,12 @@
 #include <tests/autotestshell.h>
 
 #include <QUrl>
-#include <QDebug>
 
 #include <KIO/DeleteJob>
 
 #include <vcs/dvcs/dvcsjob.h>
 #include "../mercurialplugin.h"
+#include "debug.h"
 
 const QString tempDir = QDir::tempPath();
 const QString MercurialTestDir1("kdevMercurial_testdir");
@@ -78,7 +78,7 @@ void MercurialInitTest::cleanupTestCase()
 
 void MercurialInitTest::repoInit()
 {
-    qDebug() << "Trying to init repo";
+    mercurialDebug() << "Trying to init repo";
     // make job that creates the local repository
     VcsJob *j = m_proxy->init(QUrl::fromLocalFile(mercurialTest_BaseDir));
     QVERIFY(j);
@@ -98,7 +98,7 @@ void MercurialInitTest::repoInit()
 
 void MercurialInitTest::addFiles()
 {
-    qDebug() << "Adding files to the repo";
+    mercurialDebug() << "Adding files to the repo";
 
     //we start it after repoInit, so we still have empty mercurial repo
     {
@@ -191,7 +191,7 @@ void MercurialInitTest::addFiles()
 
 void MercurialInitTest::commitFiles()
 {
-    qDebug() << "Committing...";
+    mercurialDebug() << "Committing...";
     //we start it after addFiles, so we just have to commit
     ///TODO: if "" is ok?
     VcsJob *j = m_proxy->commit(QString("Test commit"), {QUrl::fromLocalFile(mercurialTest_BaseDir)}, KDevelop::IBasicVersionControl::Recursive);
@@ -219,7 +219,7 @@ void MercurialInitTest::commitFiles()
     QVERIFY(files.contains(mercurialTest_FileName2));
     QVERIFY(files.contains("src/" + mercurialTest_FileName3));
 
-    qDebug() << "Committing one more time";
+    mercurialDebug() << "Committing one more time";
 
     //let's try to change the file and test "hg commit -a"
     QFile f(mercurialTest_BaseDir + mercurialTest_FileName);
@@ -296,11 +296,11 @@ void MercurialInitTest::removeTempDirs()
 {
     if (QFileInfo(mercurialTest_BaseDir).exists())
         if (!(KIO::del(QUrl::fromLocalFile(mercurialTest_BaseDir))->exec()))
-            qDebug() << "KIO::del(" << mercurialTest_BaseDir << ") returned false";
+            mercurialDebug() << "KIO::del(" << mercurialTest_BaseDir << ") returned false";
 
     if (QFileInfo(mercurialTest_BaseDir2).exists())
         if (!(KIO::del(QUrl::fromLocalFile(mercurialTest_BaseDir2))->exec()))
-            qDebug() << "KIO::del(" << mercurialTest_BaseDir2 << ") returned false";
+            mercurialDebug() << "KIO::del(" << mercurialTest_BaseDir2 << ") returned false";
 }
 
 QTEST_MAIN(MercurialInitTest)
