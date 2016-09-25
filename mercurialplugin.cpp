@@ -59,7 +59,7 @@ namespace
 {
     QString logTemplate()
     {
-        return QStringLiteral("{file_copies}\\0{file_dels}\\0{file_adds}\\0{file_mods}\\0{desc}\\0{date|rfc3339date}\\0{author}\\0{parents}\\0{node}\\0{rev}\\0");
+        return QStringLiteral("{desc}\0{date|rfc3339date}\0{author}\0{parents}\0{node}\0{rev}\0{file_dels}\0{file_adds}\0{file_mods}\0{file_copies}\0");
     }
 }
 
@@ -169,7 +169,7 @@ VcsJob *MercurialPlugin::createWorkingCopy(const VcsLocation &localOrRepoLocatio
 
 VcsJob *MercurialPlugin::pull(const VcsLocation &otherRepository, const QUrl &workingRepository)
 {
-    DVcsJob *job = new DVcsJob(workingRepository.toLocalFile(), this);
+    DVcsJob *job = new DVcsJob(findWorkingDir(workingRepository), this);
 
     *job << "hg" << "pull" << "--";
 
@@ -734,8 +734,9 @@ bool MercurialPlugin::parseAnnotations(DVcsJob *job) const
             return false;
         }
 
-        QDateTime dt = QDateTime::fromString(reAnnot.cap(3), "%:a %:b %d %H:%M:%S %Y %z");
-        mercurialDebug() << reAnnot.cap(3) << dt;
+        QDateTime dt = QDateTime::fromString(reAnnot.cap(3).left(reAnnot.cap(3).lastIndexOf(" ")), "ddd MMM dd hh:mm:ss yyyy");
+        mercurialDebug() << reAnnot.cap(3).left(reAnnot.cap(3).lastIndexOf(" ")) << dt;
+        Q_ASSERT(dt.isValid());
         annotation.setDate(dt);
 
         VcsRevision vcsrev;
