@@ -555,7 +555,7 @@ VcsJob *MercurialPlugin::identify(const QUrl &localLocation)
 {
     DVcsJob *job = new DVcsJob(findWorkingDir(localLocation), this);
 
-    *job << "hg" << "identify" << "-n" << "--" << localLocation;
+    *job << "hg" << "identify" << "-n";
 
     connect(job, SIGNAL(readyForParsing(KDevelop::DVcsJob *)),
             SLOT(parseIdentify(KDevelop::DVcsJob *)));
@@ -590,7 +590,7 @@ VcsJob *MercurialPlugin::branch(const QUrl &repository, const VcsRevision &/*rev
 VcsJob *MercurialPlugin::branches(const QUrl &repository)
 {
     DVcsJob *job = new DVcsJob(findWorkingDir(repository), this);
-    *job << "hg" << "branches" << "--" << repository;
+    *job << "hg" << "branches";
     connect(job, SIGNAL(readyForParsing(KDevelop::DVcsJob *)), this, SLOT(parseMultiLineOutput(KDevelop::DVcsJob *)));
     return job;
 }
@@ -627,37 +627,9 @@ VcsJob *MercurialPlugin::tag(const QUrl &repository, const QString &commitMessag
     return job;
 }
 
-QString MercurialPlugin::curBranch(const QString &repository)
-{
-    DVcsJob *job = new DVcsJob(findWorkingDir(QUrl::fromLocalFile(repository)), this);
-    *job << "hg" << "branch";
-
-    QString result;
-    if (job->exec() && job->status() == VcsJob::JobSucceeded) {
-        // Strip the final newline. Mercurial does not allow whitespaces at beginning or end
-        result = job->output().simplified();
-    }
-
-    return result;
-}
-
-QStringList MercurialPlugin::branches(const QString &repository)
-{
-    DVcsJob *job = new DVcsJob(findWorkingDir(QUrl::fromLocalFile(repository)), this);
-    *job << "hg" << "branches" << "-q";
-
-    QStringList result;
-    if (job->exec() && job->status() == VcsJob::JobSucceeded) {
-        result = job->output().split('\n', QString::SkipEmptyParts);
-    }
-
-    return result;
-}
-
-
 QList<DVcsEvent> MercurialPlugin::getAllCommits(const QString &repo)
 {
-    DVcsJob *job = new DVcsJob(repo, this);
+    DVcsJob *job = new DVcsJob(findWorkingDir(QUrl::fromLocalFile(repo)), this);
 
     *job << "hg" << "log" << "--template" << "{desc}\\_%{date|isodate}\\_%{author}\\_%{parents}\\_%{node}\\_%{rev}\\_%";
 
@@ -672,6 +644,7 @@ QList<DVcsEvent> MercurialPlugin::getAllCommits(const QString &repo)
 
 void MercurialPlugin::parseMultiLineOutput(DVcsJob *job) const
 {
+    mercurialDebug() << job->output();
     job->setResults(job->output().split('\n', QString::SkipEmptyParts));
 }
 
@@ -831,7 +804,7 @@ void MercurialPlugin::parseLogOutputBasicVersionControl(DVcsJob *job) const
         }
 
         event.setItems(items);
-        events.push_front(QVariant::fromValue(event));
+        events.push_back(QVariant::fromValue(event));
     }
 
     job->setResults(QVariant(events));
@@ -842,6 +815,7 @@ void MercurialPlugin::parseIdentify(DVcsJob *job) const
     QString value = job->output();
     QList<QVariant> result;
 
+    mercurialDebug() << value;
     // remove last '\n'
     value.chop(1);
 

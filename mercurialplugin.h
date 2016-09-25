@@ -139,9 +139,6 @@ public:
     KDevelop::VcsJob *switchBranch(const QUrl &repository, const QString &branchName) override;
     KDevelop::VcsJob *tag(const QUrl &repository, const QString &commitMessage, const KDevelop::VcsRevision &rev, const QString &tagName) override;
 
-    QString curBranch(const QString &repository);
-    QStringList branches(const QString &repository);
-
     //graph helpers
     QList<DVcsEvent> getAllCommits(const QString &repo) override;
 
