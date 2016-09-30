@@ -18,6 +18,7 @@ if (MERCURIAL)
         ../ui/mercurialheadswidget.cpp
         ../models/mercurialqueueseriesmodel.cpp
         ../models/mercurialheadsmodel.cpp
+        ../mercurialannotatejob.cpp
         ../mercurialpushjob.cpp
         ../mercurialvcslocationwidget.cpp
         ../mercurialplugin.cpp)

@@ -153,7 +153,6 @@ public:
 protected slots:
     void parseLogOutputBasicVersionControl(KDevelop::DVcsJob *job) const;
     bool parseStatus(KDevelop::DVcsJob *job) const;
-    bool parseAnnotations(KDevelop::DVcsJob *job) const;
     void parseDiff(KDevelop::DVcsJob *job);
     void parseMultiLineOutput(KDevelop::DVcsJob *job) const;
 

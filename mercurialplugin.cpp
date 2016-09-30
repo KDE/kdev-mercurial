@@ -45,6 +45,7 @@
 #include <vcs/dvcs/dvcsjob.h>
 
 #include "mercurialvcslocationwidget.h"
+#include "mercurialannotatejob.h"
 #include "mercurialpushjob.h"
 #include "ui/mercurialheadswidget.h"
 #include "ui/mercurialqueuesmanager.h"
@@ -512,25 +513,7 @@ VcsJob *MercurialPlugin::log(const QUrl &localLocation,
 VcsJob *MercurialPlugin::annotate(const QUrl &localLocation,
                                   const VcsRevision &rev)
 {
-    DVcsJob *job = new DVcsJob(findWorkingDir(localLocation), this);
-
-    /*
-     * TODO: it would be very nice if we can add "-v" key
-     * to get full author name
-     */
-    *job << "hg" << "annotate" << "-n" << "-u" << "-d";
-
-    QString srev = toMercurialRevision(rev);
-
-    if (srev != QString::null && !srev.isEmpty()) {
-        *job << "-r" << srev;
-    }
-
-    *job << "--" << localLocation.toLocalFile();
-
-    connect(job, SIGNAL(readyForParsing(KDevelop::DVcsJob *)), SLOT(parseAnnotations(KDevelop::DVcsJob *)));
-
-    return job;
+    return new MercurialAnnotateJob(findWorkingDir(localLocation), rev, localLocation, this);
 }
 
 KDevelop::VcsJob* MercurialPlugin::mergeBranch(const QUrl &/*repository*/, const QString &/*branchName*/)
@@ -677,50 +660,6 @@ void MercurialPlugin::parseDiff(DVcsJob *job)
     diff.setDiff(output);
 
     job->setResults(qVariantFromValue(diff));
-}
-
-
-bool MercurialPlugin::parseAnnotations(DVcsJob *job) const
-{
-    if (job->status() != VcsJob::JobSucceeded)
-        return false;
-
-    QStringList lines = job->output().split('\n', QString::SkipEmptyParts); // Drops the final empty line, all other are prefixed
-    QList<QVariant> result;
-    static const QString reAnnotPat("\\s*(\\S+)\\s+(\\d+)\\s+(\\w+ \\w+ \\d\\d \\d\\d:\\d\\d:\\d\\d \\d\\d\\d\\d .\\d\\d\\d\\d): ([^\n]*)");
-    QRegExp reAnnot(reAnnotPat, Qt::CaseSensitive, QRegExp::RegExp2);
-    unsigned int lineNumber = 0;
-    foreach (const QString & line, lines) {
-        if (!reAnnot.exactMatch(line)) {
-            mercurialDebug() << "Could not parse annotation line: \"" << line << '\"';
-            return false;
-        }
-        VcsAnnotationLine annotation;
-        annotation.setLineNumber(lineNumber++);
-        annotation.setAuthor(reAnnot.cap(1));
-        annotation.setText(reAnnot.cap(4));
-
-        bool success = false;
-        qlonglong rev = reAnnot.cap(2).toLongLong(&success);
-        if (!success) {
-            mercurialDebug() << "Could not parse revision in annotation line: \"" << line << '\"';
-            return false;
-        }
-
-        QDateTime dt = QDateTime::fromString(reAnnot.cap(3).left(reAnnot.cap(3).lastIndexOf(" ")), "ddd MMM dd hh:mm:ss yyyy");
-        mercurialDebug() << reAnnot.cap(3).left(reAnnot.cap(3).lastIndexOf(" ")) << dt;
-        Q_ASSERT(dt.isValid());
-        annotation.setDate(dt);
-
-        VcsRevision vcsrev;
-        vcsrev.setRevisionValue(rev, VcsRevision::GlobalNumber);
-        annotation.setRevision(vcsrev);
-        result.push_back(qVariantFromValue(annotation));
-    }
-
-    job->setResults(result);
-
-    return true;
 }
 
 void MercurialPlugin::parseLogOutputBasicVersionControl(DVcsJob *job) const

@@ -76,6 +76,7 @@ set(kdevmercurial_PART_SRCS
     models/mercurialqueueseriesmodel.cpp
     models/mercurialheadsmodel.cpp
     mercurialpushjob.cpp
+    mercurialannotatejob.cpp
     mercurialvcslocationwidget.cpp
     mercurialplugin.cpp
     mercurialpluginmetadata.cpp
