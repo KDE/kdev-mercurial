@@ -25,6 +25,8 @@
 
 #include "mercurialplugin.h"
 
+#include <QSet>
+
 class MercurialAnnotateJob : public KDevelop::VcsJob
 {
     Q_OBJECT
@@ -47,8 +49,9 @@ private:
     KDevelop::VcsJob::JobStatus m_status;
     QList<QVariant> m_annotations;
     QHash<QString, QPair<QString, QString>> m_revisionsCache;
+    QSet <QString> m_revisionsToLog;
 
     void setFail();
     void setSuccess();
+    void nextPartOfLog();
 };
-

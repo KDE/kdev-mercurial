@@ -37,7 +37,7 @@ QString revisionToString(const KDevelop::VcsRevision& rev)
         if (rev.specialType() == KDevelop::VcsRevision::Head) {
             return QStringLiteral("tip");
         } else if (rev.specialType() == KDevelop::VcsRevision::Start) {
-            return QStringLiteral("1");
+            return QStringLiteral("0");
         }
     } else if (rev.revisionType() == KDevelop::VcsRevision::GlobalNumber) {
         return QString::number(rev.revisionValue().toLongLong());
@@ -64,10 +64,6 @@ void MercurialAnnotateJob::start()
 
     DVcsJob *job = new DVcsJob(m_workingDir, vcsPlugin());
     *job << "hg" << "annotate" << "-n" << "-d";
-
-    if (!revisionToString(m_revision).isEmpty()) {
-        *job << "-r" << revisionToString(m_revision);
-    }
 
     *job << "--" << m_location.toLocalFile();
 
@@ -96,7 +92,8 @@ void MercurialAnnotateJob::parseAnnotateOutput(VcsJob *j)
     if (job->status() != VcsJob::JobSucceeded)
         return setFail();
 
-    QStringList lines = job->output().split('\n', QString::SkipEmptyParts);
+    QStringList lines = job->output().split('\n');
+    lines.removeLast();
 
     static const QString reAnnotPat("\\s*(\\d+)\\s+(\\w+ \\w+ \\d\\d \\d\\d:\\d\\d:\\d\\d \\d\\d\\d\\d .\\d\\d\\d\\d): ([^\n]*)");
     QRegExp reAnnot(reAnnotPat, Qt::CaseSensitive, QRegExp::RegExp2);
@@ -118,7 +115,7 @@ void MercurialAnnotateJob::parseAnnotateOutput(VcsJob *j)
         }
 
         QDateTime dt = QDateTime::fromString(reAnnot.cap(2).left(reAnnot.cap(2).lastIndexOf(" ")), "ddd MMM dd hh:mm:ss yyyy");
-        mercurialDebug() << reAnnot.cap(2).left(reAnnot.cap(2).lastIndexOf(" ")) << dt;
+        //mercurialDebug() << reAnnot.cap(2).left(reAnnot.cap(2).lastIndexOf(" ")) << dt;
         Q_ASSERT(dt.isValid());
         annotation.setDate(dt);
 
@@ -128,18 +125,38 @@ void MercurialAnnotateJob::parseAnnotateOutput(VcsJob *j)
         m_annotations.push_back(qVariantFromValue(annotation));
     }
 
+    for (const auto& annotation: m_annotations) {
+        const auto revision = revisionToString(annotation.value<VcsAnnotationLine>().revision());
+        if (!m_revisionsToLog.contains(revision)) {
+            m_revisionsToLog.insert(revision);
+        }
+    }
+
+    nextPartOfLog();
+}
+
+void MercurialAnnotateJob::nextPartOfLog()
+{
     m_status = JobRunning;
 
     DVcsJob *logJob = new DVcsJob(m_workingDir, vcsPlugin());
 
-    *logJob << "hg" << "log" << "--template" << "{rev}\\_%{desc}\\_%{author}\\_%";
+    *logJob << "hg" << "log" << "--template" << "{rev}\\_%{desc|firstline}\\_%{author}\\_%";
 
-    for (const auto& annotation: m_annotations) {
-        *logJob << "-r" << revisionToString(annotation.value<VcsAnnotationLine>().revision());
+    int numRevisions = 0;
+    for (auto it = m_revisionsToLog.begin(); it != m_revisionsToLog.end();) {
+        *logJob << "-r" << *it;
+        it = m_revisionsToLog.erase(it);
+
+        if (++numRevisions >= 200) {
+            // Prevent mercurial crash
+            break;
+        }
     }
 
     connect(logJob, SIGNAL(resultsReady(KDevelop::VcsJob *)), SLOT(parseLogOutput(KDevelop::VcsJob *)));
     logJob->start();
+
 }
 
 void MercurialAnnotateJob::parseLogOutput(KDevelop::VcsJob* j)
@@ -158,6 +175,11 @@ void MercurialAnnotateJob::parseLogOutput(KDevelop::VcsJob* j)
         if (!m_revisionsCache.contains(*it)) {
             m_revisionsCache[*it] = {*(it + 1), *(it + 2)};
         }
+    }
+
+    if (!m_revisionsToLog.isEmpty()) {
+        // TODO: We can show what we've got so far
+        return nextPartOfLog();
     }
 
     for (int idx = 0; idx < m_annotations.size(); idx++) {
