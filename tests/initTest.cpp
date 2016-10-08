@@ -50,7 +50,7 @@ using namespace KDevelop;
 
 void MercurialInitTest::initTestCase()
 {
-    AutoTestShell::init();
+    AutoTestShell::init({"kdevmercurial"});
     m_testCore = new KDevelop::TestCore();
     m_testCore->initialize(KDevelop::Core::NoUi);
     // m_testCore->initialize(KDevelop::Core::Default);
