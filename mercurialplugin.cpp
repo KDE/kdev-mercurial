@@ -161,7 +161,7 @@ VcsJob *MercurialPlugin::repositoryLocation(const QUrl &/*directory*/)
 
 VcsJob *MercurialPlugin::createWorkingCopy(const VcsLocation &localOrRepoLocationSrc, const QUrl &destinationDirectory, IBasicVersionControl::RecursionMode)
 {
-    DVcsJob *job = new DVcsJob(QDir::home(), this);
+    DVcsJob *job = new DVcsJob(QDir::home(), this, KDevelop::OutputJob::Silent);
 
     *job << "hg" << "clone" << "--" << localOrRepoLocationSrc.localUrl().toLocalFile() << destinationDirectory.toLocalFile();
 
@@ -207,7 +207,7 @@ VcsJob *MercurialPlugin::add(const QList<QUrl> &localLocations, IBasicVersionCon
 
 VcsJob *MercurialPlugin::copy(const QUrl &localLocationSrc, const QUrl &localLocationDst)
 {
-    DVcsJob *job = new DVcsJob(findWorkingDir(localLocationSrc), this);
+    DVcsJob *job = new DVcsJob(findWorkingDir(localLocationSrc), this, KDevelop::OutputJob::Silent);
     *job << "hg" << "cp" << "--" << localLocationSrc.toLocalFile() << localLocationDst.path();
     return job;
 }
@@ -215,7 +215,7 @@ VcsJob *MercurialPlugin::copy(const QUrl &localLocationSrc, const QUrl &localLoc
 VcsJob *MercurialPlugin::move(const QUrl &localLocationSrc,
                               const QUrl &localLocationDst)
 {
-    DVcsJob *job = new DVcsJob(findWorkingDir(localLocationSrc), this);
+    DVcsJob *job = new DVcsJob(findWorkingDir(localLocationSrc), this, KDevelop::OutputJob::Silent);
     *job << "hg" << "mv" << "--" << localLocationSrc.toLocalFile() << localLocationDst.path();
     return job;
 }
@@ -235,7 +235,7 @@ VcsJob *MercurialPlugin::commit(const QString &message,
         return NULL;
     }
 
-    DVcsJob *job = new DVcsJob(findWorkingDir(locations.first()), this);
+    DVcsJob *job = new DVcsJob(findWorkingDir(locations.first()), this, KDevelop::OutputJob::Silent);
     *job << "hg" << "commit" << "-m" << message << "--" << locations;
     return job;
 }
@@ -338,7 +338,7 @@ VcsJob *MercurialPlugin::diff(const QUrl &fileOrDirectory,
 
     const QString srcPath = fileOrDirectory.toLocalFile();
 
-    DVcsJob *job = new DVcsJob(workingDir, this);
+    DVcsJob *job = new DVcsJob(workingDir, this, KDevelop::OutputJob::Silent);
 
     *job << "hg" << "diff" << "-g";
 
@@ -396,7 +396,7 @@ VcsJob *MercurialPlugin::status(const QList<QUrl> &localLocations, IBasicVersion
         return NULL;
     }
 
-    DVcsJob *job = new DVcsJob(findWorkingDir(locations.first()), this);
+    DVcsJob *job = new DVcsJob(findWorkingDir(locations.first()), this, KDevelop::OutputJob::Silent);
     *job << "hg" << "status" << "-A" << "--" << locations;
 
     connect(job, SIGNAL(readyForParsing(KDevelop::DVcsJob *)), SLOT(parseStatus(KDevelop::DVcsJob *)));
@@ -495,7 +495,7 @@ VcsJob *MercurialPlugin::log(const QUrl &localLocation,
                              const VcsRevision &from,
                              unsigned long limit)
 {
-    DVcsJob *job = new DVcsJob(findWorkingDir(localLocation), this);
+    DVcsJob *job = new DVcsJob(findWorkingDir(localLocation), this, KDevelop::OutputJob::Silent);
 
     *job << "hg" << "log" << "-r" << toMercurialRevision(from) + ':' + toMercurialRevision(to);
 
@@ -536,7 +536,7 @@ VcsJob *MercurialPlugin::heads(const QUrl &localLocation)
 
 VcsJob *MercurialPlugin::identify(const QUrl &localLocation)
 {
-    DVcsJob *job = new DVcsJob(findWorkingDir(localLocation), this);
+    DVcsJob *job = new DVcsJob(findWorkingDir(localLocation), this, KDevelop::OutputJob::Silent);
 
     *job << "hg" << "identify" << "-n";
 

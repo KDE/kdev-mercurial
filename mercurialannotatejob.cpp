@@ -48,7 +48,7 @@ QString revisionToString(const KDevelop::VcsRevision& rev)
 }
 
 MercurialAnnotateJob::MercurialAnnotateJob(const QDir &workingDir, const VcsRevision& revision, const QUrl& location, MercurialPlugin *parent)
-    : VcsJob(parent),
+    : VcsJob(parent, KDevelop::OutputJob::Silent),
     m_workingDir(workingDir),
     m_revision(revision),
     m_location(location),
@@ -62,7 +62,7 @@ void MercurialAnnotateJob::start()
 {
     m_status = JobRunning;
 
-    DVcsJob *job = new DVcsJob(m_workingDir, vcsPlugin());
+    DVcsJob *job = new DVcsJob(m_workingDir, vcsPlugin(), KDevelop::OutputJob::Silent);
     *job << "hg" << "annotate" << "-n" << "-d";
 
     *job << "--" << m_location.toLocalFile();
@@ -139,7 +139,7 @@ void MercurialAnnotateJob::nextPartOfLog()
 {
     m_status = JobRunning;
 
-    DVcsJob *logJob = new DVcsJob(m_workingDir, vcsPlugin());
+    DVcsJob *logJob = new DVcsJob(m_workingDir, vcsPlugin(), KDevelop::OutputJob::Silent);
 
     *logJob << "hg" << "log" << "--template" << "{rev}\\_%{desc|firstline}\\_%{author}\\_%";
 
