@@ -429,7 +429,7 @@ bool MercurialPlugin::parseStatus(DVcsJob *job) const
 //             break;
 //         }
 // 
-//         QUrl file(it->mid(2).prepend(dir));
+//         QUrl file = QUrl::fromLocalFile(it->mid(2).prepend(dir));
 // 
 //         VcsStatusInfo status;
 //         status.setUrl(file);
@@ -444,7 +444,7 @@ bool MercurialPlugin::parseStatus(DVcsJob *job) const
     for (; it != output.constEnd(); it++) {
         QChar stCh = it->at(0);
 
-        QUrl file(it->mid(2).prepend(dir));
+        QUrl file = QUrl::fromLocalFile(it->mid(2).prepend(dir));
 
         if (!conflictedFiles.contains(file)) {
             VcsStatusInfo status;
