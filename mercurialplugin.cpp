@@ -35,6 +35,7 @@
 #include <QAction>
 #include <QMenu>
 #include <QDateTime>
+#include <QStandardPaths>
 
 #include <interfaces/icore.h>
 
@@ -67,6 +68,11 @@ namespace
 MercurialPlugin::MercurialPlugin(QObject *parent, const QVariantList &)
     : DistributedVersionControlPlugin(parent, QStringLiteral("kdevmercurial"))
 {
+    if (QStandardPaths::findExecutable(QStringLiteral("hg")).isEmpty()) {
+        setErrorDescription(i18n("Unable to find hg executable. Is it installed on the system?"));
+        return;
+    }
+
     KDEV_USE_EXTENSION_INTERFACE(KDevelop::IBasicVersionControl)
     KDEV_USE_EXTENSION_INTERFACE(KDevelop::IDistributedVersionControl)
 
