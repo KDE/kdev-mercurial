@@ -23,18 +23,12 @@ include(KDECMakeSettings)
 
 find_package(KF5 REQUIRED COMPONENTS
   Config
-  GuiAddons
-  WidgetsAddons
   IconThemes
   I18n
   ItemModels
   ItemViews
-  JobWidgets
   KCMUtils
-  KIO
-  Parts
-  WindowSystem
-  XmlGui)
+  KIO)
 
 find_package(KDevPlatform 5.0.0 REQUIRED)
 
