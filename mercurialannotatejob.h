@@ -38,18 +38,28 @@ public:
     KDevelop::VcsJob::JobStatus status() const override;
     KDevelop::IPlugin *vcsPlugin() const override;
 
+protected:
+    bool doKill() override;
+
 private slots:
     void parseAnnotateOutput(KDevelop::VcsJob *job);
     void parseLogOutput(KDevelop::VcsJob *job);
+    void parseCommitResult(KDevelop::VcsJob *job);
+    void parseStripResult(KDevelop::VcsJob *job);
+    void parseStatusResult(KDevelop::VcsJob *job);
 
 private:
+    void launchAnnotateJob() const;
+
     QDir m_workingDir;
     KDevelop::VcsRevision m_revision;
     QUrl m_location;
     KDevelop::VcsJob::JobStatus m_status;
+    mutable QPointer<KJob> m_job;
     QList<QVariant> m_annotations;
     QHash<QString, QPair<QString, QString>> m_revisionsCache;
     QSet <QString> m_revisionsToLog;
+    bool m_hasModifiedFile = false;
 
     void setFail();
     void setSuccess();

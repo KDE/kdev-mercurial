@@ -41,17 +41,74 @@ MercurialAnnotateJob::MercurialAnnotateJob(const QDir &workingDir, const VcsRevi
     setCapabilities(Killable);
 }
 
+bool MercurialAnnotateJob::doKill()
+{
+    m_status = JobCanceled;
+    if (m_job) {
+        return m_job->kill(KJob::Quietly);
+    }
+    return true;
+}
+
 void MercurialAnnotateJob::start()
 {
     m_status = JobRunning;
 
     DVcsJob *job = new DVcsJob(m_workingDir, vcsPlugin(), KDevelop::OutputJob::Silent);
-    *job << "hg" << "annotate" << "-n" << "-d";
+    *job << "hg" << "status" << "-m"  << "-a" << "-n";
 
     *job << "--" << m_location.toLocalFile();
 
-    connect(job, SIGNAL(resultsReady(KDevelop::VcsJob *)), SLOT(parseAnnotateOutput(KDevelop::VcsJob *)));
+    connect(job, SIGNAL(resultsReady(KDevelop::VcsJob *)), SLOT(parseStatusResult(KDevelop::VcsJob *)));
+    m_job = job;
     job->start();
+}
+
+void MercurialAnnotateJob::parseCommitResult(KDevelop::VcsJob* j)
+{
+    DVcsJob *job = static_cast<DVcsJob *>(j);
+    if (job->status() != VcsJob::JobSucceeded)
+        return setFail();
+
+    launchAnnotateJob();
+}
+
+void MercurialAnnotateJob::launchAnnotateJob() const
+{
+    DVcsJob *annotateJob = new DVcsJob(m_workingDir, vcsPlugin(), KDevelop::OutputJob::Silent);
+    *annotateJob << "hg" << "annotate" << "-n" << "-d";
+
+    *annotateJob << "--" << m_location.toLocalFile();
+
+    connect(annotateJob, SIGNAL(resultsReady(KDevelop::VcsJob *)), SLOT(parseAnnotateOutput(KDevelop::VcsJob *)));
+    m_job = annotateJob;
+    annotateJob->start();
+}
+
+void MercurialAnnotateJob::parseStatusResult(KDevelop::VcsJob* j)
+{
+    DVcsJob *job = static_cast<DVcsJob *>(j);
+    if (job->status() != VcsJob::JobSucceeded)
+        return setFail();
+
+    if (job->output().isEmpty()) {
+        launchAnnotateJob();
+    } else {
+        m_hasModifiedFile = true;
+        DVcsJob *commitJob = new DVcsJob(m_workingDir, vcsPlugin(), KDevelop::OutputJob::Silent);
+        *commitJob << "hg" << "commit" << "-u"  << "not.committed.yet" << "-m" << "Not Committed Yet";
+
+        *commitJob << "--" << m_location.toLocalFile();
+
+        connect(commitJob, SIGNAL(resultsReady(KDevelop::VcsJob *)), SLOT(parseCommitResult(KDevelop::VcsJob *)));
+        m_job = commitJob;
+        commitJob->start();
+    }
+}
+
+void MercurialAnnotateJob::parseStripResult(KDevelop::VcsJob* /*job*/)
+{
+    setSuccess();
 }
 
 QVariant MercurialAnnotateJob::fetchResults()
@@ -138,6 +195,7 @@ void MercurialAnnotateJob::nextPartOfLog()
     }
 
     connect(logJob, SIGNAL(resultsReady(KDevelop::VcsJob *)), SLOT(parseLogOutput(KDevelop::VcsJob *)));
+    m_job = logJob;
     logJob->start();
 
 }
@@ -183,7 +241,16 @@ void MercurialAnnotateJob::parseLogOutput(KDevelop::VcsJob* j)
         m_annotations[idx] = qVariantFromValue(annotationLine);
     }
 
-    setSuccess();
+    if (m_hasModifiedFile) {
+        DVcsJob* stripJob = new DVcsJob(m_workingDir, vcsPlugin(), KDevelop::OutputJob::Silent);
+        *stripJob << "hg" << "strip" << "-k" << "tip";
+
+        connect(stripJob, SIGNAL(resultsReady(KDevelop::VcsJob *)), SLOT(parseStripResult(KDevelop::VcsJob *)));
+        m_job = stripJob;
+        stripJob->start();
+    } else {
+        setSuccess();
+    }
 }
 
 void MercurialAnnotateJob::setFail()
