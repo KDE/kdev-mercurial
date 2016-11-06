@@ -150,6 +150,8 @@ public:
 
     void registerRepositoryForCurrentBranchChanges(const QUrl &repository) override;
 
+    QString toMercurialRevision(const KDevelop::VcsRevision &vcsrev);
+
 protected slots:
     void parseLogOutputBasicVersionControl(KDevelop::DVcsJob *job) const;
     bool parseStatus(KDevelop::DVcsJob *job) const;
@@ -171,7 +173,6 @@ protected:
     //used in log
     void parseLogOutput(const KDevelop::DVcsJob *job, QList<DVcsEvent> &commits) const override;
 
-    static QString toMercurialRevision(const KDevelop::VcsRevision &vcsrev);
     /**
      * Remove directories from @p locations.
      */

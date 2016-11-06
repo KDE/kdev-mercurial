@@ -30,23 +30,6 @@
 
 using namespace KDevelop;
 
-namespace {
-QString revisionToString(const KDevelop::VcsRevision& rev)
-{
-    if (rev.revisionType() == KDevelop::VcsRevision::Special) {
-        if (rev.specialType() == KDevelop::VcsRevision::Head) {
-            return QStringLiteral("tip");
-        } else if (rev.specialType() == KDevelop::VcsRevision::Start) {
-            return QStringLiteral("0");
-        }
-    } else if (rev.revisionType() == KDevelop::VcsRevision::GlobalNumber) {
-        return QString::number(rev.revisionValue().toLongLong());
-    }
-
-    return {};
-}
-}
-
 MercurialAnnotateJob::MercurialAnnotateJob(const QDir &workingDir, const VcsRevision& revision, const QUrl& location, MercurialPlugin *parent)
     : VcsJob(parent, KDevelop::OutputJob::Silent),
     m_workingDir(workingDir),
@@ -126,7 +109,7 @@ void MercurialAnnotateJob::parseAnnotateOutput(VcsJob *j)
     }
 
     for (const auto& annotation: m_annotations) {
-        const auto revision = revisionToString(annotation.value<VcsAnnotationLine>().revision());
+        const auto revision = static_cast<MercurialPlugin*>(vcsPlugin())->toMercurialRevision(annotation.value<VcsAnnotationLine>().revision());
         if (!m_revisionsToLog.contains(revision)) {
             m_revisionsToLog.insert(revision);
         }
@@ -184,7 +167,7 @@ void MercurialAnnotateJob::parseLogOutput(KDevelop::VcsJob* j)
 
     for (int idx = 0; idx < m_annotations.size(); idx++) {
         auto annotationLine = m_annotations[idx].value<VcsAnnotationLine>();
-        const auto revision = revisionToString(annotationLine.revision());
+        const auto revision = static_cast<MercurialPlugin*>(vcsPlugin())->toMercurialRevision(annotationLine.revision());
 
         if (!m_revisionsCache.contains(revision)) {
             Q_ASSERT(m_revisionsCache.contains(revision));
