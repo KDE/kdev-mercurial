@@ -81,7 +81,7 @@ void MercurialPushJob::serverContacted(VcsJob *job)
 
         if (response.contains("abort: http authorization required")) {
             // server requests username:password auth -> ask pass
-            KPasswordDialog dlg(0, KPasswordDialog::ShowUsernameLine);
+            KPasswordDialog dlg(nullptr, KPasswordDialog::ShowUsernameLine);
             dlg.setPrompt(i18n("Enter your login and password for Mercurial push."));
             dlg.setUsername(m_repoLocation.userName());
             dlg.setPassword(m_repoLocation.password());
@@ -94,17 +94,17 @@ void MercurialPushJob::serverContacted(VcsJob *job)
             }
         } else if (response.contains("remote: Permission denied")) {
             // server is not happy about our ssh key -> nothing could be done via gui
-            QMessageBox::critical(0, i18n("Mercurial Push Error"), i18n("Remote server does not accept your SSH key."));
+            QMessageBox::critical(nullptr, i18n("Mercurial Push Error"), i18n("Remote server does not accept your SSH key."));
         } else if (response.contains("remote: Host key verification failed.")) {
             // server key is not known for us
             // TODO: could be fixed via gui (SSH_ASKPASS etc)?
-            QMessageBox::critical(0, i18n("Mercurial Push Error"), i18n("Remote server SSH fingerprint is unknown."));
+            QMessageBox::critical(nullptr, i18n("Mercurial Push Error"), i18n("Remote server SSH fingerprint is unknown."));
         } else if (response.contains("abort: HTTP Error 404: NOT FOUND")) {
             // wrong url
-            QMessageBox::critical(0, i18n("Mercurial Push Error"), i18n("Push URL is incorrect."));
+            QMessageBox::critical(nullptr, i18n("Mercurial Push Error"), i18n("Push URL is incorrect."));
         } else {
             // TODO
-            QMessageBox::critical(0, i18n("Mercurial Push Error"), i18n("Unknown error while pushing. Please, check Version Control toolview."));
+            QMessageBox::critical(nullptr, i18n("Mercurial Push Error"), i18n("Unknown error while pushing. Please, check Version Control toolview."));
         }
     } else {
         setSuccess();

@@ -162,7 +162,7 @@ VcsJob *MercurialPlugin::init(const QUrl &directory)
 
 VcsJob *MercurialPlugin::repositoryLocation(const QUrl &/*directory*/)
 {
-    return NULL;
+    return nullptr;
 }
 
 VcsJob *MercurialPlugin::createWorkingCopy(const VcsLocation &localOrRepoLocationSrc, const QUrl &destinationDirectory, IBasicVersionControl::RecursionMode)
@@ -203,7 +203,7 @@ VcsJob *MercurialPlugin::add(const QList<QUrl> &localLocations, IBasicVersionCon
 
     if (localLocations.empty()) {
         // nothing left after filtering
-        return NULL;
+        return nullptr;
     }
 
     DVcsJob *job = new DVcsJob(findWorkingDir(locations.first()), this);
@@ -238,7 +238,7 @@ VcsJob *MercurialPlugin::commit(const QString &message,
     }
 
     if (locations.empty() || message.isEmpty()) {
-        return NULL;
+        return nullptr;
     }
 
     DVcsJob *job = new DVcsJob(findWorkingDir(locations.first()), this, KDevelop::OutputJob::Silent);
@@ -273,7 +273,7 @@ VcsJob *MercurialPlugin::update(const QList<QUrl> &localLocations,
     }
 
     if (locations.empty()) {
-        return NULL;
+        return nullptr;
     }
 
     DVcsJob *job = new DVcsJob(findWorkingDir(locations.first()), this);
@@ -292,7 +292,7 @@ VcsJob *MercurialPlugin::resolve(const QList<QUrl>   &files, KDevelop::IBasicVer
     }
 
     if (fileList.empty()) {
-        return NULL;
+        return nullptr;
     }
 
     DVcsJob *job = new DVcsJob(findWorkingDir(fileList.first()), this);
@@ -310,7 +310,7 @@ VcsJob *MercurialPlugin::diff(const QUrl &fileOrDirectory,
                               IBasicVersionControl::RecursionMode recursionMode)
 {
     if (!fileOrDirectory.isLocalFile()) {
-        return NULL;
+        return nullptr;
     }
 
     // non-standard searching for working directory
@@ -319,7 +319,7 @@ VcsJob *MercurialPlugin::diff(const QUrl &fileOrDirectory,
 
     // It's impossible to non-recursively diff directories
     if (recursionMode == NonRecursive && fileInfo.isDir()) {
-        return NULL;
+        return nullptr;
     }
 
     // find out correct working directory
@@ -339,7 +339,7 @@ VcsJob *MercurialPlugin::diff(const QUrl &fileOrDirectory,
         (srcRev.isEmpty() && dstRev.isEmpty())
     ) {
         qWarning() << "Diff between" << srcRevision.prettyValue() << '(' << srcRev << ')' << "and" << dstRevision.prettyValue() << '(' << dstRev << ')' << " not possible";
-        return NULL;
+        return nullptr;
     }
 
     const QString srcPath = fileOrDirectory.toLocalFile();
@@ -383,7 +383,7 @@ VcsJob *MercurialPlugin::diff(const QUrl &fileOrDirectory,
 VcsJob *MercurialPlugin::remove(const QList<QUrl> &files)
 {
     if (files.empty()) {
-        return NULL;
+        return nullptr;
     }
 
     DVcsJob *job = new DVcsJob(findWorkingDir(files.first()), this);
@@ -399,7 +399,7 @@ VcsJob *MercurialPlugin::status(const QList<QUrl> &localLocations, IBasicVersion
     }
 
     if (locations.empty()) {
-        return NULL;
+        return nullptr;
     }
 
     DVcsJob *job = new DVcsJob(findWorkingDir(locations.first()), this, KDevelop::OutputJob::Silent);
@@ -473,7 +473,7 @@ VcsJob *MercurialPlugin::revert(const QList<QUrl> &localLocations,
     }
 
     if (locations.empty()) {
-        return NULL;
+        return nullptr;
     }
 
     DVcsJob *job = new DVcsJob(findWorkingDir(locations.first()), this);
@@ -594,12 +594,12 @@ VcsJob *MercurialPlugin::currentBranch(const QUrl &repository)
 
 VcsJob *MercurialPlugin::deleteBranch(const QUrl &/*repository*/, const QString &/*branchName*/)
 {
-    return 0;
+    return nullptr;
 }
 
 VcsJob *MercurialPlugin::renameBranch(const QUrl &/*repository*/, const QString &/*oldBranchName*/, const QString &/*newBranchName*/)
 {
-    return 0;
+    return nullptr;
 }
 
 VcsJob *MercurialPlugin::switchBranch(const QUrl &repository, const QString &branchName)
@@ -1007,7 +1007,7 @@ void MercurialPlugin::showMercurialQueuesManager()
 
 VcsJob *MercurialPlugin::mqNew(const QUrl &/*localLocation*/, const QString &/*name*/, const QString &/*message*/)
 {
-    return 0;
+    return nullptr;
 }
 
 VcsJob *MercurialPlugin::mqPush(const QUrl &localLocation)

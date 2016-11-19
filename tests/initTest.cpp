@@ -209,7 +209,7 @@ void MercurialInitTest::commitFiles()
     QVERIFY(j->status() == KDevelop::VcsJob::JobSucceeded);
 
     //Test the results of the "mercurial add"
-    DVcsJob *jobLs = new DVcsJob(mercurialTest_BaseDir, 0);
+    DVcsJob *jobLs = new DVcsJob(mercurialTest_BaseDir, nullptr);
     *jobLs << "hg" << "stat" << "-q" << "-c" << "-n";
     QVERIFY(jobLs->exec());
     QVERIFY(jobLs->status() == KDevelop::VcsJob::JobSucceeded);

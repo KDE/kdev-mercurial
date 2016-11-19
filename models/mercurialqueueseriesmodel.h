@@ -32,7 +32,7 @@ class MercurialQueueSeriesModel : public QAbstractListModel
     Q_OBJECT
 
 public:
-    explicit MercurialQueueSeriesModel(MercurialPlugin *plugin, const QUrl &localLocation, QObject *parent = 0)
+    explicit MercurialQueueSeriesModel(MercurialPlugin *plugin, const QUrl &localLocation, QObject *parent = nullptr)
         : QAbstractListModel(parent), m_repoLocation(localLocation), m_plugin(plugin) {
         update();
     };
