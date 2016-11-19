@@ -618,7 +618,7 @@ VcsJob *MercurialPlugin::tag(const QUrl &repository, const QString &commitMessag
 
 QList<DVcsEvent> MercurialPlugin::getAllCommits(const QString &repo)
 {
-    DVcsJob *job = new DVcsJob(findWorkingDir(QUrl::fromLocalFile(repo)), this);
+    DVcsJob *job = new DVcsJob(findWorkingDir(QUrl::fromLocalFile(repo)), this, OutputJob::Silent);
 
     *job << "hg" << "log" << "--template" << "{desc}\\_%{date|isodate}\\_%{author}\\_%{parents}\\_%{node}\\_%{rev}\\_%";
 
@@ -858,6 +858,7 @@ void MercurialPlugin::parseLogOutput(const DVcsJob *job, QList<DVcsEvent> &commi
             }
         }
 
+        // TODO: Actually draw a graph, i.e use commit.setProperties as needed
         commits.push_front(commit);
     }
 }
