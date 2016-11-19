@@ -31,7 +31,7 @@ class MercurialVcsLocationWidget : public KDevelop::StandardVcsLocationWidget
 public:
     MercurialVcsLocationWidget(QWidget *parent = 0, Qt::WindowFlags f = 0)
         : KDevelop::StandardVcsLocationWidget(parent, f) {}
-    bool isCorrect() const;
+    bool isCorrect() const override;
 };
 
 #endif // MERCURIALVCSLOCATIONWIDGET_H

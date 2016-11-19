@@ -28,7 +28,7 @@ class MercurialHeadsModel : public KDevelop::VcsEventModel
     Q_OBJECT
 public:
     MercurialHeadsModel(KDevelop::IBasicVersionControl *iface, const KDevelop::VcsRevision &rev, const QUrl &url, QObject *parent);
-    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
     void setCurrentHeads(const QList<KDevelop::VcsRevision> &currentHeads) {
         m_currentHeads = currentHeads;
         emit headerDataChanged(Qt::Vertical, 0, m_currentHeads.count());

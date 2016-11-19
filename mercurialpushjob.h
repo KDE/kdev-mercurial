@@ -31,10 +31,10 @@ class MercurialPushJob : public KDevelop::VcsJob
 
 public:
     MercurialPushJob(const QDir &workingDir, const QUrl &destination, MercurialPlugin *parent);
-    void start();
-    QVariant fetchResults();
-    KDevelop::VcsJob::JobStatus status() const;
-    KDevelop::IPlugin *vcsPlugin() const;
+    void start() override;
+    QVariant fetchResults() override;
+    KDevelop::VcsJob::JobStatus status() const override;
+    KDevelop::IPlugin *vcsPlugin() const override;
 
 private slots:
     void serverContacted(KDevelop::VcsJob *job);
