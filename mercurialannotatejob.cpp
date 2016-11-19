@@ -59,7 +59,7 @@ void MercurialAnnotateJob::start()
 
     *job << "--" << m_location.toLocalFile();
 
-    connect(job, SIGNAL(resultsReady(KDevelop::VcsJob *)), SLOT(parseStatusResult(KDevelop::VcsJob *)));
+    connect(job, &DVcsJob::resultsReady, this, &MercurialAnnotateJob::parseStatusResult);
     m_job = job;
     job->start();
 }
@@ -80,7 +80,7 @@ void MercurialAnnotateJob::launchAnnotateJob() const
 
     *annotateJob << "--" << m_location.toLocalFile();
 
-    connect(annotateJob, SIGNAL(resultsReady(KDevelop::VcsJob *)), SLOT(parseAnnotateOutput(KDevelop::VcsJob *)));
+    connect(annotateJob, &DVcsJob::resultsReady, this, &MercurialAnnotateJob::parseAnnotateOutput);
     m_job = annotateJob;
     annotateJob->start();
 }
@@ -100,7 +100,7 @@ void MercurialAnnotateJob::parseStatusResult(KDevelop::VcsJob* j)
 
         *commitJob << "--" << m_location.toLocalFile();
 
-        connect(commitJob, SIGNAL(resultsReady(KDevelop::VcsJob *)), SLOT(parseCommitResult(KDevelop::VcsJob *)));
+        connect(commitJob, &DVcsJob::resultsReady, this, &MercurialAnnotateJob::parseCommitResult);
         m_job = commitJob;
         commitJob->start();
     }
@@ -194,7 +194,7 @@ void MercurialAnnotateJob::nextPartOfLog()
         }
     }
 
-    connect(logJob, SIGNAL(resultsReady(KDevelop::VcsJob *)), SLOT(parseLogOutput(KDevelop::VcsJob *)));
+    connect(logJob, &DVcsJob::resultsReady, this, &MercurialAnnotateJob::parseLogOutput);
     m_job = logJob;
     logJob->start();
 
@@ -245,7 +245,7 @@ void MercurialAnnotateJob::parseLogOutput(KDevelop::VcsJob* j)
         DVcsJob* stripJob = new DVcsJob(m_workingDir, vcsPlugin(), KDevelop::OutputJob::Silent);
         *stripJob << "hg" << "strip" << "-k" << "tip";
 
-        connect(stripJob, SIGNAL(resultsReady(KDevelop::VcsJob *)), SLOT(parseStripResult(KDevelop::VcsJob *)));
+        connect(stripJob, &DVcsJob::resultsReady, this, &MercurialAnnotateJob::parseStripResult);
         m_job = stripJob;
         stripJob->start();
     } else {

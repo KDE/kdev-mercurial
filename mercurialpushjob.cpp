@@ -51,7 +51,7 @@ void MercurialPushJob::start()
     if (!m_repoLocation.isEmpty())
         *job << m_repoLocation.url();
 
-    connect(job, SIGNAL(resultsReady(KDevelop::VcsJob *)), SLOT(serverContacted(KDevelop::VcsJob *)));
+    connect(job, &DVcsJob::readyForParsing, this, &MercurialPushJob::serverContacted);
     job->start();
 }
 

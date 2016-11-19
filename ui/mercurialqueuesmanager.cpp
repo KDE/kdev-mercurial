@@ -33,10 +33,10 @@ MercurialQueuesManager::MercurialQueuesManager(MercurialPlugin *plugin, const QU
     m_model = new MercurialQueueSeriesModel(m_plugin, repoLocation, m_ui->patchesListView);
     m_ui->patchesListView->setModel(m_model);
 
-    connect(m_ui->pushPushButton, SIGNAL(clicked(bool)), this, SLOT(executePush()));
-    connect(m_ui->pushAllPushButton, SIGNAL(clicked(bool)), this, SLOT(executePushAll()));
-    connect(m_ui->popPushButton, SIGNAL(clicked(bool)), this, SLOT(executePop()));
-    connect(m_ui->popAllPushButton, SIGNAL(clicked(bool)), this, SLOT(executePopAll()));
+    connect(m_ui->pushPushButton, &QPushButton::clicked, this, &MercurialQueuesManager::executePush);
+    connect(m_ui->pushAllPushButton, &QPushButton::clicked, this, &MercurialQueuesManager::executePushAll);
+    connect(m_ui->popPushButton, &QPushButton::clicked, this, &MercurialQueuesManager::executePop);
+    connect(m_ui->popAllPushButton, &QPushButton::clicked, this, &MercurialQueuesManager::executePopAll);
 }
 
 void MercurialQueuesManager::executePush()

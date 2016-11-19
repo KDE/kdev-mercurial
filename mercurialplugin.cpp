@@ -84,8 +84,8 @@ MercurialPlugin::MercurialPlugin(QObject *parent, const QVariantList &)
     m_mqPopAllAction = new QAction(i18nc("mercurial queues submenu", "Pop All"), this);
     m_mqManagerAction = new QAction(i18nc("mercurial queues submenu", "Manager..."), this);
 
-    connect(m_headsAction, SIGNAL(triggered()), this, SLOT(showHeads()));
-    connect(m_mqManagerAction, SIGNAL(triggered()), this, SLOT(showMercurialQueuesManager()));
+    connect(m_headsAction, &QAction::triggered, this, &MercurialPlugin::showHeads);
+    connect(m_mqManagerAction, &QAction::triggered, this, &MercurialPlugin::showMercurialQueuesManager);
 }
 
 MercurialPlugin::~MercurialPlugin()
@@ -375,7 +375,7 @@ VcsJob *MercurialPlugin::diff(const QUrl &fileOrDirectory,
 
     *job << "--" << srcPath;
 
-    connect(job, SIGNAL(readyForParsing(KDevelop::DVcsJob *)), SLOT(parseDiff(KDevelop::DVcsJob *)));
+    connect(job, &DVcsJob::readyForParsing, this, &MercurialPlugin::parseDiff);
 
     return job;
 }
@@ -405,7 +405,7 @@ VcsJob *MercurialPlugin::status(const QList<QUrl> &localLocations, IBasicVersion
     DVcsJob *job = new DVcsJob(findWorkingDir(locations.first()), this, KDevelop::OutputJob::Silent);
     *job << "hg" << "status" << "-A" << "--" << locations;
 
-    connect(job, SIGNAL(readyForParsing(KDevelop::DVcsJob *)), SLOT(parseStatus(KDevelop::DVcsJob *)));
+    connect(job, &DVcsJob::readyForParsing, this, &MercurialPlugin::parseStatus);
 
     return job;
 }
@@ -511,8 +511,8 @@ VcsJob *MercurialPlugin::log(const QUrl &localLocation,
     *job << "--template"
          << logTemplate() << "--" << localLocation;
 
-    connect(job, SIGNAL(readyForParsing(KDevelop::DVcsJob *)),
-            SLOT(parseLogOutputBasicVersionControl(KDevelop::DVcsJob *)));
+    connect(job, &DVcsJob::readyForParsing, this,
+            &MercurialPlugin::parseLogOutputBasicVersionControl);
     return job;
 }
 
@@ -535,8 +535,8 @@ VcsJob *MercurialPlugin::heads(const QUrl &localLocation)
     *job << "hg" << "heads" << "--template"
          << logTemplate() << "--" << localLocation;
 
-    connect(job, SIGNAL(readyForParsing(KDevelop::DVcsJob *)),
-            SLOT(parseLogOutputBasicVersionControl(KDevelop::DVcsJob *)));
+    connect(job, &DVcsJob::readyForParsing, this,
+            &MercurialPlugin::parseLogOutputBasicVersionControl);
     return job;
 }
 
@@ -546,8 +546,8 @@ VcsJob *MercurialPlugin::identify(const QUrl &localLocation)
 
     *job << "hg" << "identify" << "-n";
 
-    connect(job, SIGNAL(readyForParsing(KDevelop::DVcsJob *)),
-            SLOT(parseIdentify(KDevelop::DVcsJob *)));
+    connect(job, &DVcsJob::readyForParsing, this,
+            &MercurialPlugin::parseIdentify);
     return job;
 }
 
@@ -580,7 +580,7 @@ VcsJob *MercurialPlugin::branches(const QUrl &repository)
 {
     DVcsJob *job = new DVcsJob(findWorkingDir(repository), this);
     *job << "hg" << "branches";
-    connect(job, SIGNAL(readyForParsing(KDevelop::DVcsJob *)), this, SLOT(parseMultiLineOutput(KDevelop::DVcsJob *)));
+    connect(job, &DVcsJob::readyForParsing, this, &MercurialPlugin::parseMultiLineOutput);
     return job;
 }
 
@@ -588,7 +588,7 @@ VcsJob *MercurialPlugin::currentBranch(const QUrl &repository)
 {
     DVcsJob *job = new DVcsJob(findWorkingDir(repository), this);
     *job << "hg" << "branch";
-    connect(job, SIGNAL(readyForParsing(KDevelop::DVcsJob *)), this, SLOT(parseMultiLineOutput(KDevelop::DVcsJob *)));
+    connect(job, &DVcsJob::readyForParsing, this, &MercurialPlugin::parseMultiLineOutput);
     return job;
 }
 
@@ -1042,7 +1042,7 @@ VcsJob *MercurialPlugin::mqApplied(const QUrl &localLocation)
 {
     DVcsJob *job = new DVcsJob(findWorkingDir(localLocation), this);
     *job << "hg" << "qapplied";
-    connect(job, SIGNAL(readyForParsing(KDevelop::DVcsJob *)), this, SLOT(parseMultiLineOutput(KDevelop::DVcsJob *)));
+    connect(job, &DVcsJob::readyForParsing, this, &MercurialPlugin::parseMultiLineOutput);
     return job;
 }
 
@@ -1050,7 +1050,7 @@ VcsJob *MercurialPlugin::mqUnapplied(const QUrl &localLocation)
 {
     DVcsJob *job = new DVcsJob(findWorkingDir(localLocation), this);
     *job << "hg" << "qunapplied";
-    connect(job, SIGNAL(readyForParsing(KDevelop::DVcsJob *)), this, SLOT(parseMultiLineOutput(KDevelop::DVcsJob *)));
+    connect(job, &DVcsJob::readyForParsing, this, &MercurialPlugin::parseMultiLineOutput);
     return job;
 }
 

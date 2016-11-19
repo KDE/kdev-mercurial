@@ -38,8 +38,8 @@ MercurialHeadsWidget::MercurialHeadsWidget(MercurialPlugin *plugin, const QUrl &
     m_headsModel = new MercurialHeadsModel(plugin, VcsRevision(), url, this);
     m_ui->headsTableView->setModel(static_cast<QAbstractItemModel *>(m_headsModel));
 
-    connect(m_ui->checkoutPushButton, SIGNAL(clicked(bool)), this, SLOT(checkoutRequested()));
-    connect(m_ui->mergePushButton, SIGNAL(clicked(bool)), this, SLOT(mergeRequested()));
+    connect(m_ui->checkoutPushButton, &QPushButton::clicked, this,  &MercurialHeadsWidget::checkoutRequested);
+    connect(m_ui->mergePushButton, &QPushButton::clicked, this, &MercurialHeadsWidget::mergeRequested);
 
     setWindowTitle(i18n("Mercurial Heads (%1)", m_url.toLocalFile()));
 
@@ -49,7 +49,7 @@ MercurialHeadsWidget::MercurialHeadsWidget(MercurialPlugin *plugin, const QUrl &
 void MercurialHeadsWidget::updateModel()
 {
     VcsJob *identifyJob = m_plugin->identify(m_url);
-    connect(identifyJob, SIGNAL(resultsReady(KDevelop::VcsJob *)), this, SLOT(identifyReceived(KDevelop::VcsJob *)));
+    connect(identifyJob, &VcsJob::resultsReady, this, &MercurialHeadsWidget::identifyReceived);
     ICore::self()->runController()->registerJob(identifyJob);
 }
 
@@ -70,7 +70,7 @@ void MercurialHeadsWidget::checkoutRequested()
     }
 
     VcsJob *job = m_plugin->checkoutHead(m_url, m_headsModel->eventForIndex(selection).revision());
-    connect(job, SIGNAL(resultsReady(KDevelop::VcsJob *)), this, SLOT(updateModel()));
+    connect(job, &VcsJob::resultsReady, this, &MercurialHeadsWidget::updateModel);
     ICore::self()->runController()->registerJob(job);
 }
 
@@ -82,6 +82,6 @@ void MercurialHeadsWidget::mergeRequested()
     }
 
     VcsJob *job = m_plugin->mergeWith(m_url, m_headsModel->eventForIndex(selection).revision());
-    connect(job, SIGNAL(resultsReady(KDevelop::VcsJob *)), this, SLOT(updateModel()));
+    connect(job, &VcsJob::resultsReady, this, &MercurialHeadsWidget::updateModel);
     ICore::self()->runController()->registerJob(job);
 }
