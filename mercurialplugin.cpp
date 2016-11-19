@@ -717,14 +717,14 @@ void MercurialPlugin::parseLogOutputBasicVersionControl(DVcsJob *job) const
 
         QList<VcsItemEvent> items;
 
-        const VcsItemEvent::Action actions[3] = {VcsItemEvent::ContentsModified, VcsItemEvent::Added, VcsItemEvent::Deleted};
+        const VcsItemEvent::Action actions[3] = {VcsItemEvent::Deleted, VcsItemEvent::Added, VcsItemEvent::ContentsModified};
         for (int i = 0; i < 3; i++) {
             const auto &files = *it++;
             if (files.isEmpty()) {
                 continue;
             }
 
-            foreach (const auto & file, files.split(' ')) {
+            foreach (const auto& file, files.split(' ')) {
                 VcsItemEvent item;
                 item.setActions(actions[i]);
                 item.setRepositoryLocation(QUrl::fromPercentEncoding(file.toLocal8Bit()));
