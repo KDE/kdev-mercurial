@@ -111,9 +111,16 @@ void MercurialInitTest::addFiles()
     writeToFile(mercurialTest_BaseDir + mercurialTest_FileName, "commit 0 content");
     writeToFile(mercurialTest_BaseDir + mercurialTest_FileName2, "commit 0 content, foo");
 
-    // TODO: check status output
     VcsJob *j = m_proxy->status({QUrl::fromLocalFile(mercurialTest_BaseDir)}, KDevelop::IBasicVersionControl::Recursive);
     verifyJobSucceed(j);
+    auto statusResults = j->fetchResults().toList();
+    QCOMPARE(statusResults.size(), 2);
+    auto status = statusResults[0].value<VcsStatusInfo>();
+    QCOMPARE(status.url(), QUrl::fromLocalFile(mercurialTest_BaseDir + mercurialTest_FileName2));
+    QCOMPARE(status.state(), VcsStatusInfo::ItemUnknown);
+    status = statusResults[1].value<VcsStatusInfo>();
+    QCOMPARE(status.url(), QUrl::fromLocalFile(mercurialTest_BaseDir + mercurialTest_FileName));
+    QCOMPARE(status.state(), VcsStatusInfo::ItemUnknown);
 
     // /tmp/kdevMercurial_testdir/ and kdevMercurial_testdir
     //add always should use aboslute path to the any directory of the repository, let's check:
@@ -126,9 +133,19 @@ void MercurialInitTest::addFiles()
 
     writeToFile(mercurialSrcDir + mercurialTest_FileName3, "commit 0 content, bar");
 
-    // TODO: check status output
     j = m_proxy->status({QUrl::fromLocalFile(mercurialTest_BaseDir)}, KDevelop::IBasicVersionControl::Recursive);
     verifyJobSucceed(j);
+    statusResults = j->fetchResults().toList();
+    QCOMPARE(statusResults.size(), 3);
+    status = statusResults[0].value<VcsStatusInfo>();
+    QCOMPARE(status.url(), QUrl::fromLocalFile(mercurialTest_BaseDir + mercurialTest_FileName2));
+    QCOMPARE(status.state(), VcsStatusInfo::ItemAdded);
+    status = statusResults[1].value<VcsStatusInfo>();
+    QCOMPARE(status.url(), QUrl::fromLocalFile(mercurialTest_BaseDir + mercurialTest_FileName));
+    QCOMPARE(status.state(), VcsStatusInfo::ItemAdded);
+    status = statusResults[2].value<VcsStatusInfo>();
+    QCOMPARE(status.url(), QUrl::fromLocalFile(mercurialSrcDir + mercurialTest_FileName3));
+    QCOMPARE(status.state(), VcsStatusInfo::ItemUnknown);
 
     // repository path without trailing slash and a file in a parent directory
     // /tmp/repo  and /tmp/repo/src/bar
