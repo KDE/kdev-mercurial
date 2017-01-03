@@ -73,9 +73,6 @@ MercurialPlugin::MercurialPlugin(QObject *parent, const QVariantList &)
         return;
     }
 
-    KDEV_USE_EXTENSION_INTERFACE(KDevelop::IBasicVersionControl)
-    KDEV_USE_EXTENSION_INTERFACE(KDevelop::IDistributedVersionControl)
-
     m_headsAction = new QAction(i18n("Heads..."), this);
     m_mqNew = new QAction(i18nc("mercurial queues submenu", "New..."), this);
     m_mqPushAction = new QAction(i18nc("mercurial queues submenu", "Push"), this);
