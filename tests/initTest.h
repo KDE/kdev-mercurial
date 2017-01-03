@@ -43,16 +43,16 @@ private:
     void addFiles();
     void commitFiles();
     void cloneRepository();
-    // void importTestData();
-    // void checkoutTestData();
 
 private slots:
-    void initTestCase();
     void testInit();
     void testAdd();
     void testCommit();
     void testBranching();
-    void revHistory();
+    void testRevisionHistory();
+    void testAnnotate();
+
+    void initTestCase();
     void cleanupTestCase();
 
 private:

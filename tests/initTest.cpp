@@ -32,6 +32,7 @@
 #include <KIO/DeleteJob>
 
 #include <vcs/dvcs/dvcsjob.h>
+#include <vcs/vcsannotation.h>
 #include "../mercurialplugin.h"
 #include "debug.h"
 
@@ -56,12 +57,12 @@ void verifyJobSucceed(VcsJob* job)
     QVERIFY(job->status() == KDevelop::VcsJob::JobSucceeded);
 }
 
-void writeToFile(const QString& path, const QString& content)
+void writeToFile(const QString& path, const QString& content, QIODevice::OpenModeFlag mode = QIODevice::WriteOnly)
 {
     QFile f(path);
-    QVERIFY(f.open(QIODevice::WriteOnly));
+    QVERIFY(f.open(mode));
     QTextStream input(&f);
-    input << content;
+    input << content << endl;
 }
 
 }
@@ -107,8 +108,8 @@ void MercurialInitTest::addFiles()
     mercurialDebug() << "Adding files to the repo";
 
     // we start it after repoInit, so we still have empty mercurial repo
-    writeToFile(mercurialTest_BaseDir + mercurialTest_FileName, "HELLO WORLD");
-    writeToFile(mercurialTest_BaseDir + mercurialTest_FileName2, "No, bar()!");
+    writeToFile(mercurialTest_BaseDir + mercurialTest_FileName, "commit 0 content");
+    writeToFile(mercurialTest_BaseDir + mercurialTest_FileName2, "commit 0 content, foo");
 
     // TODO: check status output
     VcsJob *j = m_proxy->status({QUrl::fromLocalFile(mercurialTest_BaseDir)}, KDevelop::IBasicVersionControl::Recursive);
@@ -123,7 +124,7 @@ void MercurialInitTest::addFiles()
     j = m_proxy->add({QUrl::fromLocalFile(mercurialTest_BaseDir + mercurialTest_FileName)}, KDevelop::IBasicVersionControl::Recursive);
     verifyJobSucceed(j);
 
-    writeToFile(mercurialSrcDir + mercurialTest_FileName3, "No, foo()! It's bar()!");
+    writeToFile(mercurialSrcDir + mercurialTest_FileName3, "commit 0 content, bar");
 
     // TODO: check status output
     j = m_proxy->status({QUrl::fromLocalFile(mercurialTest_BaseDir)}, KDevelop::IBasicVersionControl::Recursive);
@@ -151,7 +152,7 @@ void MercurialInitTest::commitFiles()
     mercurialDebug() << "Committing...";
     // we start it after addFiles, so we just have to commit
     ///TODO: if "" is ok?
-    VcsJob *j = m_proxy->commit(QString("Test commit"), {QUrl::fromLocalFile(mercurialTest_BaseDir)}, KDevelop::IBasicVersionControl::Recursive);
+    VcsJob *j = m_proxy->commit(QString("commit 0"), {QUrl::fromLocalFile(mercurialTest_BaseDir)}, KDevelop::IBasicVersionControl::Recursive);
     verifyJobSucceed(j);
 
     j = m_proxy->status({QUrl::fromLocalFile(mercurialTest_BaseDir)}, KDevelop::IBasicVersionControl::Recursive);
@@ -170,12 +171,12 @@ void MercurialInitTest::commitFiles()
     mercurialDebug() << "Committing one more time";
 
     // let's try to change the file and test "hg commit -a"
-    writeToFile(mercurialTest_BaseDir + mercurialTest_FileName, "Just another HELLO WORLD");
+    writeToFile(mercurialTest_BaseDir + mercurialTest_FileName, "commit 1 content", QIODevice::Append);
 
     j = m_proxy->add({QUrl::fromLocalFile(mercurialTest_BaseDir + mercurialTest_FileName)}, KDevelop::IBasicVersionControl::Recursive);
     verifyJobSucceed(j);
 
-    j = m_proxy->commit(QString("KDevelop's Test commit2"), {QUrl::fromLocalFile(mercurialTest_BaseDir)}, KDevelop::IBasicVersionControl::Recursive);
+    j = m_proxy->commit(QString("commit 1"), {QUrl::fromLocalFile(mercurialTest_BaseDir)}, KDevelop::IBasicVersionControl::Recursive);
     verifyJobSucceed(j);
 }
 
@@ -206,14 +207,14 @@ void MercurialInitTest::testBranching()
 {
 }
 
-void MercurialInitTest::revHistory()
+void MercurialInitTest::testRevisionHistory()
 {
     QList<DVcsEvent> commits = m_proxy->getAllCommits(mercurialTest_BaseDir);
     QCOMPARE(commits.count(), 2);
     QCOMPARE(commits[0].getParents().size(), 1); //initial commit is on the top
     QVERIFY(commits[1].getParents().isEmpty());  //0 is later than 1!
-    QCOMPARE(commits[0].getLog(), QString("KDevelop's Test commit2"));  //0 is later than 1!
-    QCOMPARE(commits[1].getLog(), QString("Test commit"));
+    QCOMPARE(commits[0].getLog(), QString("commit 1"));  //0 is later than 1!
+    QCOMPARE(commits[1].getLog(), QString("commit 0"));
     QVERIFY(commits[1].getCommit().contains(QRegExp("^\\w{,40}$")));
     QVERIFY(commits[0].getCommit().contains(QRegExp("^\\w{,40}$")));
     QVERIFY(commits[0].getParents()[0].contains(QRegExp("^\\w{,40}$")));
@@ -230,6 +231,55 @@ void MercurialInitTest::removeTempDirs()
             mercurialDebug() << "KIO::del(" << mercurialTest_BaseDir2 << ") returned false";
 }
 
-QTEST_MAIN(MercurialInitTest)
+void MercurialInitTest::testAnnotate()
+{
+    // TODO: Check annotation with a lot of commits (> 200)
 
-// #include "mercurialtest.moc"
+    VcsRevision revision;
+    revision.setRevisionValue(0, KDevelop::VcsRevision::GlobalNumber);
+    auto job = m_proxy->annotate(QUrl::fromLocalFile(mercurialTest_BaseDir + mercurialTest_FileName), revision);
+    verifyJobSucceed(job);
+
+    auto results = job->fetchResults().toList();
+    QCOMPARE(results.size(), 2);
+
+    auto commit0 = results[0].value<VcsAnnotationLine>();
+    QCOMPARE(commit0.text(), QStringLiteral("commit 0 content"));
+    QCOMPARE(commit0.lineNumber(), 0);
+    QVERIFY(commit0.date().isValid());
+    QCOMPARE(commit0.revision().revisionValue().toLongLong(), 0);
+
+    auto commit1 = results[1].value<VcsAnnotationLine>();
+    QCOMPARE(commit1.text(), QStringLiteral("commit 1 content"));
+    QCOMPARE(commit1.lineNumber(), 1);
+    QVERIFY(commit1.date().isValid());
+    QCOMPARE(commit1.revision().revisionValue().toLongLong(), 1);
+
+    // Let's change a file without commiting it
+    writeToFile(mercurialTest_BaseDir + mercurialTest_FileName, "commit 2 content (temporary)", QIODevice::Append);
+
+    job = m_proxy->annotate(QUrl::fromLocalFile(mercurialTest_BaseDir + mercurialTest_FileName), revision);
+    verifyJobSucceed(job);
+
+    results = job->fetchResults().toList();
+    QCOMPARE(results.size(), 3);
+    auto commit2 = results[2].value<VcsAnnotationLine>();
+    QCOMPARE(commit2.text(), QStringLiteral("commit 2 content (temporary)"));
+    QCOMPARE(commit2.lineNumber(), 2);
+    QVERIFY(commit2.date().isValid());
+    QCOMPARE(commit2.revision().revisionValue().toLongLong(), 2);
+    QCOMPARE(commit2.author(), QStringLiteral("not.committed.yet"));
+    QCOMPARE(commit2.commitMessage(), QStringLiteral("Not Committed Yet"));
+
+    // Check that commit 2 is stripped and mercurialTest_FileName is still modified
+    job = m_proxy->status({QUrl::fromLocalFile(mercurialTest_BaseDir + mercurialTest_FileName)}, KDevelop::IBasicVersionControl::Recursive);
+    verifyJobSucceed(job);
+
+    auto statusResults = job->fetchResults().toList();
+    QCOMPARE(statusResults.size(), 1);
+    auto status = statusResults[0].value<VcsStatusInfo>();
+    QCOMPARE(status.url(), QUrl::fromLocalFile(mercurialTest_BaseDir + mercurialTest_FileName));
+    QCOMPARE(status.state(), VcsStatusInfo::ItemModified);
+}
+
+QTEST_MAIN(MercurialInitTest)
