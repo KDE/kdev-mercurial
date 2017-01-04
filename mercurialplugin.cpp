@@ -646,7 +646,6 @@ void MercurialPlugin::parseDiff(DVcsJob *job)
     // Not quite clean m_lastRepoRoot holds the root, after querying isValidDirectory()
     QString workingDir(job->directory().absolutePath());
     isValidDirectory(QUrl::fromLocalFile(workingDir));
-    // TODO: Is this the right port? Original code was: m_lastRepoRoot.path(KUrl::RemoveTrailingSlash);
     QString repoRoot = m_lastRepoRoot.adjusted(QUrl::StripTrailingSlash).path();
 
     VcsDiff diff;
@@ -661,6 +660,8 @@ void MercurialPlugin::parseDiff(DVcsJob *job)
     output.replace(reg, replacement);
 
     diff.setDiff(output);
+    diff.setBaseDiff(QUrl::fromLocalFile(repoRoot));
+    diff.setDepth(0);
 
     job->setResults(qVariantFromValue(diff));
 }

@@ -51,6 +51,7 @@ private slots:
     void testBranching();
     void testRevisionHistory();
     void testAnnotate();
+    void testDiff();
 
     void initTestCase();
     void cleanupTestCase();

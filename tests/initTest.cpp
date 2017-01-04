@@ -299,4 +299,18 @@ void MercurialInitTest::testAnnotate()
     QCOMPARE(status.state(), VcsStatusInfo::ItemModified);
 }
 
+void MercurialInitTest::testDiff()
+{
+    // after testAnnotate mercurialTest_FileName must be modified, let's check that
+    // TODO: make tests not depend on each other
+    VcsRevision srcrev = VcsRevision::createSpecialRevision(VcsRevision::Base);
+    VcsRevision dstrev = VcsRevision::createSpecialRevision(VcsRevision::Working);
+    VcsJob* j = m_proxy->diff(QUrl::fromLocalFile(mercurialTest_BaseDir), srcrev, dstrev, VcsDiff::DiffUnified, IBasicVersionControl::Recursive);
+    verifyJobSucceed(j);
+
+    KDevelop::VcsDiff d = j->fetchResults().value<KDevelop::VcsDiff>();
+    QCOMPARE(d.baseDiff().toLocalFile(), mercurialTest_BaseDir.left(mercurialTest_BaseDir.size() - 1));
+    QVERIFY(d.diff().contains(QUrl::fromLocalFile(mercurialTest_BaseDir + mercurialTest_FileName).toLocalFile()));
+}
+
 QTEST_MAIN(MercurialInitTest)
