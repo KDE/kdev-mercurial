@@ -568,14 +568,14 @@ VcsJob *MercurialPlugin::mergeWith(const QUrl &localLocation, const KDevelop::Vc
 
 VcsJob *MercurialPlugin::branch(const QUrl &repository, const VcsRevision &/*rev*/, const QString &branchName)
 {
-    DVcsJob *job = new DVcsJob(findWorkingDir(repository), this);
+    DVcsJob *job = new DVcsJob(findWorkingDir(repository), this, OutputJob::Silent);
     *job << "hg" << "branch" << "--" << branchName;
     return job;
 }
 
 VcsJob *MercurialPlugin::branches(const QUrl &repository)
 {
-    DVcsJob *job = new DVcsJob(findWorkingDir(repository), this);
+    DVcsJob *job = new DVcsJob(findWorkingDir(repository), this, OutputJob::Silent);
     *job << "hg" << "branches";
     connect(job, &DVcsJob::readyForParsing, this, &MercurialPlugin::parseMultiLineOutput);
     return job;
@@ -583,7 +583,7 @@ VcsJob *MercurialPlugin::branches(const QUrl &repository)
 
 VcsJob *MercurialPlugin::currentBranch(const QUrl &repository)
 {
-    DVcsJob *job = new DVcsJob(findWorkingDir(repository), this);
+    DVcsJob *job = new DVcsJob(findWorkingDir(repository), this, OutputJob::Silent);
     *job << "hg" << "branch";
     connect(job, &DVcsJob::readyForParsing, this, &MercurialPlugin::parseMultiLineOutput);
     return job;
