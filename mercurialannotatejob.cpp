@@ -243,7 +243,7 @@ void MercurialAnnotateJob::parseLogOutput(KDevelop::VcsJob* j)
 
     if (m_hasModifiedFile) {
         DVcsJob* stripJob = new DVcsJob(m_workingDir, vcsPlugin(), KDevelop::OutputJob::Silent);
-        *stripJob << "hg" << "strip" << "-k" << "tip";
+        *stripJob << "hg" << "--config" << "extensions.mq=" << "strip" << "-k" << "tip";
 
         connect(stripJob, &DVcsJob::resultsReady, this, &MercurialAnnotateJob::parseStripResult);
         m_job = stripJob;
