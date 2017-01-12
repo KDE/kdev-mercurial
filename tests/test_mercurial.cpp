@@ -21,7 +21,7 @@
     Boston, MA 02110-1301, USA.
 */
 
-#include "initTest.h"
+#include "test_mercurial.h"
 
 #include <QtTest/QtTest>
 #include <tests/testcore.h>
@@ -33,6 +33,7 @@
 
 #include <vcs/dvcs/dvcsjob.h>
 #include <vcs/vcsannotation.h>
+
 #include "../mercurialplugin.h"
 #include "debug.h"
 
@@ -67,7 +68,7 @@ void writeToFile(const QString& path, const QString& content, QIODevice::OpenMod
 
 }
 
-void MercurialInitTest::initTestCase()
+void MercurialTest::initTestCase()
 {
     AutoTestShell::init({"kdevmercurial"});
     m_testCore = new KDevelop::TestCore();
@@ -84,14 +85,14 @@ void MercurialInitTest::initTestCase()
     tmpdir.mkdir(mercurialTest_BaseDir2);
 }
 
-void MercurialInitTest::cleanupTestCase()
+void MercurialTest::cleanupTestCase()
 {
     delete m_proxy;
 
     removeTempDirs();
 }
 
-void MercurialInitTest::repoInit()
+void MercurialTest::repoInit()
 {
     mercurialDebug() << "Trying to init repo";
     // create the local repository
@@ -103,7 +104,7 @@ void MercurialInitTest::repoInit()
     QVERIFY(!m_proxy->isValidDirectory(QUrl::fromLocalFile("/tmp")));
 }
 
-void MercurialInitTest::addFiles()
+void MercurialTest::addFiles()
 {
     mercurialDebug() << "Adding files to the repo";
 
@@ -164,7 +165,7 @@ void MercurialInitTest::addFiles()
     verifyJobSucceed(j);
 }
 
-void MercurialInitTest::commitFiles()
+void MercurialTest::commitFiles()
 {
     mercurialDebug() << "Committing...";
     // we start it after addFiles, so we just have to commit
@@ -197,7 +198,7 @@ void MercurialInitTest::commitFiles()
     verifyJobSucceed(j);
 }
 
-void MercurialInitTest::cloneRepository()
+void MercurialTest::cloneRepository()
 {
     // make job that clones the local repository, created in the previous test
     VcsJob *j = m_proxy->createWorkingCopy(VcsLocation(mercurialTest_BaseDir), QUrl::fromLocalFile(mercurialTest_BaseDir2));
@@ -205,26 +206,26 @@ void MercurialInitTest::cloneRepository()
     QVERIFY(QFileInfo(QString(mercurialTest_BaseDir2 + "/.hg/")).exists());
 }
 
-void MercurialInitTest::testInit()
+void MercurialTest::testInit()
 {
     repoInit();
 }
 
-void MercurialInitTest::testAdd()
+void MercurialTest::testAdd()
 {
     addFiles();
 }
 
-void MercurialInitTest::testCommit()
+void MercurialTest::testCommit()
 {
     commitFiles();
 }
 
-void MercurialInitTest::testBranching()
+void MercurialTest::testBranching()
 {
 }
 
-void MercurialInitTest::testRevisionHistory()
+void MercurialTest::testRevisionHistory()
 {
     QList<DVcsEvent> commits = m_proxy->getAllCommits(mercurialTest_BaseDir);
     QCOMPARE(commits.count(), 2);
@@ -237,7 +238,7 @@ void MercurialInitTest::testRevisionHistory()
     QVERIFY(commits[0].getParents()[0].contains(QRegExp("^\\w{,40}$")));
 }
 
-void MercurialInitTest::removeTempDirs()
+void MercurialTest::removeTempDirs()
 {
     if (QFileInfo(mercurialTest_BaseDir).exists())
         if (!(KIO::del(QUrl::fromLocalFile(mercurialTest_BaseDir))->exec()))
@@ -248,7 +249,7 @@ void MercurialInitTest::removeTempDirs()
             mercurialDebug() << "KIO::del(" << mercurialTest_BaseDir2 << ") returned false";
 }
 
-void MercurialInitTest::testAnnotate()
+void MercurialTest::testAnnotate()
 {
     // TODO: Check annotation with a lot of commits (> 200)
 
@@ -299,7 +300,7 @@ void MercurialInitTest::testAnnotate()
     QCOMPARE(status.state(), VcsStatusInfo::ItemModified);
 }
 
-void MercurialInitTest::testDiff()
+void MercurialTest::testDiff()
 {
     // after testAnnotate mercurialTest_FileName must be modified, let's check that
     // TODO: make tests not depend on each other
@@ -313,4 +314,4 @@ void MercurialInitTest::testDiff()
     QVERIFY(d.diff().contains(QUrl::fromLocalFile(mercurialTest_BaseDir + mercurialTest_FileName).toLocalFile()));
 }
 
-QTEST_MAIN(MercurialInitTest)
+QTEST_MAIN(MercurialTest)

@@ -12,8 +12,8 @@ find_program(MERCURIAL NAMES hg)
 
 if (MERCURIAL)
     set( EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_BINARY_DIR} )
-    set(mercurialInitTest_SRCS
-        initTest.cpp
+    set(mercurialTest_SRCS
+        test_mercurial.cpp
         ../ui/mercurialqueuesmanager.cpp
         ../ui/mercurialheadswidget.cpp
         ../models/mercurialqueueseriesmodel.cpp
@@ -22,7 +22,7 @@ if (MERCURIAL)
         ../mercurialpushjob.cpp
         ../mercurialvcslocationwidget.cpp
         ../mercurialplugin.cpp)
-    ecm_add_test(${mercurialInitTest_SRCS}
+    ecm_add_test(${mercurialTest_SRCS}
         TEST_NAME test_kdevmercurial
         LINK_LIBRARIES Qt5::Test KDev::Vcs KDev::Util KDev::Tests
         GUI
