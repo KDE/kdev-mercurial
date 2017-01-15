@@ -123,6 +123,9 @@ void MercurialTest::addFiles()
     QCOMPARE(status.url(), QUrl::fromLocalFile(mercurialTest_BaseDir + mercurialTest_FileName));
     QCOMPARE(status.state(), VcsStatusInfo::ItemUnknown);
 
+    j = m_proxy->add({QUrl::fromLocalFile(mercurialTest_BaseDir)}, KDevelop::IBasicVersionControl::NonRecursive);
+    QVERIFY(!j);
+
     // /tmp/kdevMercurial_testdir/ and kdevMercurial_testdir
     //add always should use aboslute path to the any directory of the repository, let's check:
     j = m_proxy->add({QUrl::fromLocalFile(mercurialTest_BaseDir), QUrl::fromLocalFile(MercurialTestDir1)}, KDevelop::IBasicVersionControl::Recursive);

@@ -198,7 +198,7 @@ VcsJob *MercurialPlugin::add(const QList<QUrl> &localLocations, IBasicVersionCon
         filterOutDirectories(locations);
     }
 
-    if (localLocations.empty()) {
+    if (locations.empty()) {
         // nothing left after filtering
         return nullptr;
     }
