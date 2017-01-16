@@ -74,22 +74,27 @@ void MercurialTest::initTestCase()
     AutoTestShell::init({"kdevmercurial"});
     m_testCore = new KDevelop::TestCore();
     m_testCore->initialize(KDevelop::Core::NoUi);
-    // m_testCore->initialize(KDevelop::Core::Default);
 
     m_proxy = new MercurialPlugin(m_testCore);
-    removeTempDirs();
-
-    // Now create the basic directory structure
-    QDir tmpdir(tempDir);
-    tmpdir.mkdir(mercurialTest_BaseDir);
-    tmpdir.mkdir(mercurialSrcDir);
-    tmpdir.mkdir(mercurialTest_BaseDir2);
 }
 
 void MercurialTest::cleanupTestCase()
 {
     delete m_proxy;
 
+    removeTempDirs();
+}
+
+void MercurialTest::init()
+{
+    QDir tmpdir(tempDir);
+    tmpdir.mkdir(mercurialTest_BaseDir);
+    tmpdir.mkdir(mercurialSrcDir);
+    tmpdir.mkdir(mercurialTest_BaseDir2);
+}
+
+void MercurialTest::cleanup()
+{
     removeTempDirs();
 }
 
@@ -109,7 +114,6 @@ void MercurialTest::addFiles()
 {
     mercurialDebug() << "Adding files to the repo";
 
-    // we start it after repoInit, so we still have empty mercurial repo
     writeToFile(mercurialTest_BaseDir + mercurialTest_FileName, "commit 0 content");
     writeToFile(mercurialTest_BaseDir + mercurialTest_FileName2, "commit 0 content, foo");
 
@@ -172,8 +176,7 @@ void MercurialTest::addFiles()
 void MercurialTest::commitFiles()
 {
     mercurialDebug() << "Committing...";
-    // we start it after addFiles, so we just have to commit
-    ///TODO: if "" is ok?
+
     VcsJob *j = m_proxy->commit(QString("commit 0"), {QUrl::fromLocalFile(mercurialTest_BaseDir)}, KDevelop::IBasicVersionControl::Recursive);
     verifyJobSucceed(j);
 
@@ -217,20 +220,28 @@ void MercurialTest::testInit()
 
 void MercurialTest::testAdd()
 {
+    repoInit();
     addFiles();
 }
 
 void MercurialTest::testCommit()
 {
+    repoInit();
+    addFiles();
     commitFiles();
 }
 
 void MercurialTest::testBranching()
 {
+    // TODO:
 }
 
 void MercurialTest::testRevisionHistory()
 {
+    repoInit();
+    addFiles();
+    commitFiles();
+
     QList<DVcsEvent> commits = m_proxy->getAllCommits(mercurialTest_BaseDir);
     QCOMPARE(commits.count(), 2);
     QCOMPARE(commits[0].getParents().size(), 1); //initial commit is on the top
@@ -255,8 +266,11 @@ void MercurialTest::removeTempDirs()
 
 void MercurialTest::testAnnotate()
 {
-    // TODO: Check annotation with a lot of commits (> 200)
+    repoInit();
+    addFiles();
+    commitFiles();
 
+    // TODO: Check annotation with a lot of commits (> 200)
     VcsRevision revision;
     revision.setRevisionValue(0, KDevelop::VcsRevision::GlobalNumber);
     auto job = m_proxy->annotate(QUrl::fromLocalFile(mercurialTest_BaseDir + mercurialTest_FileName), revision);
@@ -306,8 +320,12 @@ void MercurialTest::testAnnotate()
 
 void MercurialTest::testDiff()
 {
-    // after testAnnotate mercurialTest_FileName must be modified, let's check that
-    // TODO: make tests not depend on each other
+    repoInit();
+    addFiles();
+    commitFiles();
+
+    writeToFile(mercurialTest_BaseDir + mercurialTest_FileName, "commit 2 content (temporary)", QIODevice::Append);
+
     VcsRevision srcrev = VcsRevision::createSpecialRevision(VcsRevision::Base);
     VcsRevision dstrev = VcsRevision::createSpecialRevision(VcsRevision::Working);
     VcsJob* j = m_proxy->diff(QUrl::fromLocalFile(mercurialTest_BaseDir), srcrev, dstrev, VcsDiff::DiffUnified, IBasicVersionControl::Recursive);
@@ -320,6 +338,10 @@ void MercurialTest::testDiff()
 
 void MercurialTest::testAnnotateFailed()
 {
+    repoInit();
+    addFiles();
+    commitFiles();
+
     auto verifyAnnotateJobFailed = [this](MercurialAnnotateJob::TestCase test)
     {
         VcsRevision revision;
