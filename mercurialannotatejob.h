@@ -47,6 +47,7 @@ private slots:
     void parseCommitResult(KDevelop::VcsJob *job);
     void parseStripResult(KDevelop::VcsJob *job);
     void parseStatusResult(KDevelop::VcsJob *job);
+    void subJobFinished(KJob *job);
 
 private:
     void launchAnnotateJob() const;
@@ -64,4 +65,17 @@ private:
     void setFail();
     void setSuccess();
     void nextPartOfLog();
+
+    // Those variables below for testing purposes only
+    friend class MercurialTest;
+    enum class TestCase
+    {
+      None,
+      Status,
+      Commit,
+      Annotate,
+      Log,
+      Strip
+    };
+    TestCase m_testCase = TestCase::None;
 };

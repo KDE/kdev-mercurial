@@ -55,11 +55,16 @@ void MercurialAnnotateJob::start()
     m_status = JobRunning;
 
     DVcsJob *job = new DVcsJob(m_workingDir, vcsPlugin(), KDevelop::OutputJob::Silent);
-    *job << "hg" << "status" << "-m"  << "-a" << "-n";
+    if (Q_UNLIKELY(m_testCase == TestCase::Status)) {
+         *job << "some_command_that_doesnt_exist";
+    } else {
+        *job << "hg" << "status" << "-m"  << "-a" << "-n";
 
-    *job << "--" << m_location.toLocalFile();
+        *job << "--" << m_location.toLocalFile();
+    }
 
     connect(job, &DVcsJob::resultsReady, this, &MercurialAnnotateJob::parseStatusResult);
+    connect(job, &KJob::finished, this, &MercurialAnnotateJob::subJobFinished);
     m_job = job;
     job->start();
 }
@@ -76,11 +81,16 @@ void MercurialAnnotateJob::parseCommitResult(KDevelop::VcsJob* j)
 void MercurialAnnotateJob::launchAnnotateJob() const
 {
     DVcsJob *annotateJob = new DVcsJob(m_workingDir, vcsPlugin(), KDevelop::OutputJob::Silent);
-    *annotateJob << "hg" << "annotate" << "-n" << "-d";
+    if (Q_UNLIKELY(m_testCase == TestCase::Annotate)) {
+         *annotateJob << "some_command_that_doesnt_exist";
+    } else {
+        *annotateJob << "hg" << "annotate" << "-n" << "-d";
 
-    *annotateJob << "--" << m_location.toLocalFile();
+        *annotateJob << "--" << m_location.toLocalFile();
+    }
 
     connect(annotateJob, &DVcsJob::resultsReady, this, &MercurialAnnotateJob::parseAnnotateOutput);
+    connect(annotateJob, &KJob::finished, this, &MercurialAnnotateJob::subJobFinished);
     m_job = annotateJob;
     annotateJob->start();
 }
@@ -96,11 +106,15 @@ void MercurialAnnotateJob::parseStatusResult(KDevelop::VcsJob* j)
     } else {
         m_hasModifiedFile = true;
         DVcsJob *commitJob = new DVcsJob(m_workingDir, vcsPlugin(), KDevelop::OutputJob::Silent);
-        *commitJob << "hg" << "commit" << "-u"  << "not.committed.yet" << "-m" << "Not Committed Yet";
+        if (Q_UNLIKELY(m_testCase == TestCase::Commit)) {
+            *commitJob << "some_command_that_doesnt_exist";
+        } else {
+            *commitJob << "hg" << "commit" << "-u"  << "not.committed.yet" << "-m" << "Not Committed Yet";
 
-        *commitJob << "--" << m_location.toLocalFile();
-
+            *commitJob << "--" << m_location.toLocalFile();
+        }
         connect(commitJob, &DVcsJob::resultsReady, this, &MercurialAnnotateJob::parseCommitResult);
+        connect(commitJob, &KJob::finished, this, &MercurialAnnotateJob::subJobFinished);
         m_job = commitJob;
         commitJob->start();
     }
@@ -180,8 +194,11 @@ void MercurialAnnotateJob::nextPartOfLog()
     m_status = JobRunning;
 
     DVcsJob *logJob = new DVcsJob(m_workingDir, vcsPlugin(), KDevelop::OutputJob::Silent);
-
-    *logJob << "hg" << "log" << "--template" << "{rev}\\_%{desc|firstline}\\_%{author}\\_%";
+    if (Q_UNLIKELY(m_testCase == TestCase::Log)) {
+         *logJob << "some_command_that_doesnt_exist";
+    } else {
+        *logJob << "hg" << "log" << "--template" << "{rev}\\_%{desc|firstline}\\_%{author}\\_%";
+    }
 
     int numRevisions = 0;
     for (auto it = m_revisionsToLog.begin(); it != m_revisionsToLog.end();) {
@@ -195,9 +212,9 @@ void MercurialAnnotateJob::nextPartOfLog()
     }
 
     connect(logJob, &DVcsJob::resultsReady, this, &MercurialAnnotateJob::parseLogOutput);
+    connect(logJob, &KJob::finished, this, &MercurialAnnotateJob::subJobFinished);
     m_job = logJob;
     logJob->start();
-
 }
 
 void MercurialAnnotateJob::parseLogOutput(KDevelop::VcsJob* j)
@@ -243,9 +260,14 @@ void MercurialAnnotateJob::parseLogOutput(KDevelop::VcsJob* j)
 
     if (m_hasModifiedFile) {
         DVcsJob* stripJob = new DVcsJob(m_workingDir, vcsPlugin(), KDevelop::OutputJob::Silent);
-        *stripJob << "hg" << "--config" << "extensions.mq=" << "strip" << "-k" << "tip";
+        if (Q_UNLIKELY(m_testCase == TestCase::Strip)) {
+            *stripJob << "some_command_that_doesnt_exist";
+        } else {
+            *stripJob << "hg" << "--config" << "extensions.mq=" << "strip" << "-k" << "tip";
+        }
 
         connect(stripJob, &DVcsJob::resultsReady, this, &MercurialAnnotateJob::parseStripResult);
+        connect(stripJob, &KJob::finished, this, &MercurialAnnotateJob::subJobFinished);
         m_job = stripJob;
         stripJob->start();
     } else {
@@ -265,4 +287,11 @@ void MercurialAnnotateJob::setSuccess()
     m_status = JobSucceeded;
     emitResult();
     emit resultsReady(this);
+}
+
+void MercurialAnnotateJob::subJobFinished(KJob* job)
+{
+    if (job->error()) {
+        setFail();
+    }
 }

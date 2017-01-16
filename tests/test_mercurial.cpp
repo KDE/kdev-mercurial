@@ -35,6 +35,7 @@
 #include <vcs/vcsannotation.h>
 
 #include "../mercurialplugin.h"
+#include "../mercurialannotatejob.h"
 #include "debug.h"
 
 using namespace KDevelop;
@@ -315,6 +316,27 @@ void MercurialTest::testDiff()
     KDevelop::VcsDiff d = j->fetchResults().value<KDevelop::VcsDiff>();
     QCOMPARE(d.baseDiff().toLocalFile(), mercurialTest_BaseDir.left(mercurialTest_BaseDir.size() - 1));
     QVERIFY(d.diff().contains(QUrl::fromLocalFile(mercurialTest_BaseDir + mercurialTest_FileName).toLocalFile()));
+}
+
+void MercurialTest::testAnnotateFailed()
+{
+    auto verifyAnnotateJobFailed = [this](MercurialAnnotateJob::TestCase test)
+    {
+        VcsRevision revision;
+        revision.setRevisionValue(0, KDevelop::VcsRevision::GlobalNumber);
+        auto job = m_proxy->annotate(QUrl::fromLocalFile(mercurialTest_BaseDir + mercurialTest_FileName), revision);
+        auto annotateJob = dynamic_cast<MercurialAnnotateJob*>(job);
+        QVERIFY(annotateJob);
+        annotateJob->m_testCase = test;
+
+        QVERIFY(job->exec());
+        QVERIFY(job->status() == KDevelop::VcsJob::JobFailed);
+    };
+    verifyAnnotateJobFailed(MercurialAnnotateJob::TestCase::Status);
+    //verifyAnnotateJobFailed(MercurialAnnotateJob::TestCase::Commit);
+    verifyAnnotateJobFailed(MercurialAnnotateJob::TestCase::Annotate);
+    verifyAnnotateJobFailed(MercurialAnnotateJob::TestCase::Log);
+    //verifyAnnotateJobFailed(MercurialAnnotateJob::TestCase::Strip);
 }
 
 QTEST_MAIN(MercurialTest)

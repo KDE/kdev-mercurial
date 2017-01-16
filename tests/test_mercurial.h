@@ -50,6 +50,7 @@ private slots:
     void testRevisionHistory();
     void testAnnotate();
     void testDiff();
+    void testAnnotateFailed();
 
     void initTestCase();
     void cleanupTestCase();

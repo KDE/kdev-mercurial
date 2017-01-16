@@ -51,7 +51,7 @@ void MercurialPushJob::start()
     if (!m_repoLocation.isEmpty())
         *job << m_repoLocation.url();
 
-    connect(job, &DVcsJob::readyForParsing, this, &MercurialPushJob::serverContacted);
+    connect(job, &KJob::finished, this, &MercurialPushJob::serverContacted);
     job->start();
 }
 
@@ -70,7 +70,7 @@ IPlugin *MercurialPushJob::vcsPlugin() const
     return static_cast<IPlugin *>(parent());
 }
 
-void MercurialPushJob::serverContacted(VcsJob *job)
+void MercurialPushJob::serverContacted(KJob *job)
 {
     DVcsJob *dvcsJob = static_cast<DVcsJob *>(job);
     // check for errors
@@ -85,12 +85,10 @@ void MercurialPushJob::serverContacted(VcsJob *job)
             dlg.setPrompt(i18n("Enter your login and password for Mercurial push."));
             dlg.setUsername(m_repoLocation.userName());
             dlg.setPassword(m_repoLocation.password());
-            if (!dlg.exec()) {
-                setFail();
-            } else {
+            if (dlg.exec()) {
                 m_repoLocation.setUserName(dlg.username());
                 m_repoLocation.setPassword(dlg.password());
-                start();
+                return start();
             }
         } else if (response.contains("remote: Permission denied")) {
             // server is not happy about our ssh key -> nothing could be done via gui
@@ -106,6 +104,7 @@ void MercurialPushJob::serverContacted(VcsJob *job)
             // TODO
             QMessageBox::critical(nullptr, i18n("Mercurial Push Error"), i18n("Unknown error while pushing. Please, check Version Control toolview."));
         }
+        setFail();
     } else {
         setSuccess();
     }

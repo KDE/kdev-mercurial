@@ -37,7 +37,7 @@ public:
     KDevelop::IPlugin *vcsPlugin() const override;
 
 private slots:
-    void serverContacted(KDevelop::VcsJob *job);
+    void serverContacted(KJob *job);
 
 private:
     QDir m_workingDir;
