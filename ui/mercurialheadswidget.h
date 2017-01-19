@@ -45,7 +45,7 @@ public:
 
 private slots:
     void updateModel();
-    void identifyReceived(KDevelop::VcsJob *job);
+
     void checkoutRequested();
     void mergeRequested();
 

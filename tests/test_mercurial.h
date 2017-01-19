@@ -51,6 +51,7 @@ private slots:
     void testAnnotate();
     void testDiff();
     void testAnnotateFailed();
+    void testHeads();
 
     void initTestCase();
     void cleanupTestCase();

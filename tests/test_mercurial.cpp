@@ -27,6 +27,7 @@
 #include <tests/testcore.h>
 #include <tests/autotestshell.h>
 
+#include <QScopedPointer>
 #include <QUrl>
 
 #include <KIO/DeleteJob>
@@ -36,6 +37,7 @@
 
 #include "../mercurialplugin.h"
 #include "../mercurialannotatejob.h"
+#include "../models/mercurialheadsmodel.h"
 #include "debug.h"
 
 using namespace KDevelop;
@@ -359,6 +361,36 @@ void MercurialTest::testAnnotateFailed()
     verifyAnnotateJobFailed(MercurialAnnotateJob::TestCase::Annotate);
     verifyAnnotateJobFailed(MercurialAnnotateJob::TestCase::Log);
     //verifyAnnotateJobFailed(MercurialAnnotateJob::TestCase::Strip);
+}
+
+void MercurialTest::testHeads()
+{
+    repoInit();
+    addFiles();
+    commitFiles();
+
+    VcsRevision revision;
+    revision.setRevisionValue(0, KDevelop::VcsRevision::GlobalNumber);
+    auto job = m_proxy->checkoutHead(QUrl::fromLocalFile(mercurialTest_BaseDir), revision);
+    verifyJobSucceed(job);
+
+    writeToFile(mercurialTest_BaseDir + mercurialTest_FileName, "new head content", QIODevice::Append);
+
+    auto j = m_proxy->commit(QString("new head"), {QUrl::fromLocalFile(mercurialTest_BaseDir)}, KDevelop::IBasicVersionControl::Recursive);
+    verifyJobSucceed(j);
+
+    QScopedPointer<MercurialHeadsModel> headsModel(new MercurialHeadsModel(m_proxy, QUrl::fromLocalFile(mercurialTest_BaseDir), nullptr));
+    headsModel->update();
+
+    QSignalSpy waiter(headsModel.data(), &MercurialHeadsModel::updateComplete);
+    QVERIFY(waiter.wait());
+    QVERIFY(waiter.count() == 1);
+
+    QCOMPARE(headsModel->rowCount(), 2);
+    auto rev2 = headsModel->data(headsModel->index(0, VcsBasicEventModel::RevisionColumn)).toLongLong();
+    auto rev1 = headsModel->data(headsModel->index(1, VcsBasicEventModel::RevisionColumn)).toLongLong();
+    QCOMPARE(rev2, 2);
+    QCOMPARE(rev1, 1);
 }
 
 QTEST_MAIN(MercurialTest)

@@ -527,10 +527,9 @@ KDevelop::VcsJob* MercurialPlugin::mergeBranch(const QUrl &/*repository*/, const
 
 VcsJob *MercurialPlugin::heads(const QUrl &localLocation)
 {
-    DVcsJob *job = new DVcsJob(findWorkingDir(localLocation), this);
+    DVcsJob *job = new DVcsJob(findWorkingDir(localLocation), this, KDevelop::OutputJob::Silent);
 
-    *job << "hg" << "heads" << "--template"
-         << logTemplate() << "--" << localLocation;
+    *job << "hg" << "heads" << "--template" << logTemplate();
 
     connect(job, &DVcsJob::readyForParsing, this,
             &MercurialPlugin::parseLogOutputBasicVersionControl);

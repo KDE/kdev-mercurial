@@ -35,7 +35,7 @@ MercurialHeadsWidget::MercurialHeadsWidget(MercurialPlugin *plugin, const QUrl &
     : QDialog(), m_ui(new Ui::MercurialHeadsWidget), m_plugin(plugin), m_url(url)
 {
     m_ui->setupUi(this);
-    m_headsModel = new MercurialHeadsModel(plugin, VcsRevision(), url, this);
+    m_headsModel = new MercurialHeadsModel(plugin, url, this);
     m_ui->headsTableView->setModel(static_cast<QAbstractItemModel *>(m_headsModel));
 
     connect(m_ui->checkoutPushButton, &QPushButton::clicked, this,  &MercurialHeadsWidget::checkoutRequested);
@@ -48,18 +48,7 @@ MercurialHeadsWidget::MercurialHeadsWidget(MercurialPlugin *plugin, const QUrl &
 
 void MercurialHeadsWidget::updateModel()
 {
-    VcsJob *identifyJob = m_plugin->identify(m_url);
-    connect(identifyJob, &VcsJob::resultsReady, this, &MercurialHeadsWidget::identifyReceived);
-    ICore::self()->runController()->registerJob(identifyJob);
-}
-
-void MercurialHeadsWidget::identifyReceived(VcsJob *job)
-{
-    QList<VcsRevision> currentHeads;
-    foreach (const QVariant & value, job->fetchResults().toList()) {
-        currentHeads << value.value<VcsRevision>();
-    }
-    m_headsModel->setCurrentHeads(currentHeads);
+    m_headsModel->update();
 }
 
 void MercurialHeadsWidget::checkoutRequested()
