@@ -124,6 +124,13 @@ bool MercurialPlugin::isValidDirectory(const QUrl &directory)
     return true;
 }
 
+bool MercurialPlugin::isValidRemoteRepositoryUrl(const QUrl& remoteLocation)
+{
+    Q_UNUSED(remoteLocation);
+    // TODO
+    return false;
+}
+
 bool MercurialPlugin::isVersionControlled(const QUrl &url)
 {
     const QFileInfo fsObject(url.toLocalFile());

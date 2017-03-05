@@ -61,6 +61,7 @@ public:
     ~MercurialPlugin();
 
     bool isValidDirectory(const QUrl &dirPath) override;
+    bool isValidRemoteRepositoryUrl(const QUrl& remoteLocation) override;
     bool isVersionControlled(const QUrl &path) override;
     QString name() const override;
 
