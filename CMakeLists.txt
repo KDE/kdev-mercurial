@@ -59,9 +59,6 @@ if (HAVE_TUC_FLAG)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror=tautological-undefined-compare")
 endif()
 
-add_subdirectory(tests)
-add_subdirectory(icons)
-
 ########### next target ###############
 
 set(kdevmercurial_PART_SRCS
@@ -90,5 +87,10 @@ target_link_libraries(kdevmercurial
     KDev::Vcs
     KDev::Project
 )
+
+# process tests subfolder only after ui files have been registered to cmake above
+# so that proper dependencies are created for the included generated headers
+add_subdirectory(tests)
+add_subdirectory(icons)
 
 feature_summary(WHAT ALL FATAL_ON_MISSING_REQUIRED_PACKAGES)
