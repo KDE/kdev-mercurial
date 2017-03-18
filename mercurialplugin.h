@@ -33,11 +33,11 @@
 #include <vcs/vcsstatusinfo.h>
 
 class QAction;
+class KDirWatch;
+
 namespace KDevelop
 {
-
 class VcsJob;
-
 class VcsRevision;
 }
 
@@ -153,7 +153,7 @@ public:
 
     QString toMercurialRevision(const KDevelop::VcsRevision &vcsrev);
 
-protected slots:
+private slots:
     void parseLogOutputBasicVersionControl(KDevelop::DVcsJob *job) const;
     bool parseStatus(KDevelop::DVcsJob *job) const;
     void parseDiff(KDevelop::DVcsJob *job);
@@ -164,14 +164,20 @@ protected slots:
      */
     void parseIdentify(KDevelop::DVcsJob *job) const;
 
+    void fileChanged(const QString& file);
     /*
      * ui helpers
      */
     void showHeads();
     void showMercurialQueuesManager();
 
-protected:
-    //used in log
+signals:
+    void repositoryBranchChanged(const QUrl& repository);
+
+private:
+    KDirWatch* m_watcher;
+    QList<QUrl> m_branchesChange;
+
     void parseLogOutput(const KDevelop::DVcsJob *job, QList<DVcsEvent> &commits) const override;
 
     /**

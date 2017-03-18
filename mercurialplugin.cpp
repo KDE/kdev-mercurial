@@ -36,6 +36,9 @@
 #include <QMenu>
 #include <QDateTime>
 #include <QStandardPaths>
+#include <QTimer>
+
+#include <KDirWatch>
 
 #include <interfaces/icore.h>
 
@@ -44,6 +47,8 @@
 #include <vcs/vcsrevision.h>
 #include <vcs/vcsannotation.h>
 #include <vcs/dvcs/dvcsjob.h>
+
+#include <util/path.h>
 
 #include "mercurialvcslocationwidget.h"
 #include "mercurialannotatejob.h"
@@ -83,6 +88,10 @@ MercurialPlugin::MercurialPlugin(QObject *parent, const QVariantList &)
 
     connect(m_headsAction, &QAction::triggered, this, &MercurialPlugin::showHeads);
     connect(m_mqManagerAction, &QAction::triggered, this, &MercurialPlugin::showMercurialQueuesManager);
+
+    m_watcher = new KDirWatch(this);
+    connect(m_watcher, &KDirWatch::dirty, this, &MercurialPlugin::fileChanged);
+    connect(m_watcher, &KDirWatch::created, this, &MercurialPlugin::fileChanged);
 }
 
 MercurialPlugin::~MercurialPlugin()
@@ -92,6 +101,15 @@ MercurialPlugin::~MercurialPlugin()
 QString MercurialPlugin::name() const
 {
     return QLatin1String("Mercurial");
+}
+
+void MercurialPlugin::fileChanged(const QString& file)
+{
+    Q_ASSERT(file.endsWith(QStringLiteral("branch")));
+    const QUrl repoUrl = Path(file).parent().parent().toUrl();
+
+    m_branchesChange.append(repoUrl);
+    QTimer::singleShot(1000, this, [this](){emit repositoryBranchChanged(m_branchesChange.takeFirst());});
 }
 
 bool MercurialPlugin::isValidDirectory(const QUrl &directory)
@@ -119,7 +137,6 @@ bool MercurialPlugin::isValidDirectory(const QUrl &directory)
         return false;
 
     dir.cdUp(); // Leave .hg
-    // TODO: Check whether this is the right port, original code was: m_lastRepoRoot.setDirectory(dir.absolutePath());
     m_lastRepoRoot.setPath(dir.absolutePath());
     return true;
 }
@@ -597,11 +614,13 @@ VcsJob *MercurialPlugin::currentBranch(const QUrl &repository)
 
 VcsJob *MercurialPlugin::deleteBranch(const QUrl &/*repository*/, const QString &/*branchName*/)
 {
+    // Not supported
     return nullptr;
 }
 
 VcsJob *MercurialPlugin::renameBranch(const QUrl &/*repository*/, const QString &/*oldBranchName*/, const QString &/*newBranchName*/)
 {
+    // Not supported
     return nullptr;
 }
 
@@ -964,9 +983,12 @@ QUrl MercurialPlugin::remotePushRepositoryLocation(QDir &directory)
     return QUrl::fromLocalFile(job->output().trimmed());
 }
 
-void MercurialPlugin::registerRepositoryForCurrentBranchChanges(const QUrl &/*repository*/)
+void MercurialPlugin::registerRepositoryForCurrentBranchChanges(const QUrl& repository)
 {
-    // TODO
+    if (isValidDirectory(repository)) {
+        QString headFile = m_lastRepoRoot.path() + QStringLiteral("/.hg/branch");
+        m_watcher->addFile(headFile);
+    }
 }
 
 void MercurialPlugin::additionalMenuEntries(QMenu *menu, const QList<QUrl> &urls)
