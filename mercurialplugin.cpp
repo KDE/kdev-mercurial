@@ -543,10 +543,110 @@ VcsJob *MercurialPlugin::annotate(const QUrl &localLocation,
     return new MercurialAnnotateJob(findWorkingDir(localLocation), rev, localLocation, this);
 }
 
-KDevelop::VcsJob* MercurialPlugin::mergeBranch(const QUrl &/*repository*/, const QString &/*branchName*/)
+class MergeBranchJob : public VcsJob
 {
-    // TODO:
-    return nullptr;
+public:
+	MergeBranchJob(const QDir &workingDir, const QString& branchName, MercurialPlugin* parent)
+	: VcsJob(parent, KDevelop::OutputJob::Silent),
+	m_status(JobNotStarted),
+	m_workingDir(workingDir),
+	m_branchName(branchName)
+	{
+		setType(JobType::Merge);
+		setCapabilities(Killable);
+	}
+
+	void start() override
+	{
+		m_status = JobRunning;
+
+		auto job = new DVcsJob(m_workingDir, vcsPlugin(), KDevelop::OutputJob::Silent);
+		*job << "hg" << "log" << "-b" << m_branchName << "-l" << "1" << "--template" << "{rev}";
+
+		connect(job, &DVcsJob::resultsReady, this, [this](VcsJob* j) {
+			auto job = static_cast<DVcsJob *>(j);
+			if (job->status() != VcsJob::JobSucceeded || job->output().isEmpty())
+				return setFail();
+
+			auto mergeJob = new DVcsJob(m_workingDir, vcsPlugin());
+
+			*mergeJob << "hg" << "merge" << "-r" << job->output().trimmed();
+
+			connect(mergeJob, &KJob::finished, this, [this](KJob *job) {
+				if (job->error()) {
+					setFail();
+				}
+			});
+			connect(job, &DVcsJob::resultsReady, this, [this](VcsJob* j) {
+				auto job = static_cast<DVcsJob *>(j);
+				if (job->status() != VcsJob::JobSucceeded || job->output().isEmpty())
+					return setFail();
+				setSuccess();
+			});
+
+			m_job = mergeJob;
+			mergeJob->start();
+		});
+		connect(job, &KJob::finished, this, [this](KJob *job) {
+			if (job->error()) {
+				setFail();
+			}
+		});
+		m_job = job;
+		job->start();
+	}
+
+	QVariant fetchResults() override
+	{
+		return {};
+	}
+
+	KDevelop::VcsJob::JobStatus status() const override
+	{
+		return m_status;
+	}
+
+	KDevelop::IPlugin *vcsPlugin() const override
+	{
+		return static_cast<IPlugin *>(parent());
+	}
+
+protected:
+	bool doKill() override
+	{
+		m_status = JobCanceled;
+		if (m_job) {
+			return m_job->kill(KJob::Quietly);
+		}
+		return true;
+	}
+
+private:
+	void setFail()
+	{
+		m_status = JobFailed;
+		emitResult();
+		emit resultsReady(this);
+	}
+
+	void setSuccess()
+	{
+		m_status = JobSucceeded;
+		emitResult();
+		emit resultsReady(this);
+	}
+
+	KDevelop::VcsJob::JobStatus m_status;
+	mutable QPointer<KJob> m_job;
+	QDir m_workingDir;
+	QString m_branchName;
+};
+
+KDevelop::VcsJob* MercurialPlugin::mergeBranch(const QUrl& repository, const QString& branchName)
+{
+    Q_ASSERT(!branchName.isEmpty());
+
+    return new MergeBranchJob(findWorkingDir(repository), branchName, this);
 }
 
 VcsJob *MercurialPlugin::heads(const QUrl &localLocation)
