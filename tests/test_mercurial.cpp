@@ -235,7 +235,57 @@ void MercurialTest::testCommit()
 
 void MercurialTest::testBranching()
 {
-    // TODO:
+    repoInit();
+    addFiles();
+    commitFiles();
+
+    auto j = m_proxy->branches(QUrl::fromLocalFile(mercurialTest_BaseDir));
+    verifyJobSucceed(j);
+    auto branches = j->fetchResults().toList();
+    QCOMPARE(branches.size(), 1);
+    QVERIFY(branches.first().toString().startsWith(QStringLiteral("default")));
+
+    // add branch
+    j = m_proxy->branch(QUrl::fromLocalFile(mercurialTest_BaseDir), VcsRevision::createSpecialRevision(VcsRevision::Head), "test");
+    verifyJobSucceed(j);
+    j = m_proxy->commit(QString("commit 0"), {QUrl::fromLocalFile(mercurialTest_BaseDir)}, KDevelop::IBasicVersionControl::Recursive);
+    verifyJobSucceed(j);
+    j = m_proxy->branches(QUrl::fromLocalFile(mercurialTest_BaseDir));
+    verifyJobSucceed(j);
+    branches = j->fetchResults().toList();
+    std::sort(branches.begin(), branches.end());
+    QCOMPARE(branches.size(), 2);
+    QVERIFY(branches.first().toString().startsWith(QStringLiteral("default")));
+    QVERIFY(branches.last().toString().startsWith(QStringLiteral("test")));
+
+    // switch branch
+    j = m_proxy->currentBranch(QUrl::fromLocalFile(mercurialTest_BaseDir));
+    verifyJobSucceed(j);
+    branches = j->fetchResults().toList();
+    QCOMPARE(branches.size(), 1);
+    QVERIFY(branches.first().toString().startsWith(QStringLiteral("test")));
+    j = m_proxy->switchBranch(QUrl::fromLocalFile(mercurialTest_BaseDir), QStringLiteral("default"));
+    verifyJobSucceed(j);
+    j = m_proxy->currentBranch(QUrl::fromLocalFile(mercurialTest_BaseDir));
+    verifyJobSucceed(j);
+    branches = j->fetchResults().toList();
+    QCOMPARE(branches.size(), 1);
+    QVERIFY(branches.first().toString().startsWith(QStringLiteral("default")));
+
+    // commit + merge
+    writeToFile(mercurialTest_BaseDir + mercurialTest_FileName, "commit 2 content");
+    j = m_proxy->commit(QString("commit 2"), {QUrl::fromLocalFile(mercurialTest_BaseDir)}, KDevelop::IBasicVersionControl::Recursive);
+    verifyJobSucceed(j);
+    j = m_proxy->switchBranch(QUrl::fromLocalFile(mercurialTest_BaseDir), QStringLiteral("test"));
+    verifyJobSucceed(j);
+    j = m_proxy->mergeBranch(QUrl::fromLocalFile(mercurialTest_BaseDir), QStringLiteral("default"));
+    verifyJobSucceed(j);
+    j = m_proxy->commit(QString("Merge default"), {QUrl::fromLocalFile(mercurialTest_BaseDir)}, KDevelop::IBasicVersionControl::Recursive);
+    verifyJobSucceed(j);
+    auto commits = m_proxy->getAllCommits(mercurialTest_BaseDir);
+    QCOMPARE(commits.count(), 5);
+    QCOMPARE(commits[0].getLog(), QString("Merge default"));
+    QCOMPARE(commits[0].getParents().size(), 2);
 }
 
 void MercurialTest::testRevisionHistory()

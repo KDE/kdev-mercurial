@@ -565,7 +565,7 @@ public:
 					setFail();
 				}
 			});
-			connect(job, &DVcsJob::resultsReady, this, [this](VcsJob* j) {
+			connect(mergeJob, &DVcsJob::resultsReady, this, [this](VcsJob* j) {
 				auto job = static_cast<DVcsJob *>(j);
 				if (job->status() != VcsJob::JobSucceeded || job->output().isEmpty())
 					return setFail();
