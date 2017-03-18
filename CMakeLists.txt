@@ -71,6 +71,7 @@ set(kdevmercurial_PART_SRCS
     mercurialvcslocationwidget.cpp
     mercurialplugin.cpp
     mercurialpluginmetadata.cpp
+    mercurialjob.cpp
 )
 
 set(kdevmercurial_UIS

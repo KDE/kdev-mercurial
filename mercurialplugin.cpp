@@ -50,6 +50,7 @@
 
 #include <util/path.h>
 
+#include "mercurialjob.h"
 #include "mercurialvcslocationwidget.h"
 #include "mercurialannotatejob.h"
 #include "mercurialpushjob.h"
@@ -531,18 +532,13 @@ VcsJob *MercurialPlugin::annotate(const QUrl &localLocation,
     return new MercurialAnnotateJob(findWorkingDir(localLocation), rev, localLocation, this);
 }
 
-class MergeBranchJob : public VcsJob
+class MergeBranchJob : public MercurialJob
 {
 public:
 	MergeBranchJob(const QDir &workingDir, const QString& branchName, MercurialPlugin* parent)
-	: VcsJob(parent, KDevelop::OutputJob::Silent),
-	m_status(JobNotStarted),
-	m_workingDir(workingDir),
+	: MercurialJob(workingDir, parent, JobType::Merge),
 	m_branchName(branchName)
-	{
-		setType(JobType::Merge);
-		setCapabilities(Killable);
-	}
+	{}
 
 	void start() override
 	{
@@ -584,49 +580,7 @@ public:
 		job->start();
 	}
 
-	QVariant fetchResults() override
-	{
-		return {};
-	}
-
-	KDevelop::VcsJob::JobStatus status() const override
-	{
-		return m_status;
-	}
-
-	KDevelop::IPlugin *vcsPlugin() const override
-	{
-		return static_cast<IPlugin *>(parent());
-	}
-
-protected:
-	bool doKill() override
-	{
-		m_status = JobCanceled;
-		if (m_job) {
-			return m_job->kill(KJob::Quietly);
-		}
-		return true;
-	}
-
 private:
-	void setFail()
-	{
-		m_status = JobFailed;
-		emitResult();
-		emit resultsReady(this);
-	}
-
-	void setSuccess()
-	{
-		m_status = JobSucceeded;
-		emitResult();
-		emit resultsReady(this);
-	}
-
-	KDevelop::VcsJob::JobStatus m_status;
-	mutable QPointer<KJob> m_job;
-	QDir m_workingDir;
 	QString m_branchName;
 };
 

@@ -31,24 +31,10 @@
 using namespace KDevelop;
 
 MercurialAnnotateJob::MercurialAnnotateJob(const QDir &workingDir, const VcsRevision& revision, const QUrl& location, MercurialPlugin *parent)
-    : VcsJob(parent, KDevelop::OutputJob::Silent),
-    m_workingDir(workingDir),
+    : MercurialJob(workingDir, parent, JobType::Annotate),
     m_revision(revision),
-    m_location(location),
-    m_status(JobNotStarted)
-{
-    setType(JobType::Annotate);
-    setCapabilities(Killable);
-}
-
-bool MercurialAnnotateJob::doKill()
-{
-    m_status = JobCanceled;
-    if (m_job) {
-        return m_job->kill(KJob::Quietly);
-    }
-    return true;
-}
+    m_location(location)
+{}
 
 void MercurialAnnotateJob::start()
 {
@@ -128,16 +114,6 @@ void MercurialAnnotateJob::parseStripResult(KDevelop::VcsJob* /*job*/)
 QVariant MercurialAnnotateJob::fetchResults()
 {
     return m_annotations;
-}
-
-VcsJob::JobStatus MercurialAnnotateJob::status() const
-{
-    return m_status;
-}
-
-IPlugin *MercurialAnnotateJob::vcsPlugin() const
-{
-    return static_cast<IPlugin *>(parent());
 }
 
 void MercurialAnnotateJob::parseAnnotateOutput(VcsJob *j)
@@ -273,20 +249,6 @@ void MercurialAnnotateJob::parseLogOutput(KDevelop::VcsJob* j)
     } else {
         setSuccess();
     }
-}
-
-void MercurialAnnotateJob::setFail()
-{
-    m_status = JobFailed;
-    emitResult();
-    emit resultsReady(this);
-}
-
-void MercurialAnnotateJob::setSuccess()
-{
-    m_status = JobSucceeded;
-    emitResult();
-    emit resultsReady(this);
 }
 
 void MercurialAnnotateJob::subJobFinished(KJob* job)

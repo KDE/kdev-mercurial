@@ -21,7 +21,8 @@ if (MERCURIAL)
         ../mercurialannotatejob.cpp
         ../mercurialpushjob.cpp
         ../mercurialvcslocationwidget.cpp
-        ../mercurialplugin.cpp)
+        ../mercurialplugin.cpp
+        ../mercurialjob.cpp)
     ecm_add_test(${mercurialTest_SRCS}
         TEST_NAME test_kdevmercurial
         LINK_LIBRARIES Qt5::Test KDev::Vcs KDev::Util KDev::Tests

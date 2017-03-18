@@ -23,11 +23,12 @@
 
 #include <vcs/vcsjob.h>
 
+#include "mercurialjob.h"
 #include "mercurialplugin.h"
 
 #include <QSet>
 
-class MercurialAnnotateJob : public KDevelop::VcsJob
+class MercurialAnnotateJob : public MercurialJob
 {
     Q_OBJECT
 
@@ -35,11 +36,6 @@ public:
     MercurialAnnotateJob(const QDir &workingDir, const KDevelop::VcsRevision& revision, const QUrl& location, MercurialPlugin *parent);
     void start() override;
     QVariant fetchResults() override;
-    KDevelop::VcsJob::JobStatus status() const override;
-    KDevelop::IPlugin *vcsPlugin() const override;
-
-protected:
-    bool doKill() override;
 
 private slots:
     void parseAnnotateOutput(KDevelop::VcsJob *job);
@@ -52,18 +48,13 @@ private slots:
 private:
     void launchAnnotateJob() const;
 
-    QDir m_workingDir;
     KDevelop::VcsRevision m_revision;
     QUrl m_location;
-    KDevelop::VcsJob::JobStatus m_status;
-    mutable QPointer<KJob> m_job;
     QList<QVariant> m_annotations;
     QHash<QString, QPair<QString, QString>> m_revisionsCache;
     QSet <QString> m_revisionsToLog;
     bool m_hasModifiedFile = false;
 
-    void setFail();
-    void setSuccess();
     void nextPartOfLog();
 
     // Those variables below for testing purposes only
