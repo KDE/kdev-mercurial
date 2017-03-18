@@ -271,22 +271,11 @@ VcsJob *MercurialPlugin::update(const QList<QUrl> &localLocations,
                                 const VcsRevision &rev,
                                 IBasicVersionControl::RecursionMode recursion)
 {
-    /* TODO: update to Head != pull, but for consistency with git plugin...
-     * TODO: per file pulls?
-     * TODO: why rev == VcsRevision::createSpecialRevision(VcsRevision::Head) doesn't work?
-     */
     if (rev.revisionType() == VcsRevision::Special &&
             rev.revisionValue().value<VcsRevision::RevisionSpecialType>() == VcsRevision::Head) {
         return pull(VcsLocation(), QUrl::fromLocalFile(findWorkingDir(localLocations.first()).path()));
     }
 
-    /*
-     * actually reverting files
-     * TODO: hg revert does not change parents, hg update does
-     *       hg revert works on files, hg update doesn't
-     * maybe do hg update only when top dir update() is requested?
-     * TODO: nobody calls update with something other than VcsRevision::Head
-     */
     QList<QUrl> locations = localLocations;
 
     if (recursion == NonRecursive) {
@@ -299,8 +288,7 @@ VcsJob *MercurialPlugin::update(const QList<QUrl> &localLocations,
 
     DVcsJob *job = new DVcsJob(findWorkingDir(locations.first()), this);
 
-    //Note: the message is quoted somewhere else, so if we quote here then we have quotes in the commit log
-    // idk what does previous comment mean -- abatyiev
+
     *job << "hg" << "revert" << "-r" << toMercurialRevision(rev) << "--" << locations;
     return job;
 }
@@ -981,7 +969,6 @@ void MercurialPlugin::parseLogOutput(const DVcsJob *job, QList<DVcsEvent> &commi
             }
         }
 
-        // TODO: Actually draw a graph, i.e use commit.setProperties as needed
         commits.push_front(commit);
     }
 }
