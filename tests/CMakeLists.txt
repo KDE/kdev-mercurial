@@ -14,6 +14,7 @@ if (MERCURIAL)
     set( EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_BINARY_DIR} )
     set(mercurialTest_SRCS
         test_mercurial.cpp
+        ${kdevmercurial_LOG_SRCS}
         ../ui/mercurialqueuesmanager.cpp
         ../ui/mercurialheadswidget.cpp
         ../models/mercurialqueueseriesmodel.cpp

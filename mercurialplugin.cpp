@@ -59,8 +59,6 @@
 
 #include "debug.h"
 
-Q_LOGGING_CATEGORY(PLUGIN_MERCURIAL, "kdevplatform.plugins.mercurial")
-
 using namespace KDevelop;
 
 namespace
@@ -342,7 +340,7 @@ VcsJob *MercurialPlugin::diff(const QUrl &fileOrDirectory,
     QString srcRev = toMercurialRevision(srcRevision);
     QString dstRev = toMercurialRevision(dstRevision);
 
-    mercurialDebug() << "Diff between" << srcRevision.prettyValue() << '(' << srcRev << ')' << "and" << dstRevision.prettyValue() << '(' << dstRev << ')' << " requested";
+    qCDebug(PLUGIN_MERCURIAL) << "Diff between" << srcRevision.prettyValue() << '(' << srcRev << ')' << "and" << dstRevision.prettyValue() << '(' << dstRev << ')' << " requested";
 
     if (
         (srcRev.isNull() && dstRev.isNull()) ||
@@ -423,12 +421,12 @@ VcsJob *MercurialPlugin::status(const QList<QUrl> &localLocations, IBasicVersion
 bool MercurialPlugin::parseStatus(DVcsJob *job) const
 {
     if (job->status() != VcsJob::JobSucceeded) {
-        mercurialDebug() << "Job failed: " << job->output();
+        qCDebug(PLUGIN_MERCURIAL) << "Job failed: " << job->output();
         return false;
     }
 
     const QString dir = job->directory().absolutePath().append(QDir::separator());
-    mercurialDebug() << "Job succeeded for " << dir;
+    qCDebug(PLUGIN_MERCURIAL) << "Job succeeded for " << dir;
     const QStringList output = job->output().split('\n', QString::SkipEmptyParts);
     QList<QVariant> filestatus;
 
@@ -697,14 +695,14 @@ QList<DVcsEvent> MercurialPlugin::getAllCommits(const QString &repo)
 
 void MercurialPlugin::parseMultiLineOutput(DVcsJob *job) const
 {
-    mercurialDebug() << job->output();
+    qCDebug(PLUGIN_MERCURIAL) << job->output();
     job->setResults(job->output().split('\n', QString::SkipEmptyParts));
 }
 
 void MercurialPlugin::parseDiff(DVcsJob *job)
 {
     if (job->status() != VcsJob::JobSucceeded) {
-        mercurialDebug() << "Parse-job failed: " << job->output();
+        qCDebug(PLUGIN_MERCURIAL) << "Parse-job failed: " << job->output();
         return;
     }
 
@@ -739,12 +737,12 @@ void MercurialPlugin::parseLogOutputBasicVersionControl(DVcsJob *job) const
     static unsigned int entriesPerCommit = 10;
     auto items = job->output().split("\\_%");
 
-    mercurialDebug() << items;
+    qCDebug(PLUGIN_MERCURIAL) << items;
     /* remove trailing \\_% */
     items.removeLast();
 
     if ((items.count() % entriesPerCommit) != 0) {
-        mercurialDebug() << "Cannot parse commit log: unexpected number of entries";
+        qCDebug(PLUGIN_MERCURIAL) << "Cannot parse commit log: unexpected number of entries";
         return;
     }
 
@@ -757,18 +755,18 @@ void MercurialPlugin::parseLogOutputBasicVersionControl(DVcsJob *job) const
      */
     for (auto it = items.constBegin(); it != items.constEnd();) {
         QString desc = *it++;
-        mercurialDebug() << desc;
+        qCDebug(PLUGIN_MERCURIAL) << desc;
         Q_ASSERT(!desc.isEmpty());
         QString date = *it++;
-        mercurialDebug() << date;
+        qCDebug(PLUGIN_MERCURIAL) << date;
         Q_ASSERT(!date.isEmpty());
         QString author = *it++;
-        mercurialDebug() << author;
+        qCDebug(PLUGIN_MERCURIAL) << author;
         Q_ASSERT(!author.isEmpty());
         QString parents = *it++;
         QString node = *it++;
         QString rev = *it++;
-        mercurialDebug() << rev;
+        qCDebug(PLUGIN_MERCURIAL) << rev;
         Q_ASSERT(!rev.isEmpty());
 
         VcsEvent event;
@@ -825,7 +823,7 @@ void MercurialPlugin::parseIdentify(DVcsJob *job) const
     QString value = job->output();
     QList<QVariant> result;
 
-    mercurialDebug() << value;
+    qCDebug(PLUGIN_MERCURIAL) << value;
     // remove last '\n'
     value.chop(1);
 
@@ -844,13 +842,13 @@ void MercurialPlugin::parseIdentify(DVcsJob *job) const
 
 void MercurialPlugin::parseLogOutput(const DVcsJob *job, QList<DVcsEvent> &commits) const
 {
-    mercurialDebug() << "parseLogOutput";
+    qCDebug(PLUGIN_MERCURIAL) << "parseLogOutput";
 
     static unsigned int entriesPerCommit = 6;
     auto items = job->output().split("\\_%");
 
     if (uint(items.size()) < entriesPerCommit || 1 != (items.size() % entriesPerCommit)) {
-        mercurialDebug() << "Cannot parse commit log: unexpected number of entries";
+        qCDebug(PLUGIN_MERCURIAL) << "Cannot parse commit log: unexpected number of entries";
         return;
     }
 
@@ -860,7 +858,7 @@ void MercurialPlugin::parseLogOutput(const DVcsJob *job, QList<DVcsEvent> &commi
     unsigned int id = lastRev.toUInt(&success);
 
     if (!success) {
-        mercurialDebug() << "Could not parse last revision \"" << lastRev << '"';
+        qCDebug(PLUGIN_MERCURIAL) << "Could not parse last revision \"" << lastRev << '"';
         id = 1024;
     }
 
@@ -881,7 +879,7 @@ void MercurialPlugin::parseLogOutput(const DVcsJob *job, QList<DVcsEvent> &commi
         id = rev.toUInt(&success);
 
         if (!success) {
-            mercurialDebug() << "Could not parse revision \"" << rev << '"';
+            qCDebug(PLUGIN_MERCURIAL) << "Could not parse revision \"" << rev << '"';
             return;
         }
 
@@ -912,7 +910,7 @@ void MercurialPlugin::parseLogOutput(const DVcsJob *job, QList<DVcsEvent> &commi
                     id = ids.toUInt(&success);
 
                     if (!success) {
-                        mercurialDebug() << "Could not parse parent-revision \"" << ids << "\" of revision " << rev;
+                        qCDebug(PLUGIN_MERCURIAL) << "Could not parse parent-revision \"" << ids << "\" of revision " << rev;
                         return;
                     }
 
@@ -1006,14 +1004,14 @@ QUrl MercurialPlugin::remotePushRepositoryLocation(QDir &directory)
     DVcsJob *job = new DVcsJob(directory, this);
     *job << "hg" << "paths" << "default-push";
     if (!job->exec() || job->status() != VcsJob::JobSucceeded) {
-        mercurialDebug() << "no default-push, hold on";
+        qCDebug(PLUGIN_MERCURIAL) << "no default-push, hold on";
 
         // or try default
         job = new DVcsJob(directory, this);
         *job << "hg" << "paths" << "default";
 
         if (!job->exec() || job->status() != VcsJob::JobSucceeded) {
-            mercurialDebug() << "nowhere to push!";
+            qCDebug(PLUGIN_MERCURIAL) << "nowhere to push!";
 
             // fail is everywhere
             return QUrl();

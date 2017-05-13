@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.12)
 
 project(mercurial)
 
-find_package (ECM 0.0.9 REQUIRED NO_MODULE)
+find_package (ECM "5.14.0" REQUIRED NO_MODULE)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${mercurial_SOURCE_DIR}/cmake/modules ${ECM_MODULE_PATH})
 
 include(KDECompilerSettings NO_POLICY_SCOPE)
@@ -14,6 +14,7 @@ include(ECMMarkAsTest)
 include(ECMMarkNonGuiExecutable)
 include(ECMGenerateHeaders)
 include(ECMPackageConfigHelpers)
+include(ECMQtDeclareLoggingCategory)
 include(GenerateExportHeader)
 include(FeatureSummary)
 include(WriteBasicConfigVersionFile)
@@ -61,6 +62,12 @@ endif()
 
 ########### next target ###############
 
+ecm_qt_declare_logging_category(kdevmercurial_LOG_SRCS
+    HEADER debug.h
+    IDENTIFIER PLUGIN_MERCURIAL
+    CATEGORY_NAME "kdevplatform.plugins.mercurial"
+)
+
 set(kdevmercurial_PART_SRCS
     ui/mercurialqueuesmanager.cpp
     ui/mercurialheadswidget.cpp
@@ -72,6 +79,7 @@ set(kdevmercurial_PART_SRCS
     mercurialplugin.cpp
     mercurialpluginmetadata.cpp
     mercurialjob.cpp
+    ${kdevmercurial_LOG_SRCS}
 )
 
 set(kdevmercurial_UIS

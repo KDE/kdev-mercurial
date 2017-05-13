@@ -102,7 +102,7 @@ void MercurialTest::cleanup()
 
 void MercurialTest::repoInit()
 {
-    mercurialDebug() << "Trying to init repo";
+    qCDebug(PLUGIN_MERCURIAL) << "Trying to init repo";
     // create the local repository
     VcsJob *j = m_proxy->init(QUrl::fromLocalFile(mercurialTest_BaseDir));
     verifyJobSucceed(j);
@@ -114,7 +114,7 @@ void MercurialTest::repoInit()
 
 void MercurialTest::addFiles()
 {
-    mercurialDebug() << "Adding files to the repo";
+    qCDebug(PLUGIN_MERCURIAL) << "Adding files to the repo";
 
     writeToFile(mercurialTest_BaseDir + mercurialTest_FileName, "commit 0 content");
     writeToFile(mercurialTest_BaseDir + mercurialTest_FileName2, "commit 0 content, foo");
@@ -177,7 +177,7 @@ void MercurialTest::addFiles()
 
 void MercurialTest::commitFiles()
 {
-    mercurialDebug() << "Committing...";
+    qCDebug(PLUGIN_MERCURIAL) << "Committing...";
 
     VcsJob *j = m_proxy->commit(QString("commit 0"), {QUrl::fromLocalFile(mercurialTest_BaseDir)}, KDevelop::IBasicVersionControl::Recursive);
     verifyJobSucceed(j);
@@ -195,7 +195,7 @@ void MercurialTest::commitFiles()
     QVERIFY(files.contains(mercurialTest_FileName2));
     QVERIFY(files.contains("src/" + mercurialTest_FileName3));
 
-    mercurialDebug() << "Committing one more time";
+    qCDebug(PLUGIN_MERCURIAL) << "Committing one more time";
 
     // let's try to change the file and test "hg commit -a"
     writeToFile(mercurialTest_BaseDir + mercurialTest_FileName, "commit 1 content", QIODevice::Append);
@@ -309,11 +309,11 @@ void MercurialTest::removeTempDirs()
 {
     if (QFileInfo(mercurialTest_BaseDir).exists())
         if (!(KIO::del(QUrl::fromLocalFile(mercurialTest_BaseDir))->exec()))
-            mercurialDebug() << "KIO::del(" << mercurialTest_BaseDir << ") returned false";
+            qCDebug(PLUGIN_MERCURIAL) << "KIO::del(" << mercurialTest_BaseDir << ") returned false";
 
     if (QFileInfo(mercurialTest_BaseDir2).exists())
         if (!(KIO::del(QUrl::fromLocalFile(mercurialTest_BaseDir2))->exec()))
-            mercurialDebug() << "KIO::del(" << mercurialTest_BaseDir2 << ") returned false";
+            qCDebug(PLUGIN_MERCURIAL) << "KIO::del(" << mercurialTest_BaseDir2 << ") returned false";
 }
 
 void MercurialTest::testAnnotate()

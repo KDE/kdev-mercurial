@@ -77,7 +77,7 @@ void MercurialPushJob::serverContacted(KJob *job)
     if (dvcsJob->error()) {
         QString response = QString::fromLocal8Bit(dvcsJob->errorOutput());
 
-        mercurialDebug() << response;
+        qCDebug(PLUGIN_MERCURIAL) << response;
 
         if (response.contains("abort: http authorization required")) {
             // server requests username:password auth -> ask pass

@@ -130,7 +130,7 @@ void MercurialAnnotateJob::parseAnnotateOutput(VcsJob *j)
     unsigned int lineNumber = 0;
     foreach (const QString& line, lines) {
         if (!reAnnot.exactMatch(line)) {
-            mercurialDebug() << "Could not parse annotation line: \"" << line << '\"';
+            qCDebug(PLUGIN_MERCURIAL) << "Could not parse annotation line: \"" << line << '\"';
             return setFail();
         }
         VcsAnnotationLine annotation;
@@ -140,12 +140,12 @@ void MercurialAnnotateJob::parseAnnotateOutput(VcsJob *j)
         bool success = false;
         qlonglong rev = reAnnot.cap(1).toLongLong(&success);
         if (!success) {
-            mercurialDebug() << "Could not parse revision in annotation line: \"" << line << '\"';
+            qCDebug(PLUGIN_MERCURIAL) << "Could not parse revision in annotation line: \"" << line << '\"';
             return setFail();
         }
 
         QDateTime dt = QDateTime::fromString(reAnnot.cap(2).left(reAnnot.cap(2).lastIndexOf(" ")), "ddd MMM dd hh:mm:ss yyyy");
-        //mercurialDebug() << reAnnot.cap(2).left(reAnnot.cap(2).lastIndexOf(" ")) << dt;
+        //qCDebug(PLUGIN_MERCURIAL) << reAnnot.cap(2).left(reAnnot.cap(2).lastIndexOf(" ")) << dt;
         Q_ASSERT(dt.isValid());
         annotation.setDate(dt);
 
@@ -201,7 +201,7 @@ void MercurialAnnotateJob::parseLogOutput(KDevelop::VcsJob* j)
     items.removeLast();
 
     if (items.size() % 3) {
-        mercurialDebug() << "Cannot parse annotate log: unexpected number of entries" << items.size() << m_annotations.size();
+        qCDebug(PLUGIN_MERCURIAL) << "Cannot parse annotate log: unexpected number of entries" << items.size() << m_annotations.size();
         return setFail();
     }
 
@@ -224,9 +224,9 @@ void MercurialAnnotateJob::parseLogOutput(KDevelop::VcsJob* j)
             Q_ASSERT(m_revisionsCache.contains(revision));
             continue;
         }
-        mercurialDebug() << m_revisionsCache.value(revision).first << m_revisionsCache.value(revision).second;
+        qCDebug(PLUGIN_MERCURIAL) << m_revisionsCache.value(revision).first << m_revisionsCache.value(revision).second;
         if (m_revisionsCache.value(revision).first.isEmpty() && m_revisionsCache.value(revision).second.isEmpty()) {
-            mercurialDebug() << "Strange revision" << revision;
+            qCDebug(PLUGIN_MERCURIAL) << "Strange revision" << revision;
             continue;
         }
         annotationLine.setCommitMessage(m_revisionsCache.value(revision).first);
