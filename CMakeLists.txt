@@ -102,4 +102,7 @@ target_link_libraries(kdevmercurial
 add_subdirectory(tests)
 add_subdirectory(icons)
 
+# kdebugsettings file
+install(FILES kdevmercurial.categories DESTINATION ${KDE_INSTALL_CONFDIR})
+
 feature_summary(WHAT ALL FATAL_ON_MISSING_REQUIRED_PACKAGES)
