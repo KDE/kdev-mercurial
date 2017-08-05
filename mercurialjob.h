@@ -24,6 +24,7 @@
 #include <vcs/vcsjob.h>
 
 #include <QDir>
+#include <QPointer>
 
 class MercurialPlugin;
 
