@@ -31,7 +31,8 @@ find_package(KF5 REQUIRED COMPONENTS
   KCMUtils
   KIO)
 
-find_package(KDevPlatform 5.0.0 REQUIRED)
+set(KDEVPLATFORM_VERSION "5.1.40")
+find_package(KDevPlatform ${KDEVPLATFORM_VERSION} CONFIG REQUIRED)
 
 include_directories(
     ${mercurial_BINARY_DIR}
