@@ -34,6 +34,7 @@
 
 #include <vcs/dvcs/dvcsjob.h>
 #include <vcs/vcsannotation.h>
+#include <vcs/vcslocation.h>
 
 #include "../mercurialplugin.h"
 #include "../mercurialannotatejob.h"
@@ -380,7 +381,7 @@ void MercurialTest::testDiff()
 
     VcsRevision srcrev = VcsRevision::createSpecialRevision(VcsRevision::Base);
     VcsRevision dstrev = VcsRevision::createSpecialRevision(VcsRevision::Working);
-    VcsJob* j = m_proxy->diff(QUrl::fromLocalFile(mercurialTest_BaseDir), srcrev, dstrev, VcsDiff::DiffUnified, IBasicVersionControl::Recursive);
+    VcsJob* j = m_proxy->diff(QUrl::fromLocalFile(mercurialTest_BaseDir), srcrev, dstrev, IBasicVersionControl::Recursive);
     verifyJobSucceed(j);
 
     KDevelop::VcsDiff d = j->fetchResults().value<KDevelop::VcsDiff>();

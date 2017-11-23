@@ -81,7 +81,6 @@ public:
     KDevelop::VcsJob *diff(const QUrl &fileOrDirectory,
                            const KDevelop::VcsRevision &srcRevision,
                            const KDevelop::VcsRevision &dstRevision,
-                           KDevelop::VcsDiff::Type diffType,
                            KDevelop::IBasicVersionControl::RecursionMode recursionMode) override;
 
     KDevelop::VcsJob *remove(const QList<QUrl> &files) override;

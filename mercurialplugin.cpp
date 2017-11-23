@@ -46,6 +46,7 @@
 #include <vcs/vcsevent.h>
 #include <vcs/vcsrevision.h>
 #include <vcs/vcsannotation.h>
+#include <vcs/vcslocation.h>
 #include <vcs/dvcs/dvcsjob.h>
 
 #include <util/path.h>
@@ -314,7 +315,6 @@ VcsJob *MercurialPlugin::resolve(const QList<QUrl>   &files, KDevelop::IBasicVer
 VcsJob *MercurialPlugin::diff(const QUrl &fileOrDirectory,
                               const VcsRevision &srcRevision,
                               const VcsRevision &dstRevision,
-                              VcsDiff::Type diffType,
                               IBasicVersionControl::RecursionMode recursionMode)
 {
     if (!fileOrDirectory.isLocalFile()) {
@@ -366,9 +366,8 @@ VcsJob *MercurialPlugin::diff(const QUrl &fileOrDirectory,
         *job << "--reverse";
     }
 
-    if (diffType == VcsDiff::DiffUnified) {
-        *job << "-U" << "3";    // Default from GNU diff
-    }
+    // unified diff
+    *job << "-U" << "3";    // Default from GNU diff
 
     if (srcRev.isNull() /* from "Previous" */ && dstRev.isEmpty() /* to "Working" */) {
         // Do nothing, that is the default
@@ -716,7 +715,6 @@ void MercurialPlugin::parseDiff(DVcsJob *job)
     VcsDiff diff;
 
     // We have to recover the type of the diff somehow.
-    diff.setType(VcsDiff::DiffUnified);
     QString output = job->output();
 
     // hg diff adds a prefix to the paths, which we will now strip
