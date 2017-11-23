@@ -969,7 +969,7 @@ QString MercurialPlugin::toMercurialRevision(const VcsRevision &vcsrev)
         case VcsRevision::Working:
             return QString("");
         case VcsRevision::Previous: // We can't determine this from one revision alone
-            return QString::null;
+            return QString();
         case VcsRevision::Start:
             return QString("0");
         default:
@@ -980,7 +980,7 @@ QString MercurialPlugin::toMercurialRevision(const VcsRevision &vcsrev)
     case VcsRevision::Date:         // TODO
     case VcsRevision::FileNumber:   // No file number for mercurial
     default:
-        return QString::null;
+        return QString();
     }
 }
 
