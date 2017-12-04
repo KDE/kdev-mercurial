@@ -23,7 +23,8 @@
 
 #include "test_mercurial.h"
 
-#include <QtTest/QtTest>
+#include <QTest>
+#include <QSignalSpy>
 #include <tests/testcore.h>
 #include <tests/autotestshell.h>
 

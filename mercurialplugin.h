@@ -28,8 +28,8 @@
 
 #include <vcs/interfaces/idistributedversioncontrol.h>
 #include <vcs/dvcs/dvcsplugin.h>
-#include <QtCore/QObject>
-#include <QtCore/QDir>
+#include <QObject>
+#include <QDir>
 #include <vcs/vcsstatusinfo.h>
 
 class QAction;

@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include <QtCore/QObject>
+#include <QObject>
 
 class MercurialPlugin;
 

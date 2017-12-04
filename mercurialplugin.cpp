@@ -28,10 +28,9 @@
 #include <algorithm>
 #include <memory>
 
-#include <QtCore/QDir>
-#include <QtCore/QDateTime>
-#include <QtCore/QFileInfo>
-#include <QtCore/QLoggingCategory>
+#include <QDir>
+#include <QDateTime>
+#include <QFileInfo>
 #include <QAction>
 #include <QMenu>
 #include <QDateTime>
