@@ -140,7 +140,7 @@ public:
     KDevelop::VcsJob *tag(const QUrl &repository, const QString &commitMessage, const KDevelop::VcsRevision &rev, const QString &tagName) override;
 
     //graph helpers
-    QList<DVcsEvent> getAllCommits(const QString &repo) override;
+    QVector<KDevelop::DVcsEvent> getAllCommits(const QString& repo) override;
 
     /**
      * Find out where is default remote located.
@@ -177,7 +177,7 @@ private:
     KDirWatch* m_watcher;
     QList<QUrl> m_branchesChange;
 
-    void parseLogOutput(const KDevelop::DVcsJob *job, QList<DVcsEvent> &commits) const override;
+    void parseLogOutput(const KDevelop::DVcsJob* job, QVector<KDevelop::DVcsEvent>& commits) const override;
 
     /**
      * Remove directories from @p locations.

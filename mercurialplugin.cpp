@@ -677,16 +677,16 @@ VcsJob *MercurialPlugin::tag(const QUrl &repository, const QString &commitMessag
     return job;
 }
 
-QList<DVcsEvent> MercurialPlugin::getAllCommits(const QString &repo)
+QVector<DVcsEvent> MercurialPlugin::getAllCommits(const QString& repo)
 {
     DVcsJob *job = new DVcsJob(findWorkingDir(QUrl::fromLocalFile(repo)), this, OutputJob::Silent);
 
     *job << "hg" << "log" << "--template" << "{desc}\\_%{date|isodate}\\_%{author}\\_%{parents}\\_%{node}\\_%{rev}\\_%";
 
     if (!job->exec() || job->status() != VcsJob::JobSucceeded)
-        return QList<DVcsEvent>();
+        return QVector<DVcsEvent>();
 
-    QList<DVcsEvent> commits;
+    QVector<DVcsEvent> commits;
 
     parseLogOutput(job, commits);
     return commits;
@@ -838,7 +838,7 @@ void MercurialPlugin::parseIdentify(DVcsJob *job) const
 }
 
 
-void MercurialPlugin::parseLogOutput(const DVcsJob *job, QList<DVcsEvent> &commits) const
+void MercurialPlugin::parseLogOutput(const DVcsJob* job, QVector<DVcsEvent>& commits) const
 {
     qCDebug(PLUGIN_MERCURIAL) << "parseLogOutput";
 

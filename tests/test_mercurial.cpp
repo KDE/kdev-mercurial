@@ -285,8 +285,8 @@ void MercurialTest::testBranching()
     verifyJobSucceed(j);
     auto commits = m_proxy->getAllCommits(mercurialTest_BaseDir);
     QCOMPARE(commits.count(), 5);
-    QCOMPARE(commits[0].getLog(), QString("Merge default"));
-    QCOMPARE(commits[0].getParents().size(), 2);
+    QCOMPARE(commits[0].log(), QString("Merge default"));
+    QCOMPARE(commits[0].parents().size(), 2);
 }
 
 void MercurialTest::testRevisionHistory()
@@ -295,15 +295,15 @@ void MercurialTest::testRevisionHistory()
     addFiles();
     commitFiles();
 
-    QList<DVcsEvent> commits = m_proxy->getAllCommits(mercurialTest_BaseDir);
+    const auto commits = m_proxy->getAllCommits(mercurialTest_BaseDir);
     QCOMPARE(commits.count(), 2);
-    QCOMPARE(commits[0].getParents().size(), 1); //initial commit is on the top
-    QVERIFY(commits[1].getParents().isEmpty());  //0 is later than 1!
-    QCOMPARE(commits[0].getLog(), QString("commit 1"));  //0 is later than 1!
-    QCOMPARE(commits[1].getLog(), QString("commit 0"));
-    QVERIFY(commits[1].getCommit().contains(QRegExp("^\\w{,40}$")));
-    QVERIFY(commits[0].getCommit().contains(QRegExp("^\\w{,40}$")));
-    QVERIFY(commits[0].getParents()[0].contains(QRegExp("^\\w{,40}$")));
+    QCOMPARE(commits[0].parents().size(), 1); //initial commit is on the top
+    QVERIFY(commits[1].parents().isEmpty());  //0 is later than 1!
+    QCOMPARE(commits[0].log(), QString("commit 1"));  //0 is later than 1!
+    QCOMPARE(commits[1].log(), QString("commit 0"));
+    QVERIFY(commits[1].commit().contains(QRegExp("^\\w{,40}$")));
+    QVERIFY(commits[0].commit().contains(QRegExp("^\\w{,40}$")));
+    QVERIFY(commits[0].parents()[0].contains(QRegExp("^\\w{,40}$")));
 }
 
 void MercurialTest::removeTempDirs()
