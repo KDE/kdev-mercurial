@@ -20,7 +20,10 @@ find_package(KF5 ${KF5_DEP_VERSION} REQUIRED COMPONENTS
 )
 
 set(KDEVPLATFORM_VERSION "5.2.40")
-find_package(KDevPlatform ${KDEVPLATFORM_VERSION} CONFIG REQUIRED)
+find_package(KDevPlatform ${KDEVPLATFORM_VERSION} CONFIG)
+set_package_properties(KDevPlatform PROPERTIES
+    TYPE REQUIRED
+)
 
 add_definitions(
     -DQT_DEPRECATED_WARNINGS
