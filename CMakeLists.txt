@@ -13,14 +13,11 @@ include(ECMInstallIcons)
 include(ECMQtDeclareLoggingCategory)
 include(FeatureSummary)
 
-find_package(KF5 REQUIRED COMPONENTS
-  Config
-  IconThemes
-  I18n
-  ItemModels
-  ItemViews
-  KCMUtils
-  KIO)
+set(KF5_DEP_VERSION "5.15.0")
+find_package(KF5 ${KF5_DEP_VERSION} REQUIRED COMPONENTS
+    I18n
+    ItemModels
+)
 
 set(KDEVPLATFORM_VERSION "5.2.40")
 find_package(KDevPlatform ${KDEVPLATFORM_VERSION} CONFIG REQUIRED)
