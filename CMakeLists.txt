@@ -44,7 +44,7 @@ if (HAVE_TUC_FLAG)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror=tautological-undefined-compare")
 endif()
 
-########### next target ###############
+add_definitions( -DTRANSLATION_DOMAIN=\"kdevmercurial\" )
 
 ecm_qt_declare_logging_category(kdevmercurial_LOG_SRCS
     HEADER debug.h
