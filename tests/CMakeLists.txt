@@ -12,6 +12,12 @@ find_program(MERCURIAL NAMES hg)
 
 if (MERCURIAL)
     set( EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_BINARY_DIR} )
+
+    include_directories(
+        ${mercurial_BINARY_DIR}
+        ${mercurial_SOURCE_DIR}
+    )
+
     set(mercurialTest_SRCS
         test_mercurial.cpp
         ${kdevmercurial_LOG_SRCS}

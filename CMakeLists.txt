@@ -25,11 +25,6 @@ find_package(KF5 REQUIRED COMPONENTS
 set(KDEVPLATFORM_VERSION "5.2.40")
 find_package(KDevPlatform ${KDEVPLATFORM_VERSION} CONFIG REQUIRED)
 
-include_directories(
-    ${mercurial_BINARY_DIR}
-    ${mercurial_SOURCE_DIR}
-)
-
 add_definitions(
     -DQT_DEPRECATED_WARNINGS
     -DQT_DISABLE_DEPRECATED_BEFORE=0x050500
