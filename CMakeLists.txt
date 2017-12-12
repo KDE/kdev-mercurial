@@ -16,7 +16,6 @@ include(FeatureSummary)
 set(KF5_DEP_VERSION "5.15.0")
 find_package(KF5 ${KF5_DEP_VERSION} REQUIRED COMPONENTS
     I18n
-    ItemModels
 )
 
 set(KDEVPLATFORM_VERSION "5.2.40")
