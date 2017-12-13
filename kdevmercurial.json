@@ -3,8 +3,7 @@
         "Authors": [
             {
                 "Email": "batyiev@gmail.com",
-                "Name": "Andrey Batyiev", 
-                "Name[x-test]": "xxAndrey Batyievxx"
+                "Name": "Andrey Batyiev"
             }
         ],
         "Category": "Version Control",
