@@ -3,15 +3,26 @@
         "Authors": [
             {
                 "Email": "batyiev@gmail.com",
-                "Name": "Andrey Batyiev"
+                "Name": "Andrey Batyiev",
+                "Name[x-test]": "xxAndrey Batyievxx"
             }
         ],
         "Category": "Version Control",
         "Description": "This plugin integrates Mercurial to KDevelop",
+        "Description[ca]": "Aquest connector integra el Mercurial al KDevelop",
+        "Description[nl]": "Deze plugin integreert Mercurial in KDevelop",
+        "Description[pt]": "Este 'plugin' integra o Mercurial no KDevelop",
+        "Description[uk]": "За допомогою цього додатка можна інтегрувати Mercurial до KDevelop",
+        "Description[x-test]": "xxThis plugin integrates Mercurial to KDevelopxx",
         "Icon": "mercurial",
         "Id": "kdevmercurial",
         "License": "GPL",
         "Name": "Mercurial Support",
+        "Name[ca]": "Implementació per a Mercurial",
+        "Name[nl]": "Ondersteuning van Mercurial",
+        "Name[pt]": "Suporte para Mercurial",
+        "Name[uk]": "Підтримка Mercurial",
+        "Name[x-test]": "xxMercurial Supportxx",
         "ServiceTypes": [
             "KDevelop/Plugin"
         ],
