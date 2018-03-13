@@ -9,7 +9,7 @@
         ],
         "Category": "Version Control",
         "Description": "This plugin integrates Mercurial to KDevelop",
-        "Description[ca@valencia]": "Este connector integra el Mercurial al KDevelop",
+        "Description[ca@valencia]": "Aquest connector integra el Mercurial al KDevelop",
         "Description[ca]": "Aquest connector integra el Mercurial al KDevelop",
         "Description[es]": "Este complemento integra Mercurial en KDevelop",
         "Description[gl]": "Este complemento integra Mercurial en KDevelop",
