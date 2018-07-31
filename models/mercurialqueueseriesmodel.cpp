@@ -18,11 +18,12 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
  ***************************************************************************/
 
+#include "mercurialqueueseriesmodel.h"
+
 #include <QStringList>
 #include <QIcon>
 
 #include <mercurialplugin.h>
-#include "mercurialqueueseriesmodel.h"
 #include <vcs/vcsjob.h>
 
 using namespace KDevelop;
