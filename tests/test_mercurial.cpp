@@ -284,7 +284,7 @@ void MercurialTest::testBranching()
     verifyJobSucceed(j);
     j = m_proxy->commit(QString("Merge default"), {QUrl::fromLocalFile(mercurialTest_BaseDir)}, KDevelop::IBasicVersionControl::Recursive);
     verifyJobSucceed(j);
-    auto commits = m_proxy->getAllCommits(mercurialTest_BaseDir);
+    auto commits = m_proxy->allCommits(mercurialTest_BaseDir);
     QCOMPARE(commits.count(), 5);
     QCOMPARE(commits[0].log(), QString("Merge default"));
     QCOMPARE(commits[0].parents().size(), 2);
@@ -296,7 +296,7 @@ void MercurialTest::testRevisionHistory()
     addFiles();
     commitFiles();
 
-    const auto commits = m_proxy->getAllCommits(mercurialTest_BaseDir);
+    const auto commits = m_proxy->allCommits(mercurialTest_BaseDir);
     QCOMPARE(commits.count(), 2);
     QCOMPARE(commits[0].parents().size(), 1); //initial commit is on the top
     QVERIFY(commits[1].parents().isEmpty());  //0 is later than 1!

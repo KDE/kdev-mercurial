@@ -676,7 +676,7 @@ VcsJob *MercurialPlugin::tag(const QUrl &repository, const QString &commitMessag
     return job;
 }
 
-QVector<DVcsEvent> MercurialPlugin::getAllCommits(const QString& repo)
+QVector<DVcsEvent> MercurialPlugin::allCommits(const QString& repo)
 {
     DVcsJob *job = new DVcsJob(findWorkingDir(QUrl::fromLocalFile(repo)), this, OutputJob::Silent);
 

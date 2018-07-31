@@ -140,7 +140,7 @@ public:
     KDevelop::VcsJob *tag(const QUrl &repository, const QString &commitMessage, const KDevelop::VcsRevision &rev, const QString &tagName) override;
 
     //graph helpers
-    QVector<KDevelop::DVcsEvent> getAllCommits(const QString& repo) override;
+    QVector<KDevelop::DVcsEvent> allCommits(const QString& repo) override;
 
     /**
      * Find out where is default remote located.
