@@ -1,0 +1,187 @@
+# Copyright (C) YEAR This_file_is_part_of_KDE
+# This file is distributed under the same license as the PACKAGE package.
+#
+# Kristof Bal <kristof.bal@gmail.com>, 2008.
+# Freek de Kruijf <freekdekruijf@kde.nl>, 2011, 2015, 2016.
+# Ronald Stroethoff <stroet43@zonnet.nl>, 2015.
+msgid ""
+msgstr ""
+"Project-Id-Version: kdevmercurial\n"
+"Report-Msgid-Bugs-To: https://bugs.kde.org\n"
+"POT-Creation-Date: 2019-05-20 03:19+0200\n"
+"PO-Revision-Date: 2016-10-17 10:37+0200\n"
+"Last-Translator: Freek de Kruijf <freekdekruijf@kde.nl>\n"
+"Language-Team: Dutch <kde-i18n-nl@kde.org>\n"
+"Language: nl\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Lokalize 1.5\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+
+#: mercurialplugin.cpp:76
+#, kde-format
+msgid "Unable to find hg executable. Is it installed on the system?"
+msgstr "Kan het hg-programma niet vinden. Is het geïnstalleerd op het systeem?"
+
+#: mercurialplugin.cpp:80
+#, kde-format
+msgid "Heads..."
+msgstr "Heads..."
+
+#: mercurialplugin.cpp:81
+#, kde-format
+msgctxt "mercurial queues submenu"
+msgid "New..."
+msgstr "Nieuw..."
+
+#: mercurialplugin.cpp:82
+#, kde-format
+msgctxt "mercurial queues submenu"
+msgid "Push"
+msgstr "Push"
+
+#: mercurialplugin.cpp:83
+#, kde-format
+msgctxt "mercurial queues submenu"
+msgid "Push All"
+msgstr "Push alles"
+
+#: mercurialplugin.cpp:84
+#, kde-format
+msgctxt "mercurial queues submenu"
+msgid "Pop"
+msgstr "Pop"
+
+#: mercurialplugin.cpp:85
+#, kde-format
+msgctxt "mercurial queues submenu"
+msgid "Pop All"
+msgstr "Pop alles"
+
+#: mercurialplugin.cpp:86
+#, kde-format
+msgctxt "mercurial queues submenu"
+msgid "Manager..."
+msgstr "Manager..."
+
+#: mercurialplugin.cpp:1035
+#, kde-format
+msgid "Mercurial Queues"
+msgstr "Wachtrijen van Mercurial"
+
+#: mercurialpushjob.cpp:85
+#, kde-format
+msgid "Enter your login and password for Mercurial push."
+msgstr "Voer uw aanmeldnaam en wachtwoord voor Mercurial push in."
+
+#: mercurialpushjob.cpp:95 mercurialpushjob.cpp:99 mercurialpushjob.cpp:102
+#: mercurialpushjob.cpp:105
+#, kde-format
+msgid "Mercurial Push Error"
+msgstr "Fout in Mercurial push"
+
+#: mercurialpushjob.cpp:95
+#, kde-format
+msgid "Remote server does not accept your SSH key."
+msgstr "Server accepteert uw SSH key niet."
+
+#: mercurialpushjob.cpp:99
+#, kde-format
+msgid "Remote server SSH fingerprint is unknown."
+msgstr "SSH fingerprint van de server is onbekend."
+
+#: mercurialpushjob.cpp:102
+#, kde-format
+msgid "Push URL is incorrect."
+msgstr "Push URL is onjuist."
+
+#: mercurialpushjob.cpp:105
+#, kde-format
+msgid "Unknown error while pushing. Please, check Version Control toolview."
+msgstr ""
+"Een onbekende fout is opgetreden tijdens het pushen. controleer het "
+"weergaveprogramma voor Version Control."
+
+#: ui/mercurialheadswidget.cpp:44
+#, kde-format
+msgid "Mercurial Heads (%1)"
+msgstr "Mercurial Heads (%1)"
+
+#. i18n: ectx: property (text), widget (QPushButton, checkoutPushButton)
+#: ui/mercurialheadswidget.ui:44
+#, kde-format
+msgid "Checkout"
+msgstr "Checkout"
+
+#. i18n: ectx: property (text), widget (QPushButton, mergePushButton)
+#: ui/mercurialheadswidget.ui:51
+#, kde-format
+msgid "Merge into Current"
+msgstr "Samenvoegen met huidig"
+
+#. i18n: ectx: property (text), widget (QPushButton, closePushButton)
+#: ui/mercurialheadswidget.ui:71
+#, kde-format
+msgid "Close"
+msgstr "Sluiten"
+
+#. i18n: ectx: property (windowTitle), widget (QWidget, MercurialManagerWidget)
+#: ui/mercurialqueuesmanager.ui:14
+#, kde-format
+msgid "Mercurial Queues Manager"
+msgstr "Wachtrijbeheerder van Mercurial"
+
+#. i18n: ectx: property (text), widget (QPushButton, insertPushButton)
+#: ui/mercurialqueuesmanager.ui:41
+#, kde-format
+msgid "Insert..."
+msgstr "Invoegen..."
+
+#. i18n: ectx: property (text), widget (QPushButton, pushPushButton)
+#: ui/mercurialqueuesmanager.ui:61
+#, kde-format
+msgid "Push"
+msgstr "Push"
+
+#. i18n: ectx: property (text), widget (QPushButton, pushAllPushButton)
+#: ui/mercurialqueuesmanager.ui:68
+#, kde-format
+msgid "Push All"
+msgstr "Push alles"
+
+#. i18n: ectx: property (text), widget (QPushButton, popPushButton)
+#: ui/mercurialqueuesmanager.ui:88
+#, kde-format
+msgid "Pop"
+msgstr "Pop"
+
+#. i18n: ectx: property (text), widget (QPushButton, popAllPushButton)
+#: ui/mercurialqueuesmanager.ui:95
+#, kde-format
+msgid "Pop All"
+msgstr "Pop alles"
+
+#. i18n: ectx: property (text), widget (QPushButton, removePushButton)
+#: ui/mercurialqueuesmanager.ui:118
+#, kde-format
+msgid "Remove"
+msgstr "Verwijderen"
+
+#~ msgctxt "NAME OF TRANSLATORS"
+#~ msgid "Your names"
+#~ msgstr "Freek de Kruijf,Ronald Stroethoff"
+
+#~ msgctxt "EMAIL OF TRANSLATORS"
+#~ msgid "Your emails"
+#~ msgstr "freekdekruijf@kde.nl,stroet43@zonnet.nl"
+
+#~ msgctxt "@title:menu"
+#~ msgid "Mercurial"
+#~ msgstr "Mercurial"
+
+#~ msgid "Mercurial"
+#~ msgstr "Mercurial"
+
+#~ msgid "A plugin to support Mercurial version control systems"
+#~ msgstr "Een plugin voor ondersteuning van het versiebeheersysteem Mercurial"

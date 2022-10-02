@@ -1,0 +1,202 @@
+# translation of kdevmercurial.po to
+# translation of kdevelop.po to
+# Version: $Revision$
+# KDevelop polish translation file.
+# Translation work:
+#       Jacek Wojdeł <wojdel@kbs.twi.tudelft.nl>
+# Corrections:
+#       Waldemar Kochaniec
+#       Jacek Stolarczyk
+#       Anna Wojdeł <ania@kbs.twi.tudelft.nl>
+#
+# Krzysztof Lichota, 2004.
+# Marta Rybczyńska <mrybczynsk@poczta.onet.pl>, 2003, 2004.
+# Marta Rybczynska <mrybczynska@poczta.onet.pl>, 2004, 2005.
+# Michal Rudolf <mrudolf@kdewebdev.org>, 2004, 2005.
+# Krzysztof Lichota <lichota@mimuw.edu.pl>, 2005, 2006, 2007.
+# Marta Rybczyńska <kde-i18n@rybczynska.net>, 2007, 2008.
+# Michał Smoczyk <msmoczyk@wp.pl>, 2008.
+# Łukasz Wojniłowicz <lukasz.wojnilowicz@gmail.com>, 2011, 2019.
+msgid ""
+msgstr ""
+"Project-Id-Version: kdevmercurial\n"
+"Report-Msgid-Bugs-To: https://bugs.kde.org\n"
+"POT-Creation-Date: 2019-05-20 03:19+0200\n"
+"PO-Revision-Date: 2019-02-03 07:44+0100\n"
+"Last-Translator: Łukasz Wojniłowicz <lukasz.wojnilowicz@gmail.com>\n"
+"Language-Team: Polish <kde-i18n-doc@kde.org>\n"
+"Language: pl\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Lokalize 19.03.70\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
+"|| n%100>=20) ? 1 : 2);\n"
+
+#: mercurialplugin.cpp:76
+#, kde-format
+msgid "Unable to find hg executable. Is it installed on the system?"
+msgstr ""
+"Nie można znaleźć pliku wykonywalnego hg. Czy został on wgrany do systemu?"
+
+#: mercurialplugin.cpp:80
+#, kde-format
+msgid "Heads..."
+msgstr "Heads..."
+
+#: mercurialplugin.cpp:81
+#, kde-format
+msgctxt "mercurial queues submenu"
+msgid "New..."
+msgstr "Nowy..."
+
+#: mercurialplugin.cpp:82
+#, kde-format
+msgctxt "mercurial queues submenu"
+msgid "Push"
+msgstr "Popchnij"
+
+#: mercurialplugin.cpp:83
+#, kde-format
+msgctxt "mercurial queues submenu"
+msgid "Push All"
+msgstr "Popchnij wszystko"
+
+#: mercurialplugin.cpp:84
+#, kde-format
+msgctxt "mercurial queues submenu"
+msgid "Pop"
+msgstr "Pobierz"
+
+#: mercurialplugin.cpp:85
+#, kde-format
+msgctxt "mercurial queues submenu"
+msgid "Pop All"
+msgstr "Pobierz wszystko"
+
+#: mercurialplugin.cpp:86
+#, kde-format
+msgctxt "mercurial queues submenu"
+msgid "Manager..."
+msgstr "Menedżer..."
+
+#: mercurialplugin.cpp:1035
+#, kde-format
+msgid "Mercurial Queues"
+msgstr "Kolejki Mercurial"
+
+#: mercurialpushjob.cpp:85
+#, kde-format
+msgid "Enter your login and password for Mercurial push."
+msgstr "Wpisz swój login i hasło dla popchnięcia Mercurial."
+
+#: mercurialpushjob.cpp:95 mercurialpushjob.cpp:99 mercurialpushjob.cpp:102
+#: mercurialpushjob.cpp:105
+#, kde-format
+msgid "Mercurial Push Error"
+msgstr "Błąd popchnięcia Mercurial"
+
+#: mercurialpushjob.cpp:95
+#, kde-format
+msgid "Remote server does not accept your SSH key."
+msgstr "Zdalny serwer nie akceptuje twojego klucza SSH."
+
+#: mercurialpushjob.cpp:99
+#, kde-format
+msgid "Remote server SSH fingerprint is unknown."
+msgstr "Odcisk palca zdalnego serwera SSH jest nieznany."
+
+#: mercurialpushjob.cpp:102
+#, kde-format
+msgid "Push URL is incorrect."
+msgstr "Adres URL popchnięcia jest niepoprawny."
+
+#: mercurialpushjob.cpp:105
+#, kde-format
+msgid "Unknown error while pushing. Please, check Version Control toolview."
+msgstr ""
+"Nieznany błąd podczas popychania. Proszę sprawdzić widok narzędzia kontroli "
+"wersji."
+
+#: ui/mercurialheadswidget.cpp:44
+#, kde-format
+msgid "Mercurial Heads (%1)"
+msgstr "Mercurial Heads (%1)"
+
+#. i18n: ectx: property (text), widget (QPushButton, checkoutPushButton)
+#: ui/mercurialheadswidget.ui:44
+#, kde-format
+msgid "Checkout"
+msgstr "Sprawdzenie"
+
+#. i18n: ectx: property (text), widget (QPushButton, mergePushButton)
+#: ui/mercurialheadswidget.ui:51
+#, kde-format
+msgid "Merge into Current"
+msgstr "Scal z bieżącym"
+
+#. i18n: ectx: property (text), widget (QPushButton, closePushButton)
+#: ui/mercurialheadswidget.ui:71
+#, kde-format
+msgid "Close"
+msgstr "Zamknij"
+
+#. i18n: ectx: property (windowTitle), widget (QWidget, MercurialManagerWidget)
+#: ui/mercurialqueuesmanager.ui:14
+#, kde-format
+msgid "Mercurial Queues Manager"
+msgstr "Menadżer kolejek Mercurial"
+
+#. i18n: ectx: property (text), widget (QPushButton, insertPushButton)
+#: ui/mercurialqueuesmanager.ui:41
+#, kde-format
+msgid "Insert..."
+msgstr "Wstaw..."
+
+#. i18n: ectx: property (text), widget (QPushButton, pushPushButton)
+#: ui/mercurialqueuesmanager.ui:61
+#, kde-format
+msgid "Push"
+msgstr "Popchnij"
+
+#. i18n: ectx: property (text), widget (QPushButton, pushAllPushButton)
+#: ui/mercurialqueuesmanager.ui:68
+#, kde-format
+msgid "Push All"
+msgstr "Popchnij wszystko"
+
+#. i18n: ectx: property (text), widget (QPushButton, popPushButton)
+#: ui/mercurialqueuesmanager.ui:88
+#, kde-format
+msgid "Pop"
+msgstr "Pobierz"
+
+#. i18n: ectx: property (text), widget (QPushButton, popAllPushButton)
+#: ui/mercurialqueuesmanager.ui:95
+#, kde-format
+msgid "Pop All"
+msgstr "Pobierz wszystko"
+
+#. i18n: ectx: property (text), widget (QPushButton, removePushButton)
+#: ui/mercurialqueuesmanager.ui:118
+#, kde-format
+msgid "Remove"
+msgstr "Usuń"
+
+#~ msgctxt "NAME OF TRANSLATORS"
+#~ msgid "Your names"
+#~ msgstr "Łukasz Wojniłowicz"
+
+#~ msgctxt "EMAIL OF TRANSLATORS"
+#~ msgid "Your emails"
+#~ msgstr "lukasz.wojnilowicz@gmail.com"
+
+#~ msgctxt "@title:menu"
+#~ msgid "Mercurial"
+#~ msgstr "Mercurial"
+
+#~ msgid "Mercurial"
+#~ msgstr "Mercurial"
+
+#~ msgid "A plugin to support Mercurial version control systems"
+#~ msgstr "Wtyczka obsługująca system kontroli wersji Mercurial"

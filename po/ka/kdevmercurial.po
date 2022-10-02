@@ -1,0 +1,166 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR This file is copyright:
+# This file is distributed under the same license as the kdev-mercurial package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: kdev-mercurial\n"
+"Report-Msgid-Bugs-To: https://bugs.kde.org\n"
+"POT-Creation-Date: 2019-05-20 03:19+0200\n"
+"PO-Revision-Date: 2022-05-23 08:17+0200\n"
+"Last-Translator: Temuri Doghonadze <temuri.doghonadze@gmail.com>\n"
+"Language-Team: Georgian <kde-i18n-doc@kde.org>\n"
+"Language: ka\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.0.1\n"
+
+#: mercurialplugin.cpp:76
+#, kde-format
+msgid "Unable to find hg executable. Is it installed on the system?"
+msgstr "Mercurial-ის გამშვები ფაილის(hg) პოვნა შეუძლებელია. გიყენიათ?"
+
+#: mercurialplugin.cpp:80
+#, kde-format
+msgid "Heads..."
+msgstr "ჰედები..."
+
+#: mercurialplugin.cpp:81
+#, kde-format
+msgctxt "mercurial queues submenu"
+msgid "New..."
+msgstr "ახალი..."
+
+#: mercurialplugin.cpp:82
+#, kde-format
+msgctxt "mercurial queues submenu"
+msgid "Push"
+msgstr "გადაცემა"
+
+#: mercurialplugin.cpp:83
+#, kde-format
+msgctxt "mercurial queues submenu"
+msgid "Push All"
+msgstr "ყველას გადაცემა"
+
+#: mercurialplugin.cpp:84
+#, kde-format
+msgctxt "mercurial queues submenu"
+msgid "Pop"
+msgstr "პოპი"
+
+#: mercurialplugin.cpp:85
+#, kde-format
+msgctxt "mercurial queues submenu"
+msgid "Pop All"
+msgstr "ყველას პოპი"
+
+#: mercurialplugin.cpp:86
+#, kde-format
+msgctxt "mercurial queues submenu"
+msgid "Manager..."
+msgstr "მმართველი..."
+
+#: mercurialplugin.cpp:1035
+#, kde-format
+msgid "Mercurial Queues"
+msgstr "Mercurial-ის რიგები"
+
+#: mercurialpushjob.cpp:85
+#, kde-format
+msgid "Enter your login and password for Mercurial push."
+msgstr "Mercurial-ის გადაცემისთვის მომხმარებლისა და პაროლის შეყვანაა საჭირო."
+
+#: mercurialpushjob.cpp:95 mercurialpushjob.cpp:99 mercurialpushjob.cpp:102
+#: mercurialpushjob.cpp:105
+#, kde-format
+msgid "Mercurial Push Error"
+msgstr "Mercurial-ზე გადაცემის შეცდომა"
+
+#: mercurialpushjob.cpp:95
+#, kde-format
+msgid "Remote server does not accept your SSH key."
+msgstr "დაშორებულ სერვერს თქვენი SSH გასაღები არ მოსწონს."
+
+#: mercurialpushjob.cpp:99
+#, kde-format
+msgid "Remote server SSH fingerprint is unknown."
+msgstr "დაშორებული სერვერის SSH ანაბეჭდი უცნობია."
+
+#: mercurialpushjob.cpp:102
+#, kde-format
+msgid "Push URL is incorrect."
+msgstr "გადაცემის URL არასწორია."
+
+#: mercurialpushjob.cpp:105
+#, kde-format
+msgid "Unknown error while pushing. Please, check Version Control toolview."
+msgstr "უცნობი შეცდომა გადაცემისას. გადაამოწმეთ ვერსიის კონტროლი."
+
+#: ui/mercurialheadswidget.cpp:44
+#, kde-format
+msgid "Mercurial Heads (%1)"
+msgstr "Mercurial-ის ჰედები (%1)"
+
+#. i18n: ectx: property (text), widget (QPushButton, checkoutPushButton)
+#: ui/mercurialheadswidget.ui:44
+#, kde-format
+msgid "Checkout"
+msgstr "წამოღება"
+
+#. i18n: ectx: property (text), widget (QPushButton, mergePushButton)
+#: ui/mercurialheadswidget.ui:51
+#, kde-format
+msgid "Merge into Current"
+msgstr "მიმდინარეში შერწყმა"
+
+#. i18n: ectx: property (text), widget (QPushButton, closePushButton)
+#: ui/mercurialheadswidget.ui:71
+#, kde-format
+msgid "Close"
+msgstr "დახურვა"
+
+#. i18n: ectx: property (windowTitle), widget (QWidget, MercurialManagerWidget)
+#: ui/mercurialqueuesmanager.ui:14
+#, kde-format
+msgid "Mercurial Queues Manager"
+msgstr "Mercurial-ის რიგების მმართველი"
+
+#. i18n: ectx: property (text), widget (QPushButton, insertPushButton)
+#: ui/mercurialqueuesmanager.ui:41
+#, kde-format
+msgid "Insert..."
+msgstr "ჩასმა..."
+
+#. i18n: ectx: property (text), widget (QPushButton, pushPushButton)
+#: ui/mercurialqueuesmanager.ui:61
+#, kde-format
+msgid "Push"
+msgstr "გადაცემა"
+
+#. i18n: ectx: property (text), widget (QPushButton, pushAllPushButton)
+#: ui/mercurialqueuesmanager.ui:68
+#, kde-format
+msgid "Push All"
+msgstr "ყველას გადაცემა"
+
+#. i18n: ectx: property (text), widget (QPushButton, popPushButton)
+#: ui/mercurialqueuesmanager.ui:88
+#, kde-format
+msgid "Pop"
+msgstr "პოპი"
+
+#. i18n: ectx: property (text), widget (QPushButton, popAllPushButton)
+#: ui/mercurialqueuesmanager.ui:95
+#, kde-format
+msgid "Pop All"
+msgstr "ყველას პოპი"
+
+#. i18n: ectx: property (text), widget (QPushButton, removePushButton)
+#: ui/mercurialqueuesmanager.ui:118
+#, kde-format
+msgid "Remove"
+msgstr "წაშლა"
