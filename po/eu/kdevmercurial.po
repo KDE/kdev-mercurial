@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: kdev-mercurial\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
 "POT-Creation-Date: 2019-05-20 03:19+0200\n"
-"PO-Revision-Date: 2023-02-10 23:18+0100\n"
+"PO-Revision-Date: 2023-08-29 08:57+0200\n"
 "Last-Translator: Iñigo Salvador Azurmendi <xalba@ni.eus>\n"
 "Language-Team: Basque <kde-i18n-eu@kde.org>\n"
 "Language: eu\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Lokalize 22.12.2\n"
+"X-Generator: Lokalize 23.04.3\n"
 
 #: mercurialplugin.cpp:76
 #, kde-format
@@ -52,13 +52,13 @@ msgstr "Bultzatu dena"
 #, kde-format
 msgctxt "mercurial queues submenu"
 msgid "Pop"
-msgstr ""
+msgstr "Eskuratu («pop»)"
 
 #: mercurialplugin.cpp:85
 #, kde-format
 msgctxt "mercurial queues submenu"
 msgid "Pop All"
-msgstr ""
+msgstr "Eskuratu dena («pop all»)"
 
 #: mercurialplugin.cpp:86
 #, kde-format
@@ -69,18 +69,18 @@ msgstr "Kudeatzailea..."
 #: mercurialplugin.cpp:1035
 #, kde-format
 msgid "Mercurial Queues"
-msgstr ""
+msgstr "«Mercurial»en ilarak"
 
 #: mercurialpushjob.cpp:85
 #, kde-format
 msgid "Enter your login and password for Mercurial push."
-msgstr ""
+msgstr "Sartu zure saio-hasiera eta pasahitza «Mercurial» bultzatzeko."
 
 #: mercurialpushjob.cpp:95 mercurialpushjob.cpp:99 mercurialpushjob.cpp:102
 #: mercurialpushjob.cpp:105
 #, kde-format
 msgid "Mercurial Push Error"
-msgstr ""
+msgstr "«Mercurial» bultzatze errorea"
 
 #: mercurialpushjob.cpp:95
 #, kde-format
@@ -95,29 +95,30 @@ msgstr "Urruneko zerbitzariaren SSH hatz-marka ezezaguna da."
 #: mercurialpushjob.cpp:102
 #, kde-format
 msgid "Push URL is incorrect."
-msgstr ""
+msgstr "Bultzatzeko URL okerra da."
 
 #: mercurialpushjob.cpp:105
 #, kde-format
 msgid "Unknown error while pushing. Please, check Version Control toolview."
 msgstr ""
+"Errore ezezaguna bultzatzean. Mesedez, ikuskatu bertsio kontrol tresna-barra."
 
 #: ui/mercurialheadswidget.cpp:44
 #, kde-format
 msgid "Mercurial Heads (%1)"
-msgstr ""
+msgstr "«Mercurial»en buruak (%1)"
 
 #. i18n: ectx: property (text), widget (QPushButton, checkoutPushButton)
 #: ui/mercurialheadswidget.ui:44
 #, kde-format
 msgid "Checkout"
-msgstr ""
+msgstr "Atera"
 
 #. i18n: ectx: property (text), widget (QPushButton, mergePushButton)
 #: ui/mercurialheadswidget.ui:51
 #, kde-format
 msgid "Merge into Current"
-msgstr ""
+msgstr "Bateratu unekoan"
 
 #. i18n: ectx: property (text), widget (QPushButton, closePushButton)
 #: ui/mercurialheadswidget.ui:71
@@ -153,13 +154,13 @@ msgstr "Bultzatu dena"
 #: ui/mercurialqueuesmanager.ui:88
 #, kde-format
 msgid "Pop"
-msgstr ""
+msgstr "Eskuratu («pop»)"
 
 #. i18n: ectx: property (text), widget (QPushButton, popAllPushButton)
 #: ui/mercurialqueuesmanager.ui:95
 #, kde-format
 msgid "Pop All"
-msgstr ""
+msgstr "Eskuratu dena («pop all»)"
 
 #. i18n: ectx: property (text), widget (QPushButton, removePushButton)
 #: ui/mercurialqueuesmanager.ui:118
