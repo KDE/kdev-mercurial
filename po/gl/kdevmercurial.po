@@ -23,7 +23,7 @@ msgstr ""
 #: mercurialplugin.cpp:76
 #, kde-format
 msgid "Unable to find hg executable. Is it installed on the system?"
-msgstr "Non se pode atopar o executábel de hg. Está instalado no sistema?"
+msgstr "Non é posíbel atopar o executábel de hg. Está instalado no sistema?"
 
 #: mercurialplugin.cpp:80
 #, kde-format
