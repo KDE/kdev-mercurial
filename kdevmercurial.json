@@ -29,6 +29,7 @@
                 "Name[sv]": "Andrey Batyiev",
                 "Name[tr]": "Andrey Batyiev",
                 "Name[uk]": "Andrey Batyiev",
+                "Name[x-test]": "xxAndrey Batyievxx",
                 "Name[zh_TW]": "Andrey Batyiev-"
             }
         ],
@@ -59,6 +60,7 @@
         "Description[sv]": "Insticksprogrammet integrerar Mercurial i KDevelop",
         "Description[tr]": "Bu eklenti, Mercurial'ı K Geliştir ile bütünleştirir",
         "Description[uk]": "За допомогою цього додатка можна інтегрувати Mercurial до KDevelop",
+        "Description[x-test]": "xxThis plugin integrates Mercurial to KDevelopxx",
         "Description[zh_TW]": "此外掛程式將 Mercurial 整合進 KDevelop 中",
         "Icon": "mercurial",
         "Id": "kdevmercurial",
@@ -90,6 +92,7 @@
         "Name[sv]": "Mercurial-stöd",
         "Name[tr]": "Mercurial Desteği",
         "Name[uk]": "Підтримка Mercurial",
+        "Name[x-test]": "xxMercurial Supportxx",
         "Name[zh_TW]": "Mercurial 支援",
         "ServiceTypes": [
             "KDevelop/Plugin"
