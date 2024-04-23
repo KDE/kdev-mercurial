@@ -7,3 +7,6 @@ Dependencies:
     'frameworks/extra-cmake-modules': '@stable'
     'frameworks/ki18n': '@stable'
     'kdevelop/kdevelop': '@stable'
+
+Options:
+  require-passing-tests-on: ['Linux', 'FreeBSD', 'Windows']
