@@ -31,13 +31,13 @@ msgstr ""
 #: mercurialplugin.cpp:80
 #, kde-format
 msgid "Heads..."
-msgstr "Capçaleres..."
+msgstr "Capçaleres…"
 
 #: mercurialplugin.cpp:81
 #, kde-format
 msgctxt "mercurial queues submenu"
 msgid "New..."
-msgstr "Nova..."
+msgstr "Nova…"
 
 #: mercurialplugin.cpp:82
 #, kde-format
@@ -67,7 +67,7 @@ msgstr "Recupera-ho tot («pop all»)"
 #, kde-format
 msgctxt "mercurial queues submenu"
 msgid "Manager..."
-msgstr "Gestor..."
+msgstr "Gestor…"
 
 #: mercurialplugin.cpp:1035
 #, kde-format
@@ -140,7 +140,7 @@ msgstr "Gestor de cues de Mercurial"
 #: ui/mercurialqueuesmanager.ui:41
 #, kde-format
 msgid "Insert..."
-msgstr "Inserix..."
+msgstr "Inserix…"
 
 #. i18n: ectx: property (text), widget (QPushButton, pushPushButton)
 #: ui/mercurialqueuesmanager.ui:61
