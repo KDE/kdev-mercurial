@@ -4,6 +4,7 @@
             {
                 "Email": "batyiev@gmail.com",
                 "Name": "Andrey Batyiev",
+                "Name[ar]": "أندري باتييف",
                 "Name[ca@valencia]": "Andrey Batyiev",
                 "Name[ca]": "Andrey Batyiev",
                 "Name[cs]": "Andrey Batyiev",
@@ -35,6 +36,7 @@
         ],
         "Category": "Version Control",
         "Description": "This plugin integrates Mercurial to KDevelop",
+        "Description[ar]": "تكامل هذه الملحقة Mercurial بِمطوّرك",
         "Description[ca@valencia]": "Este connector integra Mercurial a KDevelop",
         "Description[ca]": "Aquest connector integra el Mercurial al KDevelop",
         "Description[cs]": "Tento modul integruje podporu pro Mercurial v KDevelop",
@@ -66,6 +68,7 @@
         "Id": "kdevmercurial",
         "License": "GPL",
         "Name": "Mercurial Support",
+        "Name[ar]": "إتاحة Mercurial",
         "Name[ca@valencia]": "Implementació de Mercurial",
         "Name[ca]": "Implementació del Mercurial",
         "Name[cs]": "Podpora pro Mercurial",
