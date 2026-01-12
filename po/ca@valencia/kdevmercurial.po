@@ -83,7 +83,7 @@ msgstr "Introduïu el vostre usuari i contrasenya per a entregar a Mercurial."
 #: mercurialpushjob.cpp:105
 #, kde-format
 msgid "Mercurial Push Error"
-msgstr "S'ha produït un error en entregar a Mercurial"
+msgstr "S'ha produït un error mentre s'entregava a Mercurial"
 
 #: mercurialpushjob.cpp:95
 #, kde-format
