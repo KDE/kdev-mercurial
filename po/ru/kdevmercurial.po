@@ -2,13 +2,14 @@
 # This file is distributed under the same license as the PACKAGE package.
 #
 # Alexander Potashev <aspotashev@gmail.com>, 2017.
+# SPDX-FileCopyrightText: 2026 Alexander Yavorskiy <kekcuha@gmail.com>
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
 "POT-Creation-Date: 2025-11-17 09:00+0000\n"
-"PO-Revision-Date: 2017-12-14 14:30+0300\n"
-"Last-Translator: Alexander Potashev <aspotashev@gmail.com>\n"
+"PO-Revision-Date: 2026-02-14 22:22+0200\n"
+"Last-Translator: Alexander Yavorskiy <kekcuha@gmail.com>\n"
 "Language-Team: Russian <kde-russian@lists.kde.ru>\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -16,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=4; plural=n==1 ? 3 : n%10==1 && n%100!=11 ? 0 : n"
 "%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Generator: Lokalize 2.0\n"
+"X-Generator: Lokalize 25.12.2\n"
 
 #: mercurialplugin.cpp:76
 #, kde-format
@@ -28,141 +29,142 @@ msgstr ""
 #: mercurialplugin.cpp:80
 #, kde-format
 msgid "Heads..."
-msgstr ""
+msgstr "Ветки…"
 
 #: mercurialplugin.cpp:81
 #, kde-format
 msgctxt "mercurial queues submenu"
 msgid "New..."
-msgstr ""
+msgstr "Создать…"
 
 #: mercurialplugin.cpp:82
 #, kde-format
 msgctxt "mercurial queues submenu"
 msgid "Push"
-msgstr ""
+msgstr "Отправить"
 
 #: mercurialplugin.cpp:83
 #, kde-format
 msgctxt "mercurial queues submenu"
 msgid "Push All"
-msgstr ""
+msgstr "Отправить все"
 
 #: mercurialplugin.cpp:84
 #, kde-format
 msgctxt "mercurial queues submenu"
 msgid "Pop"
-msgstr ""
+msgstr "Извлечь"
 
 #: mercurialplugin.cpp:85
 #, kde-format
 msgctxt "mercurial queues submenu"
 msgid "Pop All"
-msgstr ""
+msgstr "Удалить все"
 
 #: mercurialplugin.cpp:86
 #, kde-format
 msgctxt "mercurial queues submenu"
 msgid "Manager..."
-msgstr ""
+msgstr "Управление…"
 
 #: mercurialplugin.cpp:1035
 #, kde-format
 msgid "Mercurial Queues"
-msgstr ""
+msgstr "Очереди Mercurial"
 
 #: mercurialpushjob.cpp:85
 #, kde-format
 msgid "Enter your login and password for Mercurial push."
-msgstr ""
+msgstr "Введите имя пользователя и пароль для отправки изменений в Mercurial."
 
 #: mercurialpushjob.cpp:95 mercurialpushjob.cpp:99 mercurialpushjob.cpp:102
 #: mercurialpushjob.cpp:105
 #, kde-format
 msgid "Mercurial Push Error"
-msgstr ""
+msgstr "Ошибка отправки в Mercurial"
 
 #: mercurialpushjob.cpp:95
 #, kde-format
 msgid "Remote server does not accept your SSH key."
-msgstr ""
+msgstr "Удалённый сервер не принимает ваш ключ SSH."
 
 #: mercurialpushjob.cpp:99
 #, kde-format
 msgid "Remote server SSH fingerprint is unknown."
-msgstr ""
+msgstr "Отпечаток SSH удалённого сервера неизвестен."
 
 #: mercurialpushjob.cpp:102
 #, kde-format
 msgid "Push URL is incorrect."
-msgstr ""
+msgstr "Неверный URL для отправки."
 
 #: mercurialpushjob.cpp:105
 #, kde-format
 msgid "Unknown error while pushing. Please, check Version Control toolview."
 msgstr ""
+"Ошибка отправки изменений. Проверьте представление «Управление версиями»."
 
 #: ui/mercurialheadswidget.cpp:44
 #, kde-format
 msgid "Mercurial Heads (%1)"
-msgstr ""
+msgstr "Ветки Mercurial (%1)"
 
 #. i18n: ectx: property (text), widget (QPushButton, checkoutPushButton)
 #: ui/mercurialheadswidget.ui:44
 #, kde-format
 msgid "Checkout"
-msgstr ""
+msgstr "Извлечь"
 
 #. i18n: ectx: property (text), widget (QPushButton, mergePushButton)
 #: ui/mercurialheadswidget.ui:51
 #, kde-format
 msgid "Merge into Current"
-msgstr ""
+msgstr "Слияние с текущей"
 
 #. i18n: ectx: property (text), widget (QPushButton, closePushButton)
 #: ui/mercurialheadswidget.ui:71
 #, kde-format
 msgid "Close"
-msgstr ""
+msgstr "Закрыть"
 
 #. i18n: ectx: property (windowTitle), widget (QWidget, MercurialManagerWidget)
 #: ui/mercurialqueuesmanager.ui:14
 #, kde-format
 msgid "Mercurial Queues Manager"
-msgstr ""
+msgstr "Управление очередями Mercurial"
 
 #. i18n: ectx: property (text), widget (QPushButton, insertPushButton)
 #: ui/mercurialqueuesmanager.ui:41
 #, kde-format
 msgid "Insert..."
-msgstr ""
+msgstr "Вставить…"
 
 #. i18n: ectx: property (text), widget (QPushButton, pushPushButton)
 #: ui/mercurialqueuesmanager.ui:61
 #, kde-format
 msgid "Push"
-msgstr ""
+msgstr "Отправить"
 
 #. i18n: ectx: property (text), widget (QPushButton, pushAllPushButton)
 #: ui/mercurialqueuesmanager.ui:68
 #, kde-format
 msgid "Push All"
-msgstr ""
+msgstr "Отправить всё"
 
 #. i18n: ectx: property (text), widget (QPushButton, popPushButton)
 #: ui/mercurialqueuesmanager.ui:88
 #, kde-format
 msgid "Pop"
-msgstr ""
+msgstr "Извлечь"
 
 #. i18n: ectx: property (text), widget (QPushButton, popAllPushButton)
 #: ui/mercurialqueuesmanager.ui:95
 #, kde-format
 msgid "Pop All"
-msgstr ""
+msgstr "Извлечь все"
 
 #. i18n: ectx: property (text), widget (QPushButton, removePushButton)
 #: ui/mercurialqueuesmanager.ui:118
 #, kde-format
 msgid "Remove"
-msgstr ""
+msgstr "Удалить"
